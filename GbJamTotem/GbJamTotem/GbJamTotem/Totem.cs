@@ -22,6 +22,7 @@ namespace GbJamTotem
 		public int AmountOfNormalSections
 		{
 			get { return m_amountOfNormalSections; }
+			set { m_amountOfNormalSections = value; }
 		}
 
 		public Totem()
@@ -98,8 +99,9 @@ namespace GbJamTotem
 	class TotemSection : GameObject
 	{
 		const float Mass = 10.0f;
-		const float Bounciness = 0.5f;
-		
+		const float Bounciness = 0.3f;
+		const int PerspectiveOffset = 5;
+
 		PhysicsComponent m_physics;
 		Totem m_totemInstance = null;
 		TotemSection m_above = null;
@@ -107,17 +109,18 @@ namespace GbJamTotem
 
 		public float Top
 		{
-			get { return m_transform.PosY - m_sprite.Height * m_transform.SclY * m_sprite.Origin.Y; }
+			get { return m_transform.PosY - m_sprite.Height * m_transform.SclY * m_sprite.Origin.Y + PerspectiveOffset; }
 		}
 
 		public TotemSection()
 			: base()
 		{
-			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totemsection"), m_transform);
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
 			m_sprite.Origin = new Vector2(0.5f, 1.0f);
 			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
+			m_transform.PosX = 0.5f;
 		}
 
 		public void PlaceOnTotem(Totem totem, TotemSection sectionAbove, TotemSection sectionBelow)

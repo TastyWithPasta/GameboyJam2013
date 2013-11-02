@@ -33,9 +33,10 @@ namespace GbJamTotem
 
 		Color m_bgColor = new Color(239, 255, 222);
 		GameboyDrawer m_drawer;
+		Totem m_totem;
 
 		public Game1()
-			: base(720, 648)
+			: base(800, 720)
 		{
 			Particles = new ParticleSystem(this, 100);
 		}
@@ -57,13 +58,19 @@ namespace GbJamTotem
             m_drawer = new GameboyDrawer(this);
             GameCamera = new Camera2D(new Vector2(GameboyWidth * 0.5f, GameboyHeight * 0.5f));
             GameCamera.ScaleToZoom = true;
-            GameCamera.Transform.PosY = -30;
+            
 
             // Player initialisation
             //
             climbingAltitude = new Transform();
             climbingAltitude.PosY = -200;
             player = new Player(new Vector2(-50, 0), climbingAltitude);
+
+			// Totem
+			//
+			m_totem = new Totem();
+			m_totem.AmountOfNormalSections = 30;
+			m_totem.Build();
 
             // Background textures
             //
@@ -103,6 +110,7 @@ namespace GbJamTotem
 				GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
 
             player.Update();
+			m_totem.Update();
 
 			GameCamera.Update();
 
@@ -126,6 +134,7 @@ namespace GbJamTotem
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             floorBackground.Draw();
 			Particles.Draw();
+			m_totem.Draw();
             player.Draw();
 			SpriteBatch.End();
 
