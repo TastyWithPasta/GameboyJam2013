@@ -1,2 +1,2 @@
 J'aime le pommes.
-Ryuk ne doit pas être très loin...
+et les poires aussi.
