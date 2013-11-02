@@ -22,6 +22,11 @@ namespace GbJamTotem
 		}
 		public void Build()
 		{ }
+
+		public override void Update()
+		{ }
+		public override void Draw()
+		{ }
 	}
 	class TotemSection : GameObject
 	{
