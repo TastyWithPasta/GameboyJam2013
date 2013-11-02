@@ -28,6 +28,8 @@ namespace GbJamTotem
         public static Player player;
 
         Sprite floorBackground;
+        Transform initialPosition;
+        Transform climbingAltitude;
 
 		Color m_bgColor = new Color(239, 255, 222);
 		GameboyDrawer m_drawer;
@@ -59,7 +61,9 @@ namespace GbJamTotem
 
             // Player initialisation
             //
-            player = new Player(new Vector2(-50, 0));
+            climbingAltitude = new Transform();
+            climbingAltitude.PosY = -200;
+            player = new Player(new Vector2(-50, 0), climbingAltitude);
 
             // Background textures
             //
@@ -101,6 +105,8 @@ namespace GbJamTotem
             player.Update();
 
 			GameCamera.Update();
+
+            GameCamera.Transform.Position = player.Transform.Position;
 
 			Particles.Update();
 			base.Update(gameTime);
