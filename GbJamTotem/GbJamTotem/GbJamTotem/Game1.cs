@@ -26,6 +26,7 @@ namespace GbJamTotem
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
         public static Player player;
+		
 
         Sprite floorBackground;
         Transform initialPosition;
@@ -34,6 +35,9 @@ namespace GbJamTotem
 		Color m_bgColor = new Color(239, 255, 222);
 		GameboyDrawer m_drawer;
 		Totem m_totem;
+
+		public static DrawingList Foreground = new DrawingList();
+
 
 		public Game1()
 			: base(800, 720)
@@ -71,6 +75,8 @@ namespace GbJamTotem
 			m_totem = new Totem();
 			m_totem.AmountOfNormalSections = 30;
 			m_totem.Build();
+
+			player.Initialise(m_totem);
 
             // Background textures
             //
