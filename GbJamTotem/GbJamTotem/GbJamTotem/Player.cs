@@ -12,7 +12,7 @@ namespace GbJamTotem
     {
 		const float BasePlayerSpeed = 50.0f;
 		const float BasePushForce = 4.0f;
-		const float SlashDuration = 0.4f;
+		const float SlashDuration = 0.2f;
 		const float CollisionDelayDuration = SlashDuration * 0.4f;
 
 		Totem m_totemInstance;
