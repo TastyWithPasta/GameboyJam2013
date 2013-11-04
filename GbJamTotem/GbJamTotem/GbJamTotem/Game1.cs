@@ -22,6 +22,8 @@ namespace GbJamTotem
 		public const int GameboyHeight = 144;
 		public const int CameraOffset = 50;
 
+        public const int screenZoom = 3;
+
 		public static Random Random = new Random();
 		public static ParticleSystem Particles;
 		public static Camera2D GameCamera;
@@ -44,7 +46,7 @@ namespace GbJamTotem
 
 
 		public Game1()
-			: base(160, 144)
+            : base(160 * screenZoom, 144 * screenZoom)
 		{
 			Particles = new ParticleSystem(this, 100);
 		}
@@ -167,6 +169,16 @@ namespace GbJamTotem
 			// End drawing
             //
 			m_drawer.Draw();
+
+            // TODO
+            // Mettre un vrai texte comme spritefont
+            //
+            if (player.ComboCount > 0)
+            {
+                SpriteBatch.Begin();
+                SpriteBatch.DrawString(debugText, "Combo : " + player.ComboCount, new Vector2(), Color.Black);
+                SpriteBatch.End();
+            }
 
             if (debugMode)
             {
