@@ -48,7 +48,7 @@ namespace GbJamTotem
 			//Builds list of all totem parts (not placed)
 			List<TotemSection> sectionsToPlace = new List<TotemSection>();
 			for (int i = 0; i < m_amountOfNormalSections; ++i){
-				sectionsToPlace.Add(new TotemSection());
+				sectionsToPlace.Add(new NormalSection());
 			}
 
 			//Set the order of the totem sections
@@ -107,16 +107,16 @@ namespace GbJamTotem
 				m_allSections[i].Draw();
 		}
 	}
-	public class TotemSection : GameObject
+	public abstract class TotemSection : GameObject
 	{
 		const float Mass = 7.0f;
 		const float Bounciness = 0.5f;
 		const int PerspectiveOffset = 5;
 
-		PhysicsComponent m_physics;
-		Totem m_totemInstance = null;
-		TotemSection m_above = null;
-		TotemSection m_below = null;
+		protected PhysicsComponent m_physics;
+		protected Totem m_totemInstance = null;
+		protected TotemSection m_above = null;
+		protected TotemSection m_below = null;
 
 		public float Top
 		{
@@ -130,8 +130,6 @@ namespace GbJamTotem
 		public TotemSection()
 			: base()
 		{
-			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
-			m_sprite.Origin = new Vector2(0.5f, 1.0f);
 			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
@@ -188,6 +186,17 @@ namespace GbJamTotem
 		public override void Draw()
 		{
 			m_sprite.Draw();
+		}
+	}
+
+	public class NormalSection : TotemSection
+	{
+
+		public NormalSection()
+			: base()
+		{
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+			m_sprite.Origin = new Vector2(0.5f, 1.0f);
 		}
 	}
 }
