@@ -12,11 +12,13 @@ using PastaGameLibrary;
 
 namespace GbJamTotem
 {
+
 	/// <summary>
 	/// This is the main type for your game
 	/// </summary>
 	public class Game1 : MyGame
 	{
+
 		public const int GameboyWidth = 160;
 		public const int GameboyHeight = 144;
 
@@ -40,7 +42,7 @@ namespace GbJamTotem
 
 
 		public Game1()
-			: base(800, 720)
+			: base(160, 144)
 		{
 			Particles = new ParticleSystem(this, 100);
 		}
@@ -101,7 +103,7 @@ namespace GbJamTotem
 			kbs = Keyboard.GetState();
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
 				this.Exit();
-			
+
 			if (kbs.IsKeyDown(Keys.Left))
 				GameCamera.Transform.PosX -= 1f;
 			if (kbs.IsKeyDown(Keys.Right))

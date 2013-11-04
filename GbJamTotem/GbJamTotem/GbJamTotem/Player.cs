@@ -13,7 +13,7 @@ namespace GbJamTotem
 		const float BasePlayerSpeed = 50.0f;
 		const float BasePushForce = 4.0f;
 		const float SlashDuration = 0.2f;
-		const float CollisionDelayDuration = SlashDuration * 0.4f;
+		const float CollisionDelayDuration = SlashDuration * 0.5f;
 
 		Totem m_totemInstance;
 
@@ -25,12 +25,16 @@ namespace GbJamTotem
 		MoveToTransform m_movementRL;
 		DelayAction m_slashDelayRL;
 
+		MoveToTransform m_bounceLR;
+		MoveToTransform m_bounceRL;
+
         MoveToTransform m_climbing;
         SingleActionManager m_actionManager;
 
         Transform m_playerTransform;
         Transform m_leftTransform;
         Transform m_rightTransform;
+		Transform m_bounceTransform;
 
         bool isToLeft;
         bool canClimb;
@@ -74,6 +78,7 @@ namespace GbJamTotem
             m_playerTransform = new Transform(m_transform, true);
             m_leftTransform = new Transform(m_transform, true);
             m_rightTransform = new Transform(m_transform, true);
+			m_bounceTransform = new Transform(m_transform, true);
 
             m_playerTransform.PosX = initialPosition.X;
             m_leftTransform.Position = initialPosition;
@@ -98,6 +103,9 @@ namespace GbJamTotem
 			slashActionLR.AddAction(collisionLR);
 			m_slashLR = new Concurrent(new PastaGameLibrary.Action[] { slashActionLR, m_movementLR });
 
+			m_bounceLR = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_leftTransform, 1);
+			m_bounceLR.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
+
 			///
 			/// Slash Right To Left
 			/// Même principe que l'autre sens
@@ -111,6 +119,9 @@ namespace GbJamTotem
 			slashActionRL.AddAction(m_slashDelayRL);
 			slashActionRL.AddAction(collisionRL);
 			m_slashRL = new Concurrent(new PastaGameLibrary.Action[] { slashActionRL, m_movementRL });
+
+			m_bounceRL = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_rightTransform, 1);
+			m_bounceRL.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
 
             m_climbing = new MoveToTransform(Program.TheGame, m_transform, m_transform, m_climbingPosition, 1);
            
@@ -140,7 +151,22 @@ namespace GbJamTotem
 					& playerPos.Y < sections[i].Bottom + totemPos.Y)
 				{
 					sections[i].Push(BasePushForce * SpeedMultiplier * direction);
+					Bounce(toTheLeft);
 				}
+			}
+		}
+		private void Bounce(bool toTheLeft)
+		{
+			m_bounceTransform.Position = m_playerTransform.Position;
+			if (toTheLeft)
+			{
+				m_actionManager.StartNew(m_bounceRL);
+				isToLeft = false;
+			}
+			else
+			{
+				m_actionManager.StartNew(m_bounceLR);
+				isToLeft = true;
 			}
 		}
 
