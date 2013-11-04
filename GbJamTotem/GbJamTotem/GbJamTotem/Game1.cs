@@ -26,7 +26,9 @@ namespace GbJamTotem
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
         public static Player player;
-		
+
+        SpriteFont debugText;
+        bool debugMode = true;
 
         Sprite floorBackground;
         Transform initialPosition;
@@ -58,6 +60,9 @@ namespace GbJamTotem
         {
             TextureLibrary.LoadContent(Content, "Textures");
             TextureLibrary.Initialise(GraphicsDevice);
+
+            debugText = Content.Load<SpriteFont>("Text/Debug");
+
             //SoundEffectLibrary.LoadContent(Content, "SoundEffects");
             m_drawer = new GameboyDrawer(this);
             GameCamera = new Camera2D(new Vector2(GameboyWidth * 0.5f, GameboyHeight * 0.5f));
@@ -142,11 +147,21 @@ namespace GbJamTotem
 			Particles.Draw();
 			m_totem.Draw();
             player.Draw();
+
 			SpriteBatch.End();
 
 			// End drawing
             //
 			m_drawer.Draw();
+
+            if (debugMode)
+            {
+                SpriteBatch.Begin();
+                // Debug text
+                //SpriteBatch.DrawString(debugText, "LR Status : " + player.m_slashLR.IsActive, new Vector2(), Color.Black);
+                //SpriteBatch.DrawString(debugText, "RL Status : " + player.m_slashRL.IsActive, new Vector2(0,20), Color.Black);
+                SpriteBatch.End();
+            }
 
 			base.Draw(gameTime);
 		}

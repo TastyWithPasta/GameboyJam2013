@@ -169,7 +169,7 @@ namespace GbJamTotem
                 canClimb = false;
             }
 
-            if (!canClimb && this.Transform.PosY >= m_climbingPosition.PosY)
+            if (!canClimb && this.Transform.PosY <= m_climbingPosition.PosY)
             {
                 isPlaying = true;
             }
