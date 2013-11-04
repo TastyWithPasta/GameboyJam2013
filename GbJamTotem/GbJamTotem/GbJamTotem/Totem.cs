@@ -59,9 +59,11 @@ namespace GbJamTotem
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
 		int m_amountOfNormalSections = 10;
+
         int m_amoutOfLeftMetalSections = 10;
         int m_amoutOfRightMetalSections = 10;
-        int m_amoutOfBothMetalSections = 10;      
+        int m_amoutOfBothMetalSections = 10;
+
 
         #region ACCESSORS & MUTATORS
 
@@ -337,4 +339,45 @@ namespace GbJamTotem
 				m_metalSpriteRight.Draw();
         }
     }
+
+    public class SpikeSection : TotemSection
+    {
+        Sprite m_spikeSpriteLeft = null;
+        Sprite m_spikeSpriteRight = null;
+
+        public SpikeSection(SectionType type)
+            : base(type)
+        {
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+            m_sprite.Origin = TotemSection.spriteOrigin;
+
+            bool left = type == SectionType.Left || type == SectionType.Unilateral;
+            bool right = type == SectionType.Right || type == SectionType.Unilateral;
+
+            if (left)
+            {
+                m_spikeSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_spikes_left"), new Transform(m_transform, true));
+                m_spikeSpriteLeft.Origin = TotemSection.spriteOrigin;
+            }
+            if (right)
+            {
+                m_spikeSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_spikes_right"), new Transform(m_transform, true));
+                m_spikeSpriteRight.Origin = TotemSection.spriteOrigin;
+            }
+        }
+
+        public override void OnHit(bool toTheLeft, Player player, float pushForce)
+        {
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            if (m_spikeSpriteLeft != null)
+                m_spikeSpriteLeft.Draw();
+            if (m_spikeSpriteRight != null)
+                m_spikeSpriteRight.Draw();
+        }
+    }
+
 }
