@@ -8,6 +8,13 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GbJamTotem
 {
+	public enum SectionType
+	{
+ 		Left,
+		Right,
+		Unilateral,
+	}
+
 
     /* Class totem
      * 
@@ -92,17 +99,17 @@ namespace GbJamTotem
 
             for (int i = 0; i < m_amoutOfLeftMetalSections; ++i)
             {
-                sectionsToPlace.Add(new MetalSectionLeft());
+                sectionsToPlace.Add(new MetalSection(SectionType.Left));
             }
 
             for (int i = 0; i < m_amoutOfRightMetalSections; ++i)
             {
-                sectionsToPlace.Add(new MetalSectionRight());
+				sectionsToPlace.Add(new MetalSection(SectionType.Right));
             }
 
             for (int i = 0; i < m_amoutOfBothMetalSections; ++i)
             {
-                sectionsToPlace.Add(new MetalSectionBoth());
+				sectionsToPlace.Add(new MetalSection(SectionType.Unilateral));
             }
 
 			//Set the order of the totem sections
@@ -169,11 +176,16 @@ namespace GbJamTotem
 
         public static Vector2 spriteOrigin = new Vector2(0.5f, 1.0f);
 
+		protected SectionType m_type;
 		protected PhysicsComponent m_physics;
 		protected Totem m_totemInstance = null;
 		protected TotemSection m_above = null;
 		protected TotemSection m_below = null;
 
+		public SectionType Type
+		{
+			get { return m_type; }
+		}
 		public float Top
 		{
 			get { return m_transform.PosY - m_sprite.Height * m_transform.SclY * m_sprite.Origin.Y + PerspectiveOffset; }
@@ -183,9 +195,10 @@ namespace GbJamTotem
 			get { return m_transform.PosY + m_sprite.Height * m_transform.SclY * (1- m_sprite.Origin.Y);  }
 		}
 
-		public TotemSection()
+		public TotemSection(SectionType type)
 			: base()
 		{
+			m_type = type;
 			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
@@ -206,7 +219,9 @@ namespace GbJamTotem
 				m_above.ChainPush();
 		}
 
-		public void Push(float force)
+		public abstract void OnHit(bool toTheLeft, Player player, float pushForce);
+
+		protected void Push(float force)
 		{
 			m_physics.Throw(force, -5, (float)Program.Random.NextDouble());
 			m_physics.GroundLevel = 0;
@@ -247,74 +262,64 @@ namespace GbJamTotem
 
 	public class NormalSection : TotemSection
 	{
-
 		public NormalSection()
-			: base()
+			: base(SectionType.Unilateral)
 		{
 			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 		}
+		public override void OnHit(bool toTheLeft, Player player, float pushForce)
+		{
+			Push(pushForce);
+		}
 	}
 
-    public class MetalSectionLeft : TotemSection
+    public class MetalSection : TotemSection
     {
-        Sprite m_metalSprite;
+        Sprite m_metalSpriteLeft = null;
+        Sprite m_metalSpriteRight = null;
 
-        public MetalSectionLeft()
+		public MetalSection(SectionType type)
+			:base(type)
         {
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
-            m_metalSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_left"), new Transform(m_transform, true));
-            m_metalSprite.Origin = TotemSection.spriteOrigin;
+
+			bool left = type == SectionType.Left || type == SectionType.Unilateral;
+			bool right = type == SectionType.Right || type == SectionType.Unilateral;
+			if (left)
+			{
+				m_metalSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_left"), new Transform(m_transform, true));
+				m_metalSpriteLeft.Origin = TotemSection.spriteOrigin;
+			}
+			if (right)
+			{
+				m_metalSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_right"), new Transform(m_transform, true));
+				m_metalSpriteRight.Origin = TotemSection.spriteOrigin;
+			}
         }
+
+		public override void OnHit(bool toTheLeft, Player player, float pushForce)
+		{
+			if ((toTheLeft && m_type == SectionType.Left)
+				|| (!toTheLeft && m_type == SectionType.Right))
+			{
+				Push(pushForce);
+			}
+			else
+			{
+				player.Bounce(toTheLeft);
+				Push(pushForce);
+			}
+		}
 
         public override void Draw()
         {
             base.Draw();
-
-            m_metalSprite.Draw();
-        }
-    }
-
-    public class MetalSectionRight : TotemSection
-    {
-        Sprite m_metalSprite;
-
-        public MetalSectionRight()
-        {
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
-            m_sprite.Origin = TotemSection.spriteOrigin;
-            m_metalSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_right"), new Transform(m_transform, true));
-            m_metalSprite.Origin = TotemSection.spriteOrigin;
-        }
-
-        public override void Draw()
-        {
-            base.Draw();
-            m_metalSprite.Draw();
-        }
-    }
-
-    public class MetalSectionBoth : TotemSection
-    {
-        Sprite m_metalSpriteLeft;
-        Sprite m_metalSpriteRight;
-
-        public MetalSectionBoth()
-        {
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
-            m_sprite.Origin = TotemSection.spriteOrigin;
-            m_metalSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_left"), new Transform(m_transform, true));
-            m_metalSpriteLeft.Origin = TotemSection.spriteOrigin;
-            m_metalSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_right"), new Transform(m_transform, true));
-            m_metalSpriteRight.Origin = TotemSection.spriteOrigin;
-        }
-
-        public override void Draw()
-        {
-            base.Draw();
-            m_metalSpriteLeft.Draw();
-            m_metalSpriteRight.Draw();
+			if(m_metalSpriteLeft != null)
+				m_metalSpriteLeft.Draw();
+			if(m_metalSpriteRight != null)
+				m_metalSpriteRight.Draw();
         }
     }
 }

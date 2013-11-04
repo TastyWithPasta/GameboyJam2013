@@ -150,12 +150,11 @@ namespace GbJamTotem
 				if (playerPos.Y > sections[i].Top + totemPos.Y
 					& playerPos.Y < sections[i].Bottom + totemPos.Y)
 				{
-					sections[i].Push(BasePushForce * SpeedMultiplier * direction);
-					Bounce(toTheLeft);
+					sections[i].OnHit(toTheLeft, this, (float)(BasePushForce * SpeedMultiplier * direction));
 				}
 			}
 		}
-		private void Bounce(bool toTheLeft)
+		public void Bounce(bool toTheLeft)
 		{
 			m_bounceTransform.Position = m_playerTransform.Position;
 			if (toTheLeft)
