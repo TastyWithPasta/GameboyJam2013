@@ -15,6 +15,31 @@ namespace GbJamTotem
 		Unilateral,
 	}
 
+	public class SectionData
+	{
+		Type m_typeToSpawn;
+		int m_amountLeft, m_amountRight, m_amountBoth;
+
+		public SectionData(Type typeToSpawn, int amountLeft, int amountRight, int amountBoth)
+		{
+			m_typeToSpawn = typeToSpawn;
+			m_amountLeft = amountLeft;
+			m_amountRight = amountRight;
+			m_amountBoth = amountBoth;
+		}
+		public List<TotemSection> BuildSections()
+		{
+			List<TotemSection> result = new List<TotemSection>();
+			for (int i = 0; i < m_amountLeft; ++i)
+				result.Add((TotemSection)Activator.CreateInstance(m_typeToSpawn, SectionType.Left));
+			for (int i = 0; i < m_amountRight; ++i)
+				result.Add((TotemSection)Activator.CreateInstance(m_typeToSpawn, SectionType.Right));
+			for (int i = 0; i < m_amountBoth; ++i)
+				result.Add((TotemSection)Activator.CreateInstance(m_typeToSpawn, SectionType.Unilateral));
+			return result;
+		}
+	}
+
 
     /* Class totem
      * 
@@ -28,6 +53,8 @@ namespace GbJamTotem
      * */
 	public class Totem : GameObject
 	{
+		List<TotemSection> m_sectionsToPlace = new List<TotemSection>();
+
 		List<TotemSection> m_allSections = new List<TotemSection>();
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
@@ -71,7 +98,10 @@ namespace GbJamTotem
 
 		public float Top
 		{
-			get { return m_attachedSections[m_attachedSections.Count - 1].Top; }
+			get {
+				if (m_attachedSections.Count == 0)
+					return 0;
+				return m_attachedSections[m_attachedSections.Count - 1].Top; }
 		}
 		public List<TotemSection> AttachedSections
 		{
@@ -88,37 +118,22 @@ namespace GbJamTotem
 		{
 			
 		}
-			
+
+		public void AddSections(SectionData sectionsToAdd)
+		{
+			m_sectionsToPlace.AddRange(sectionsToAdd.BuildSections());
+		}
+
 		public void Build()
 		{
-			//Builds list of all totem parts (not placed)
-			List<TotemSection> sectionsToPlace = new List<TotemSection>();
-			for (int i = 0; i < m_amountOfNormalSections; ++i){
-				sectionsToPlace.Add(new NormalSection());
-			}
-
-            for (int i = 0; i < m_amoutOfLeftMetalSections; ++i)
-            {
-                sectionsToPlace.Add(new MetalSection(SectionType.Left));
-            }
-
-            for (int i = 0; i < m_amoutOfRightMetalSections; ++i)
-            {
-				sectionsToPlace.Add(new MetalSection(SectionType.Right));
-            }
-
-            for (int i = 0; i < m_amoutOfBothMetalSections; ++i)
-            {
-				sectionsToPlace.Add(new MetalSection(SectionType.Unilateral));
-            }
-
 			//Set the order of the totem sections
-			for (int i = 0; i < TotalAmountOfSections; ++i)
+			int amountOfSections = m_sectionsToPlace.Count;
+			for (int i = 0; i < amountOfSections; ++i)
 			{
-				int index = Program.Random.Next(0, sectionsToPlace.Count);
-				m_allSections.Add(sectionsToPlace[index]);
-				m_attachedSections.Add(sectionsToPlace[index]);
-				sectionsToPlace.RemoveAt(index);
+				int index = Program.Random.Next(0, m_sectionsToPlace.Count);
+				m_allSections.Add(m_sectionsToPlace[index]);
+				m_attachedSections.Add(m_sectionsToPlace[index]);
+				m_sectionsToPlace.RemoveAt(index);
 			}
 
 			//Place the totem sections in the world
@@ -262,7 +277,7 @@ namespace GbJamTotem
 
 	public class NormalSection : TotemSection
 	{
-		public NormalSection()
+		public NormalSection(SectionType type)
 			: base(SectionType.Unilateral)
 		{
 			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);

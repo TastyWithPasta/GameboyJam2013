@@ -18,9 +18,9 @@ namespace GbJamTotem
 	/// </summary>
 	public class Game1 : MyGame
 	{
-
 		public const int GameboyWidth = 160;
 		public const int GameboyHeight = 144;
+		public const int CameraOffset = 50;
 
 		public static Random Random = new Random();
 		public static ParticleSystem Particles;
@@ -73,10 +73,8 @@ namespace GbJamTotem
 			// Totem
 			//
 			m_totem = new Totem();
-			m_totem.AmountOfNormalSections = 30;
-            m_totem.AmoutOfLeftMetalSections = 5;
-            m_totem.AmoutOfRightMetalSections = 5;
-            m_totem.AmoutOfBothMetalSections = 5;
+			m_totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 20));
+			m_totem.AddSections(new SectionData(typeof(MetalSection), 5, 5, 5));
 			m_totem.Build();
 
             // Player initialisation
@@ -135,8 +133,12 @@ namespace GbJamTotem
 			m_totem.Update();
 
 			GameCamera.Update();
+            GameCamera.Transform.PosX = player.Transform.PosX;
+			GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
 
-            GameCamera.Transform.Position = player.Transform.Position;
+			if (GameCamera.Transform.PosY > -CameraOffset)
+				GameCamera.Transform.PosY = -CameraOffset;
+
 
 			Particles.Update();
 			base.Update(gameTime);
