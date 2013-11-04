@@ -8,22 +8,59 @@ using Microsoft.Xna.Framework.Input;
 
 namespace GbJamTotem
 {
+
+    /* Class totem
+     * 
+     * Build a totem with differents type of totem sections (normal, metal left, etc.)
+     * 
+     * When adding a new type of totem section :
+     * 1) Add member (+ getters & setters) amount of the new type of totem ;
+     * 2) Add the new amount in TotalAmountSections ;
+     * 3) Add a new for cycle for the new totem sections ;
+     * 
+     * */
 	public class Totem : GameObject
 	{
 		List<TotemSection> m_allSections = new List<TotemSection>();
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
 		int m_amountOfNormalSections = 10;
+        int m_amoutOfLeftMetalSections = 10;
+        int m_amoutOfRightMetalSections = 10;
+        int m_amoutOfBothMetalSections = 10;      
 
-		public int TotalAmountOfSections
+        #region ACCESSORS & MUTATORS
+
+        public int TotalAmountOfSections
 		{
-			get { return AmountOfNormalSections; }
+			get { return AmountOfNormalSections 
+                + AmoutOfLeftMetalSections
+                + AmoutOfRightMetalSections
+                + AmoutOfBothMetalSections; }
 		}	
 		public int AmountOfNormalSections
 		{
 			get { return m_amountOfNormalSections; }
 			set { m_amountOfNormalSections = value; }
 		}
+
+        public int AmoutOfLeftMetalSections
+        {
+            get { return m_amoutOfLeftMetalSections; }
+            set { m_amoutOfLeftMetalSections = value; }
+        }
+
+        public int AmoutOfRightMetalSections
+        {
+            get { return m_amoutOfRightMetalSections; }
+            set { m_amoutOfRightMetalSections = value; }
+        }
+
+        public int AmoutOfBothMetalSections
+        {
+            get { return m_amoutOfBothMetalSections; }
+            set { m_amoutOfBothMetalSections = value; }
+        }
 
 		public float Top
 		{
@@ -38,6 +75,8 @@ namespace GbJamTotem
 			get { return m_detachedSections; }
 		}
 
+        #endregion
+
 		public Totem()
 		{
 			
@@ -50,6 +89,21 @@ namespace GbJamTotem
 			for (int i = 0; i < m_amountOfNormalSections; ++i){
 				sectionsToPlace.Add(new NormalSection());
 			}
+
+            for (int i = 0; i < m_amoutOfLeftMetalSections; ++i)
+            {
+                sectionsToPlace.Add(new MetalSectionLeft());
+            }
+
+            for (int i = 0; i < m_amoutOfRightMetalSections; ++i)
+            {
+                sectionsToPlace.Add(new MetalSectionRight());
+            }
+
+            for (int i = 0; i < m_amoutOfBothMetalSections; ++i)
+            {
+                sectionsToPlace.Add(new MetalSectionBoth());
+            }
 
 			//Set the order of the totem sections
 			for (int i = 0; i < TotalAmountOfSections; ++i)
@@ -112,6 +166,8 @@ namespace GbJamTotem
 		const float Mass = 7.0f;
 		const float Bounciness = 0.5f;
 		const int PerspectiveOffset = 5;
+
+        public static Vector2 spriteOrigin = new Vector2(0.5f, 1.0f);
 
 		protected PhysicsComponent m_physics;
 		protected Totem m_totemInstance = null;
@@ -196,7 +252,69 @@ namespace GbJamTotem
 			: base()
 		{
 			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
-			m_sprite.Origin = new Vector2(0.5f, 1.0f);
+            m_sprite.Origin = TotemSection.spriteOrigin;
 		}
 	}
+
+    public class MetalSectionLeft : TotemSection
+    {
+        Sprite m_metalSprite;
+
+        public MetalSectionLeft()
+        {
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+            m_sprite.Origin = TotemSection.spriteOrigin;
+            m_metalSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_left"), new Transform(m_transform, true));
+            m_metalSprite.Origin = TotemSection.spriteOrigin;
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+
+            m_metalSprite.Draw();
+        }
+    }
+
+    public class MetalSectionRight : TotemSection
+    {
+        Sprite m_metalSprite;
+
+        public MetalSectionRight()
+        {
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+            m_sprite.Origin = TotemSection.spriteOrigin;
+            m_metalSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_right"), new Transform(m_transform, true));
+            m_metalSprite.Origin = TotemSection.spriteOrigin;
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            m_metalSprite.Draw();
+        }
+    }
+
+    public class MetalSectionBoth : TotemSection
+    {
+        Sprite m_metalSpriteLeft;
+        Sprite m_metalSpriteRight;
+
+        public MetalSectionBoth()
+        {
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+            m_sprite.Origin = TotemSection.spriteOrigin;
+            m_metalSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_left"), new Transform(m_transform, true));
+            m_metalSpriteLeft.Origin = TotemSection.spriteOrigin;
+            m_metalSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_right"), new Transform(m_transform, true));
+            m_metalSpriteRight.Origin = TotemSection.spriteOrigin;
+        }
+
+        public override void Draw()
+        {
+            base.Draw();
+            m_metalSpriteLeft.Draw();
+            m_metalSpriteRight.Draw();
+        }
+    }
 }

@@ -28,11 +28,13 @@ namespace GbJamTotem
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
         public static Player player;
-		
+
+        SpriteFont debugText;
+        bool debugMode = true;
 
         Sprite floorBackground;
-        Transform initialPosition;
         Transform climbingAltitude;
+        int deltaAboveClimbingAltitude;
 
 		Color m_bgColor = new Color(239, 255, 222);
 		GameboyDrawer m_drawer;
@@ -60,23 +62,29 @@ namespace GbJamTotem
         {
             TextureLibrary.LoadContent(Content, "Textures");
             TextureLibrary.Initialise(GraphicsDevice);
+
+            debugText = Content.Load<SpriteFont>("Text/Debug");
+
             //SoundEffectLibrary.LoadContent(Content, "SoundEffects");
             m_drawer = new GameboyDrawer(this);
             GameCamera = new Camera2D(new Vector2(GameboyWidth * 0.5f, GameboyHeight * 0.5f));
             GameCamera.ScaleToZoom = true;
-            
-
-            // Player initialisation
-            //
-            climbingAltitude = new Transform();
-            climbingAltitude.PosY = -200;
-            player = new Player(new Vector2(-50, 0), climbingAltitude);
 
 			// Totem
 			//
 			m_totem = new Totem();
 			m_totem.AmountOfNormalSections = 30;
+            m_totem.AmoutOfLeftMetalSections = 5;
+            m_totem.AmoutOfRightMetalSections = 5;
+            m_totem.AmoutOfBothMetalSections = 5;
 			m_totem.Build();
+
+            // Player initialisation
+            //
+            deltaAboveClimbingAltitude = -100;
+            climbingAltitude = new Transform();
+            climbingAltitude.PosY = m_totem.Top + deltaAboveClimbingAltitude;
+            player = new Player(new Vector2(-50, 0), climbingAltitude);
 
 			player.Initialise(m_totem);
 
@@ -104,18 +112,24 @@ namespace GbJamTotem
 			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
 				this.Exit();
 
-			if (kbs.IsKeyDown(Keys.Left))
-				GameCamera.Transform.PosX -= 1f;
-			if (kbs.IsKeyDown(Keys.Right))
-				GameCamera.Transform.PosX += 1;
-			if (kbs.IsKeyDown(Keys.Up))
-				GameCamera.Transform.PosY -= 1f;
-			if (kbs.IsKeyDown(Keys.Down))
-				GameCamera.Transform.PosY += 1;
-			if (kbs.IsKeyDown(Keys.RightShift))
-				GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 1.01f;
-			if (kbs.IsKeyDown(Keys.RightControl))
-				GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
+            if (debugMode)
+            {
+                if (kbs.IsKeyDown(Keys.Left))
+                    GameCamera.Transform.PosX -= 1f;
+                if (kbs.IsKeyDown(Keys.Right))
+                    GameCamera.Transform.PosX += 1;
+                if (kbs.IsKeyDown(Keys.Up))
+                    GameCamera.Transform.PosY -= 1f;
+                if (kbs.IsKeyDown(Keys.Down))
+                    GameCamera.Transform.PosY += 1;
+                if (kbs.IsKeyDown(Keys.RightShift))
+                    GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 1.01f;
+                if (kbs.IsKeyDown(Keys.RightControl))
+                    GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
+            }
+
+            if (kbs.IsKeyDown(Keys.Escape))
+                this.Exit();
 
             player.Update();
 			m_totem.Update();
@@ -144,11 +158,21 @@ namespace GbJamTotem
 			Particles.Draw();
 			m_totem.Draw();
             player.Draw();
+
 			SpriteBatch.End();
 
 			// End drawing
             //
 			m_drawer.Draw();
+
+            if (debugMode)
+            {
+                SpriteBatch.Begin();
+                // Debug text
+                //SpriteBatch.DrawString(debugText, "LR Status : " + player.m_slashLR.IsActive, new Vector2(), Color.Black);
+                //SpriteBatch.DrawString(debugText, "RL Status : " + player.m_slashRL.IsActive, new Vector2(0,20), Color.Black);
+                SpriteBatch.End();
+            }
 
 			base.Draw(gameTime);
 		}
