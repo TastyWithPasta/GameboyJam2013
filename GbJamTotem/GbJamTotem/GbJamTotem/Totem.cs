@@ -357,17 +357,28 @@ namespace GbJamTotem
             if (left)
             {
                 m_spikeSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_spikes_left"), new Transform(m_transform, true));
-                m_spikeSpriteLeft.Origin = TotemSection.spriteOrigin;
+				m_spikeSpriteLeft.Transform.PosX = -4;
+				m_spikeSpriteLeft.Origin = TotemSection.spriteOrigin;
             }
             if (right)
             {
                 m_spikeSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_spikes_right"), new Transform(m_transform, true));
                 m_spikeSpriteRight.Origin = TotemSection.spriteOrigin;
+				m_spikeSpriteRight.Transform.PosX = 4;
             }
         }
 
         public override void OnHit(bool toTheLeft, Player player, float pushForce)
         {
+			if ((toTheLeft && m_type == SectionType.Left)
+				|| (!toTheLeft && m_type == SectionType.Right))
+			{
+				Push(pushForce);
+			}
+			else
+			{
+				player.Bounce(toTheLeft);
+			}
         }
 
         public override void Draw()

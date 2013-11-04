@@ -75,6 +75,7 @@ namespace GbJamTotem
 			m_totem = new Totem();
 			m_totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 20));
 			m_totem.AddSections(new SectionData(typeof(MetalSection), 5, 5, 5));
+			m_totem.AddSections(new SectionData(typeof(SpikeSection), 3, 3, 3));
 			m_totem.Build();
 
             // Player initialisation

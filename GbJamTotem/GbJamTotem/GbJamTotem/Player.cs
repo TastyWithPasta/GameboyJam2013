@@ -14,6 +14,7 @@ namespace GbJamTotem
 		const float BasePushForce = 4.0f;
 		const float SlashDuration = 0.2f;
 		const float CollisionDelayDuration = SlashDuration * 0.5f;
+		const float MaxSpeedMultiplier = 3.0f;
 
 		Totem m_totemInstance;
 
@@ -151,6 +152,7 @@ namespace GbJamTotem
 					& playerPos.Y < sections[i].Bottom + totemPos.Y)
 				{
 					sections[i].OnHit(toTheLeft, this, (float)(BasePushForce * SpeedMultiplier * direction));
+					SpeedMultiplier = Math.Min(SpeedMultiplier *1.05f, MaxSpeedMultiplier);
 				}
 			}
 		}
