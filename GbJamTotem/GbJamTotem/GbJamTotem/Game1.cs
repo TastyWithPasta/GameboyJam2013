@@ -34,6 +34,7 @@ namespace GbJamTotem
 
         public static PauseScreen pauseScreen;
         public static ScoreBorder scoreBorder;
+        public static MapBorder mapBorder;
         public static int normalTotemValue = 100;
 
         public static SpriteFont debugText;
@@ -93,11 +94,11 @@ namespace GbJamTotem
             player = new Player(new Vector2(playerInitialPosition, 0), climbingAltitude);
 			player.Initialise(m_totem);
 
-            // Pause screen initialisation
+            // Pause screen & GUI initialisation
             //
             pauseScreen = new PauseScreen();
-
             scoreBorder = new ScoreBorder(ScreenHeight);
+            mapBorder = new MapBorder();
 
             // Background textures
             //
@@ -149,6 +150,7 @@ namespace GbJamTotem
             player.Update();
             m_totem.Update();
             scoreBorder.Update();
+            mapBorder.Update();
 
             GameCamera.Update();
             GameCamera.Transform.PosX = player.Transform.PosX;
@@ -185,6 +187,7 @@ namespace GbJamTotem
             //
             SpriteBatch.Begin();
             scoreBorder.Draw();
+            mapBorder.Draw();
             SpriteBatch.End();
 
 			// End drawing
