@@ -30,8 +30,11 @@ namespace GbJamTotem
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
         public static Player player;
+        int playerInitialPosition = -50;
 
-        PauseScreen pauseScreen;
+        public static PauseScreen pauseScreen;
+        public static ScoreBorder scoreBorder;
+        public static int normalTotemValue = 100;
 
         public static SpriteFont debugText;
         bool debugMode = true;
@@ -42,7 +45,7 @@ namespace GbJamTotem
 
 		Color m_bgColor = new Color(239, 255, 222);
 		GameboyDrawer m_drawer;
-		Totem m_totem;
+		public static Totem m_totem;
 
 		public static DrawingList Foreground = new DrawingList();
 
@@ -87,12 +90,14 @@ namespace GbJamTotem
             deltaAboveClimbingAltitude = -100;
             climbingAltitude = new Transform();
             climbingAltitude.PosY = m_totem.Top + deltaAboveClimbingAltitude;
-            player = new Player(new Vector2(-50, 0), climbingAltitude);
+            player = new Player(new Vector2(playerInitialPosition, 0), climbingAltitude);
 			player.Initialise(m_totem);
 
             // Pause screen initialisation
             //
             pauseScreen = new PauseScreen();
+
+            scoreBorder = new ScoreBorder(ScreenHeight);
 
             // Background textures
             //
@@ -143,6 +148,7 @@ namespace GbJamTotem
             //
             player.Update();
             m_totem.Update();
+            scoreBorder.Update();
 
             GameCamera.Update();
             GameCamera.Transform.PosX = player.Transform.PosX;
@@ -175,13 +181,22 @@ namespace GbJamTotem
 			Souls.Draw();
 			SpriteBatch.End();
 
+            // Drawing GUI
+            //
+            SpriteBatch.Begin();
+            scoreBorder.Draw();
+            SpriteBatch.End();
+
 			// End drawing
             //
             m_drawer.Draw();            
             
             // Drawing separately pause screen
+            // (Has spriteBatch inside)
             //
             pauseScreen.Draw();
+
+            
 
             // TODO
             // Mettre un vrai texte comme spritefont
@@ -189,7 +204,7 @@ namespace GbJamTotem
             if (player.ComboCount > 0)
             {
                 SpriteBatch.Begin();
-                SpriteBatch.DrawString(debugText, "Combo : " + player.ComboCount, new Vector2(), Color.Black);
+                SpriteBatch.DrawString(debugText, "Combo : " + player.ComboCount, new Vector2(), Color.Red);
                 SpriteBatch.End();
             }
 
@@ -197,8 +212,11 @@ namespace GbJamTotem
             {
                 SpriteBatch.Begin();
                 // Debug text
-                //SpriteBatch.DrawString(debugText, "LR Status : " + player.m_slashLR.IsActive, new Vector2(), Color.Black);
-                //SpriteBatch.DrawString(debugText, "RL Status : " + player.m_slashRL.IsActive, new Vector2(0,20), Color.Black);
+                //
+                //SpriteBatch.DrawString(debugText, "Score : " + scoreBorder.Score, new Vector2(0, 300), Color.Red);
+                //SpriteBatch.DrawString(debugText, "Max : " + m_totem.TotalAmountOfSections*normalTotemValue, new Vector2(0, 320), Color.Red);
+                //SpriteBatch.DrawString(debugText, "sclY : " + scoreBorder.m_graphicScore.Transform.SclY, new Vector2(0,340), Color.Red);
+                
                 SpriteBatch.End();
             }
 

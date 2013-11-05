@@ -61,11 +61,16 @@ namespace GbJamTotem
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
 
 
+
         #region ACCESSORS & MUTATORS
 
         public int TotalAmountOfSections
 		{
 			get { return m_allSections.Count; }
+            get
+            {
+                return m_allSections.Count;
+            }
 		}	
 		public float Top
 		{
@@ -266,6 +271,7 @@ namespace GbJamTotem
 		{
 			Push(player, pushForce);
             player.ComboCount++;
+            Game1.scoreBorder.Score += Game1.normalTotemValue;
 		}
 	}
 
@@ -301,6 +307,7 @@ namespace GbJamTotem
 			{
 				Push(player, pushForce);
                 player.ComboCount++;
+                Game1.scoreBorder.Score += Game1.normalTotemValue;
 			}
 			else
 			{
@@ -355,6 +362,7 @@ namespace GbJamTotem
 			{
 				Push(player, pushForce);
                 player.ComboCount++;
+                Game1.scoreBorder.Score += Game1.normalTotemValue;
 			}
 			else
 			{
