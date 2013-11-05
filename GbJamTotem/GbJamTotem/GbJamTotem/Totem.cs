@@ -58,46 +58,14 @@ namespace GbJamTotem
 		List<TotemSection> m_allSections = new List<TotemSection>();
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
-		int m_amountOfNormalSections = 10;
-
-        int m_amoutOfLeftMetalSections = 10;
-        int m_amoutOfRightMetalSections = 10;
-        int m_amoutOfBothMetalSections = 10;
 
 
         #region ACCESSORS & MUTATORS
 
         public int TotalAmountOfSections
 		{
-			get { return AmountOfNormalSections 
-                + AmoutOfLeftMetalSections
-                + AmoutOfRightMetalSections
-                + AmoutOfBothMetalSections; }
+			get { return m_allSections.Count; }
 		}	
-		public int AmountOfNormalSections
-		{
-			get { return m_amountOfNormalSections; }
-			set { m_amountOfNormalSections = value; }
-		}
-
-        public int AmoutOfLeftMetalSections
-        {
-            get { return m_amoutOfLeftMetalSections; }
-            set { m_amoutOfLeftMetalSections = value; }
-        }
-
-        public int AmoutOfRightMetalSections
-        {
-            get { return m_amoutOfRightMetalSections; }
-            set { m_amoutOfRightMetalSections = value; }
-        }
-
-        public int AmoutOfBothMetalSections
-        {
-            get { return m_amoutOfBothMetalSections; }
-            set { m_amoutOfBothMetalSections = value; }
-        }
-
 		public float Top
 		{
 			get {

@@ -44,7 +44,7 @@ namespace GbJamTotem
 
 
 		public Game1()
-			: base(160, 144)
+			: base(640, 576)
 		{
 			Particles = new ParticleSystem(this, 100);
 		}
