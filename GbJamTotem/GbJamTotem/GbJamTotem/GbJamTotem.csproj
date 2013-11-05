@@ -76,6 +76,7 @@
     <Compile Include="ComboNumber.cs" />
     <Compile Include="GameboyDrawer.cs" />
     <Compile Include="GameObject.cs" />
+    <Compile Include="PauseScreen.cs" />
     <Compile Include="PhysicsComponent.cs" />
     <Compile Include="PixelParticle.cs" />
     <Compile Include="Player.cs" />

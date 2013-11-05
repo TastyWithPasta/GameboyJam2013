@@ -31,7 +31,9 @@ namespace GbJamTotem
         public static KeyboardState old_kbs = new KeyboardState();
         public static Player player;
 
-        SpriteFont debugText;
+        PauseScreen pauseScreen;
+
+        public static SpriteFont debugText;
         bool debugMode = true;
 
         Sprite floorBackground;
@@ -86,8 +88,11 @@ namespace GbJamTotem
             climbingAltitude = new Transform();
             climbingAltitude.PosY = m_totem.Top + deltaAboveClimbingAltitude;
             player = new Player(new Vector2(-50, 0), climbingAltitude);
-
 			player.Initialise(m_totem);
+
+            // Pause screen initialisation
+            //
+            pauseScreen = new PauseScreen();
 
             // Background textures
             //
@@ -108,9 +113,11 @@ namespace GbJamTotem
 
 		protected override void Update(GameTime gameTime)
 		{
-			// Allows the game to exit
+            old_kbs = kbs;
 			kbs = Keyboard.GetState();
-			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+
+            // Allows the game to exit
+			if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed ||kbs.IsKeyDown(Keys.Escape))
 				this.Exit();
 
             if (debugMode)
@@ -129,22 +136,24 @@ namespace GbJamTotem
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
             }
 
-            if (kbs.IsKeyDown(Keys.Escape))
-                this.Exit();
-
+            pauseScreen.Update();
+            if (pauseScreen.IsGamePaused) return;
+           
+            // Update game if unpaused
+            //
             player.Update();
-			m_totem.Update();
+            m_totem.Update();
 
-			GameCamera.Update();
+            GameCamera.Update();
             GameCamera.Transform.PosX = player.Transform.PosX;
-			GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
+            GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
 
-			if (GameCamera.Transform.PosY > -CameraOffset)
-				GameCamera.Transform.PosY = -CameraOffset;
-
+            if (GameCamera.Transform.PosY > -CameraOffset)
+                GameCamera.Transform.PosY = -CameraOffset;
 
 			Souls.Update();
-			base.Update(gameTime);
+
+            base.Update(gameTime);
 		}
 
 		/// <summary>
@@ -156,7 +165,7 @@ namespace GbJamTotem
 			m_drawer.SetRenderTarget();
 			GraphicsDevice.Clear(m_bgColor);
 
-            // Begin Drawing
+            // Begin all drawing methods
             //
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             floorBackground.Draw();
@@ -164,12 +173,15 @@ namespace GbJamTotem
 			m_totem.Draw();
             player.Draw();
 			Souls.Draw();
-
 			SpriteBatch.End();
 
 			// End drawing
             //
-			m_drawer.Draw();
+            m_drawer.Draw();            
+            
+            // Drawing separately pause screen
+            //
+            pauseScreen.Draw();
 
             // TODO
             // Mettre un vrai texte comme spritefont
