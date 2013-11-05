@@ -66,7 +66,6 @@ namespace GbJamTotem
 
         public int TotalAmountOfSections
 		{
-			get { return m_allSections.Count; }
             get
             {
                 return m_allSections.Count;

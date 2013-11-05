@@ -6,14 +6,24 @@ using PastaGameLibrary;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
-namespace GbJamTotem
+namespace GbJamTotem 
 {
+	class PBounceInterpolation : IPInterpolation<float>
+	{
+		public float GetInterpolation(float from, float to, float ratio)
+		{
+			ratio = 1 - (float)Math.Abs(Math.Sin((ratio + 0.5f) * Math.PI));
+			return from + (to - from) * ratio;
+		}
+	}
+
     public class Player : GameObject
     {
 		const float BasePlayerSpeed = 50.0f;
 		const float BasePushForce = 4.0f;
 		const float SlashDuration = 0.2f;
-		const float CollisionDelayDuration = SlashDuration * 0.5f;
+		const float CollisionDelayRatio = 0.5f;
+		const float CollisionDelayDuration = SlashDuration * CollisionDelayRatio;
 		const float MaxSpeedMultiplier = 2.75f;
 
 		Totem m_totemInstance;
@@ -26,8 +36,10 @@ namespace GbJamTotem
 		MoveToTransform m_movementRL;
 		DelayAction m_slashDelayRL;
 
-		MoveToTransform m_bounceLR;
-		MoveToTransform m_bounceRL;
+		Concurrent m_slashBounceLR;
+		Concurrent m_slashBounceRL;
+		MoveToTransform m_metalBounceLR; //Pas la même chose que slashBounce: metalBounce interrompt l'animation normale de slash
+		MoveToTransform m_metalBounceRL;
 
         MoveToTransform m_climbing;
         SingleActionManager m_actionManager;
@@ -135,8 +147,8 @@ namespace GbJamTotem
 			slashActionLR.AddAction(collisionLR);
 			m_slashLR = new Concurrent(new PastaGameLibrary.Action[] { slashActionLR, m_movementLR });
 
-			m_bounceLR = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_leftTransform, 1);
-			m_bounceLR.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
+			m_metalBounceLR = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_leftTransform, 1);
+			m_metalBounceLR.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
 
 			///
 			/// Slash Right To Left
@@ -145,6 +157,9 @@ namespace GbJamTotem
 			m_movementRL = new MoveToTransform(Program.TheGame, m_playerTransform, m_rightTransform, m_leftTransform, 1);
 			m_movementRL.Interpolator = new PSmoothstepInterpolation();
 			m_movementRL.Timer.Interval = SlashDuration;
+
+
+
 			m_slashDelayRL = new DelayAction(Program.TheGame, CollisionDelayDuration);
 			MethodAction collisionRL = new MethodAction(delegate() { DoCollisionWithSections(true);  });
 			Sequence slashActionRL = new Sequence(1);
@@ -152,11 +167,38 @@ namespace GbJamTotem
 			slashActionRL.AddAction(collisionRL);
 			m_slashRL = new Concurrent(new PastaGameLibrary.Action[] { slashActionRL, m_movementRL });
 
-			m_bounceRL = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_rightTransform, 1);
-			m_bounceRL.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
+			//
+			// Mouvement de rebond volontaire gauche
+			//
+			MoveToTransform bounceMovementL = new MoveToTransform(Program.TheGame, m_playerTransform, m_leftTransform, m_bounceTransform, 1);
+			bounceMovementL.Timer.Interval = SlashDuration;
+			bounceMovementL.Interpolator = new PBounceInterpolation();
+			MethodAction actionL = new MethodAction(
+				delegate()
+				{
+					m_bounceTransform.PosY = 0;
+					m_bounceTransform.PosX = m_leftTransform.PosX + (m_rightTransform.PosX - m_leftTransform.PosX) * CollisionDelayRatio;
+				});
+			m_slashBounceLR = new Concurrent(new PastaGameLibrary.Action[] { actionL, slashActionLR, bounceMovementL });
+
+			//
+			// Mouvement de rebond volontaire droite
+			//
+			MoveToTransform bounceMovementR = new MoveToTransform(Program.TheGame, m_playerTransform, m_rightTransform, m_bounceTransform, 1);
+			bounceMovementR.Timer.Interval = SlashDuration;
+			bounceMovementR.Interpolator = new PBounceInterpolation();
+			MethodAction actionR = new MethodAction(
+				delegate()
+				{
+					m_bounceTransform.PosY = 0;
+					m_bounceTransform.PosX = m_rightTransform.PosX - (m_rightTransform.PosX - m_leftTransform.PosX) * CollisionDelayRatio;
+				});
+			m_slashBounceRL = new Concurrent(new PastaGameLibrary.Action[] { actionR, slashActionRL, bounceMovementR });
+
+			m_metalBounceRL = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_rightTransform, 1);
+			m_metalBounceRL.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
 
             m_climbing = new MoveToTransform(Program.TheGame, m_transform, m_transform, m_climbingPosition, 1);
-           
             m_climbing.Interpolator = new PSmoothstepInterpolation();
             m_climbing.Timer.Interval = 0.2f;
         }
@@ -192,12 +234,12 @@ namespace GbJamTotem
 			m_bounceTransform.Position = m_playerTransform.Position;
 			if (toTheLeft)
 			{
-				m_actionManager.StartNew(m_bounceRL);
+				m_actionManager.StartNew(m_metalBounceRL);
 				isToLeft = false;
 			}
 			else
 			{
-				m_actionManager.StartNew(m_bounceLR);
+				m_actionManager.StartNew(m_metalBounceLR);
 				isToLeft = true;
 			}
 
@@ -210,18 +252,36 @@ namespace GbJamTotem
 
 		public override void Update()
         {
-            if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space)
-				&& !m_slashLR.IsActive && !m_slashRL.IsActive && isToLeft)
-            {
-				m_actionManager.StartNew(m_slashLR);
-                isToLeft = false;
-            }
+			bool animationIsActive = m_slashLR.IsActive || m_slashRL.IsActive 
+				|| m_slashBounceLR.IsActive || m_slashBounceLR.IsActive
+				|| m_metalBounceLR.IsActive || m_metalBounceRL.IsActive;
 
-            if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space)
-				&& !m_slashRL.IsActive && !m_slashLR.IsActive && !isToLeft)
+			if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt) && !animationIsActive)
+			{
+				if (isToLeft)
+				{
+					m_actionManager.StartNew(m_slashBounceLR);
+					isToLeft = true;
+				}
+				else
+				{
+					m_actionManager.StartNew(m_slashBounceRL);
+					isToLeft = false;
+				}
+			}
+
+            if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
             {
-                m_actionManager.StartNew(m_slashRL);
-                isToLeft = true;
+				if (isToLeft)
+				{
+					m_actionManager.StartNew(m_slashLR);
+					isToLeft = false;
+				}
+				else
+				{
+					m_actionManager.StartNew(m_slashRL);
+					isToLeft = true;
+				}
             }
 
             // Activate climbing animation
