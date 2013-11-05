@@ -43,6 +43,14 @@ namespace GbJamTotem
 
 		float m_speedMultiplier = 1; //Permet d'accélérer le rythme d'action du joueur
 
+        int comboCount;
+
+        public int ComboCount
+        {
+            get { return comboCount; }
+            set { comboCount = value; }
+        }
+
         Vector2 m_initialPosition;
         Transform m_climbingPosition;
 
@@ -73,6 +81,7 @@ namespace GbJamTotem
             isToLeft = true;
             canClimb = true;
             isPlaying = false;
+            comboCount = 0;
 
             m_actionManager = new SingleActionManager();
 
@@ -169,6 +178,12 @@ namespace GbJamTotem
 				m_actionManager.StartNew(m_bounceLR);
 				isToLeft = true;
 			}
+
+            //Reset combo
+            //
+            SpeedMultiplier = 1;
+            comboCount = 0;
+
 		}
 
 		public override void Update()

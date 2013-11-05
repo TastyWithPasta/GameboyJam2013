@@ -49,6 +49,7 @@ namespace GbJamTotem
      * 1) Add member (+ getters & setters) amount of the new type of totem ;
      * 2) Add the new amount in TotalAmountSections ;
      * 3) Add a new for cycle for the new totem sections ;
+     * 4) Add comboCount++ for good hits. (Resets done in Player.Bounce)
      * 
      * */
 	public class Totem : GameObject
@@ -256,6 +257,7 @@ namespace GbJamTotem
 		public override void OnHit(bool toTheLeft, Player player, float pushForce)
 		{
 			Push(pushForce);
+            player.ComboCount++;
 		}
 	}
 
@@ -290,10 +292,12 @@ namespace GbJamTotem
 				|| (!toTheLeft && m_type == SectionType.Right))
 			{
 				Push(pushForce);
+                player.ComboCount++;
 			}
 			else
 			{
 				player.Bounce(toTheLeft);
+                player.ComboCount = 0;
 				Push(pushForce);
 			}
 		}
@@ -342,10 +346,12 @@ namespace GbJamTotem
 				|| (!toTheLeft && m_type == SectionType.Right))
 			{
 				Push(pushForce);
+                player.ComboCount++;
 			}
 			else
 			{
 				player.Bounce(toTheLeft);
+                player.ComboCount = 0; // TODO Utile ici?
 			}
         }
 
