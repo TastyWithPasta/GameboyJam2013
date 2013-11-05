@@ -241,9 +241,11 @@ namespace GbJamTotem
 
 		protected void Push(float force)
 		{
+
 			m_physics.Throw(force, -5, (float)Program.Random.NextDouble());
 			m_physics.GroundLevel = 0;
 			m_totemInstance.Detach(this);
+
 
 			if(m_below != null)
 				m_below.m_above = m_above;
@@ -262,6 +264,7 @@ namespace GbJamTotem
 			m_totemInstance = null;
 			m_below = null;
 			m_above = null;
+
 		}
 
 		public override void Update()
