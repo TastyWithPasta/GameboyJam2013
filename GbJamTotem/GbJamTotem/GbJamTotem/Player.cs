@@ -14,7 +14,7 @@ namespace GbJamTotem
 		const float BasePushForce = 4.0f;
 		const float SlashDuration = 0.2f;
 		const float CollisionDelayDuration = SlashDuration * 0.5f;
-		const float MaxSpeedMultiplier = 2.5f;
+		const float MaxSpeedMultiplier = 2.75f;
 
 		Totem m_totemInstance;
 
@@ -62,6 +62,11 @@ namespace GbJamTotem
 			get { return m_soulHotspot; }
 		}
 
+		public bool IsToLeft
+		{
+			get { return isToLeft; }
+		}
+
         Vector2 m_initialPosition;
         Transform m_climbingPosition;
 
@@ -70,6 +75,10 @@ namespace GbJamTotem
 			get { return m_speedMultiplier; }
 			set { 
 				//Changer le multiplicateur de vitesse implique que les animations vont plus vite
+
+				if (m_speedMultiplier > MaxSpeedMultiplier)
+					m_speedMultiplier = MaxSpeedMultiplier;
+				
 				m_speedMultiplier = value;
 				m_movementLR.Timer.Interval = SlashDuration / value;
 				m_slashDelayLR.Timer.Interval = CollisionDelayDuration / value;

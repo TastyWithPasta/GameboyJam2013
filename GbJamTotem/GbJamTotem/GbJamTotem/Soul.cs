@@ -19,8 +19,12 @@ namespace GbJamTotem
 			//m_transform.ParentTransform = player.Transform;
 			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("soul_temp"), m_transform);
 			Vector2 explodePosition;
-			explodePosition.X = Program.Random.Next(-72, 73);
-			explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)Math.Min(player.Transform.PosY + 200, 0));
+
+			if (player.IsToLeft)
+				explodePosition.X = Program.Random.Next(-72, -20) + 0.5f;
+			else
+				explodePosition.X = Program.Random.Next(20, 73) + 0.5f;
+			explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)Math.Min(10, player.Transform.PosY + 100)) + 0.5f;
 			m_moveToExplosionPoint = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);
 			m_moveToExplosionPoint.StartPosition = initialPosition;
 			m_moveToExplosionPoint.Timer.Interval = BaseExplosionDuration / player.SpeedMultiplier;

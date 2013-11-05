@@ -189,7 +189,7 @@ namespace GbJamTotem
 			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
-			m_transform.PosX = 0.5f;
+			m_transform.PosX += 0.5f;
 			m_generator = new ParticleGenerator<Soul>(Program.TheGame, Game1.Souls);
 		}
 
@@ -235,6 +235,7 @@ namespace GbJamTotem
 			m_below = null;
 			m_above = null;
 
+			
 
 			m_generator.Generate(player.ComboCount, new object[] { m_transform.PositionGlobal, player });
 		}
