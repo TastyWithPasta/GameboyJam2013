@@ -33,6 +33,7 @@ namespace GbJamTotem
         SingleActionManager m_actionManager;
 
         Transform m_playerTransform;
+		Transform m_soulHotspot;
         Transform m_leftTransform;
         Transform m_rightTransform;
 		Transform m_bounceTransform;
@@ -50,6 +51,16 @@ namespace GbJamTotem
             get { return comboCount; }
             set { comboCount = value; }
         }
+
+		public Transform SpriteTransform
+		{
+			get { return m_playerTransform; }
+		}
+
+		public Transform SoulHotspot
+		{
+			get { return m_soulHotspot; }
+		}
 
         Vector2 m_initialPosition;
         Transform m_climbingPosition;
@@ -89,6 +100,8 @@ namespace GbJamTotem
             m_leftTransform = new Transform(m_transform, true);
             m_rightTransform = new Transform(m_transform, true);
 			m_bounceTransform = new Transform(m_transform, true);
+			m_soulHotspot = new Transform(m_playerTransform, true);
+			m_soulHotspot.Position = new Vector2(10, -10);
 
             m_playerTransform.PosX = initialPosition.X;
             m_leftTransform.Position = initialPosition;

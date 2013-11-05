@@ -167,6 +167,7 @@ namespace GbJamTotem
 		protected Totem m_totemInstance = null;
 		protected TotemSection m_above = null;
 		protected TotemSection m_below = null;
+		private ParticleGenerator<Soul> m_generator;
 
 		public SectionType Type
 		{
@@ -189,6 +190,7 @@ namespace GbJamTotem
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
 			m_transform.PosX = 0.5f;
+			m_generator = new ParticleGenerator<Soul>(Program.TheGame, Game1.Souls);
 		}
 
 		public void PlaceOnTotem(Totem totem, TotemSection sectionAbove, TotemSection sectionBelow)
@@ -207,7 +209,7 @@ namespace GbJamTotem
 
 		public abstract void OnHit(bool toTheLeft, Player player, float pushForce);
 
-		protected void Push(float force)
+		protected void Push(Player player, float force)
 		{
 			m_physics.Throw(force, -5, (float)Program.Random.NextDouble());
 			m_physics.GroundLevel = 0;
@@ -230,6 +232,9 @@ namespace GbJamTotem
 			m_totemInstance = null;
 			m_below = null;
 			m_above = null;
+
+
+			m_generator.Generate(player.ComboCount, new object[] { m_transform.PositionGlobal, player });
 		}
 
 		public override void Update()
@@ -256,7 +261,7 @@ namespace GbJamTotem
 		}
 		public override void OnHit(bool toTheLeft, Player player, float pushForce)
 		{
-			Push(pushForce);
+			Push(player, pushForce);
             player.ComboCount++;
 		}
 	}
@@ -291,14 +296,14 @@ namespace GbJamTotem
 			if ((toTheLeft && m_type == SectionType.Left)
 				|| (!toTheLeft && m_type == SectionType.Right))
 			{
-				Push(pushForce);
+				Push(player, pushForce);
                 player.ComboCount++;
 			}
 			else
 			{
 				player.Bounce(toTheLeft);
                 player.ComboCount = 0;
-				Push(pushForce);
+				Push(player, pushForce);
 			}
 		}
 
@@ -345,7 +350,7 @@ namespace GbJamTotem
 			if ((toTheLeft && m_type == SectionType.Left)
 				|| (!toTheLeft && m_type == SectionType.Right))
 			{
-				Push(pushForce);
+				Push(player, pushForce);
                 player.ComboCount++;
 			}
 			else

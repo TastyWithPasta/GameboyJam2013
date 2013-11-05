@@ -25,7 +25,7 @@ namespace GbJamTotem
         public const int screenZoom = 3;
 
 		public static Random Random = new Random();
-		public static ParticleSystem Particles;
+		public static ParticleSystem Souls;
 		public static Camera2D GameCamera;
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
@@ -48,7 +48,7 @@ namespace GbJamTotem
 		public Game1()
             : base(160 * screenZoom, 144 * screenZoom)
 		{
-			Particles = new ParticleSystem(this, 100);
+			Souls = new ParticleSystem(this, 500);
 		}
 		protected override void Initialize()
 		{
@@ -143,7 +143,7 @@ namespace GbJamTotem
 				GameCamera.Transform.PosY = -CameraOffset;
 
 
-			Particles.Update();
+			Souls.Update();
 			base.Update(gameTime);
 		}
 
@@ -160,9 +160,10 @@ namespace GbJamTotem
             //
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             floorBackground.Draw();
-			Particles.Draw();
+			
 			m_totem.Draw();
             player.Draw();
+			Souls.Draw();
 
 			SpriteBatch.End();
 
