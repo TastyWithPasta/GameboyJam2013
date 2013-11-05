@@ -59,6 +59,7 @@ namespace GbJamTotem
 		List<TotemSection> m_allSections = new List<TotemSection>();
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
+
 		int m_amountOfNormalSections = 10;
 
         int m_amoutOfLeftMetalSections = 10;
@@ -70,10 +71,14 @@ namespace GbJamTotem
 
         public int TotalAmountOfSections
 		{
-			get { return AmountOfNormalSections 
+			/*get { return AmountOfNormalSections 
                 + AmoutOfLeftMetalSections
                 + AmoutOfRightMetalSections
-                + AmoutOfBothMetalSections; }
+                + AmoutOfBothMetalSections; }*/
+            get
+            {
+                return m_allSections.Count;
+            }
 		}	
 		public int AmountOfNormalSections
 		{
@@ -293,6 +298,7 @@ namespace GbJamTotem
 		{
 			Push(pushForce);
             player.ComboCount++;
+            Game1.scoreBorder.Score += Game1.normalTotemValue;
 		}
 	}
 
@@ -328,6 +334,7 @@ namespace GbJamTotem
 			{
 				Push(pushForce);
                 player.ComboCount++;
+                Game1.scoreBorder.Score += Game1.normalTotemValue;
 			}
 			else
 			{
@@ -382,6 +389,7 @@ namespace GbJamTotem
 			{
 				Push(pushForce);
                 player.ComboCount++;
+                Game1.scoreBorder.Score += Game1.normalTotemValue;
 			}
 			else
 			{
