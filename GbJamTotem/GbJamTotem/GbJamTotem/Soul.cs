@@ -24,7 +24,7 @@ namespace GbJamTotem
 				explodePosition.X = Program.Random.Next(-72, -20) + 0.5f;
 			else
 				explodePosition.X = Program.Random.Next(20, 73) + 0.5f;
-			explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)Math.Min(10, player.Transform.PosY + 100)) + 0.5f;
+			explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)player.Transform.PosY + 100) + 0.5f;
 			m_moveToExplosionPoint = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);
 			m_moveToExplosionPoint.StartPosition = initialPosition;
 			m_moveToExplosionPoint.Timer.Interval = BaseExplosionDuration / player.SpeedMultiplier;
