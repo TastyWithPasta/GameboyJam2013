@@ -22,7 +22,7 @@ namespace GbJamTotem
 		public const int GameboyHeight = 144;
 		public const int CameraOffset = 50;
 
-        public const int screenZoom = 2;
+        public const int screenZoom = 3;
 
 		public static Random Random = new Random();
 		public static ParticleSystem Souls;
