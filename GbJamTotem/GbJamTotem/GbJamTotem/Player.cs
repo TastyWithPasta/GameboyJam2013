@@ -19,7 +19,7 @@ namespace GbJamTotem
 
     public class Player : GameObject
     {
-		const float BasePlayerSpeed = 50.0f;
+		const float BasePlayerSpeed = 60.0f;
 		const float BasePushForce = 4.0f;
 		const float SlashDuration = 0.2f;
 		const float CollisionDelayRatio = 0.5f;
@@ -114,7 +114,7 @@ namespace GbJamTotem
             canClimb = true;
             isPlaying = false;
             comboCount = 0;
-
+			
             m_actionManager = new SingleActionManager();
 
             m_playerTransform = new Transform(m_transform, true);
@@ -123,6 +123,8 @@ namespace GbJamTotem
 			m_bounceTransform = new Transform(m_transform, true);
 			m_soulHotspot = new Transform(m_playerTransform, true);
 			m_soulHotspot.Position = new Vector2(10, -10);
+
+			m_playerTransform.ScaleUniform = 0.6f;
 
             m_playerTransform.PosX = initialPosition.X;
             m_leftTransform.Position = initialPosition;
@@ -225,7 +227,7 @@ namespace GbJamTotem
 					& playerPos.Y < sections[i].Bottom + totemPos.Y)
 				{
 					sections[i].OnHit(toTheLeft, this, (float)(BasePushForce * SpeedMultiplier * direction));
-					SpeedMultiplier = Math.Min(SpeedMultiplier *1.10f, MaxSpeedMultiplier);
+					SpeedMultiplier = Math.Min(SpeedMultiplier * 1.05f, MaxSpeedMultiplier);
 				}
 			}
 		}
@@ -249,7 +251,6 @@ namespace GbJamTotem
             comboCount = 0;
 
 		}
-
 		public override void Update()
         {
 			bool animationIsActive = m_slashLR.IsActive || m_slashRL.IsActive 
@@ -312,11 +313,9 @@ namespace GbJamTotem
             m_actionManager.Update();
             Game1.old_kbs = Game1.kbs;
         }
-
         public override void Draw()
         {
             m_sprite.Draw();
         }
-
     }
 }

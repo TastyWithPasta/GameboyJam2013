@@ -1,6 +1,5 @@
 ####Personnel
 *.png
-GbJamTotem/GbJamTotem/PastaLibrary/
 GbJamTotem/GbJamTotem.sln
 GbJamTotem/GbJamTotem/GbJamTotem/Game.ico
 GbJamTotem/GbJamTotem/GbJamTotem/Properties/AssemblyInfo.cs
@@ -10,6 +9,7 @@ GbJamTotem/GbJamTotem/GbJamTotemContent/GbJamTotemContent.contentproj
 ## Eclipse
 #################
 
+.orig
 *.pydevproject
 .project
 .metadata
