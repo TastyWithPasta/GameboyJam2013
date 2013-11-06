@@ -14,11 +14,18 @@ namespace GbJamTotem
         float timer;
         float timeCounter = 3;
         bool activeTimer;
+        bool countdownHasFinished;
+
+        public bool CountdownHasFinished
+        {
+            get { return countdownHasFinished; }
+        }
 
         public Countdown()
         {
             timer = 0;
             activeTimer = false;
+            countdownHasFinished = false;
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter3"), m_transform);
             m_sprite.Transform.Position = new Vector2(Game1.GameboyWidth/2, Game1.GameboyHeight/2);
             m_sprite.Transform.Scale = new Vector2();
@@ -27,26 +34,21 @@ namespace GbJamTotem
 
         public void activateCountdown()
         {
+            m_sprite.Transform.Scale = new Vector2(1);
             activeTimer = true;
         }
 
         public void resetCountdown()
         {
             timer = 0;
+            timeCounter = 3;
             activeTimer = false;
+            countdownHasFinished = false;
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter3"), m_transform);
         }
 
         public override void Update()
         {
-            // TODO
-            // Activer le timer en dehors du countdown
-            //
-            if (Game1.kbs.IsKeyDown(Keys.T) && Game1.old_kbs.IsKeyUp(Keys.T))
-            {
-                activeTimer = true;
-                m_sprite.Transform.Scale = new Vector2(1);
-            }
 
             if(activeTimer){
 
@@ -69,6 +71,9 @@ namespace GbJamTotem
                 {
                     activeTimer = false;
                     m_sprite.Transform.Scale = new Vector2(0);
+                    countdownHasFinished = true;
+                    Game1.scoreBorder.Slide(true);
+                    Game1.mapBorder.Slide(true);
                 }
             }
 

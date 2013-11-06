@@ -43,7 +43,6 @@ namespace GbJamTotem
 
         Sprite floorBackground;
         Transform climbingAltitude;
-        const int deltaAboveClimbingAltitude = -200;
 
 		Color m_bgColor = new Color(239, 255, 222);
 		GameboyDrawer m_drawer;
@@ -90,7 +89,7 @@ namespace GbJamTotem
             // Player initialisation
             //
             climbingAltitude = new Transform();
-            climbingAltitude.PosY = m_totem.Top + deltaAboveClimbingAltitude;
+            climbingAltitude.PosY = m_totem.Top;
             player = new Player(new Vector2(playerInitialPosition, 0), climbingAltitude);
 			player.Initialise(m_totem);
 
@@ -221,7 +220,7 @@ namespace GbJamTotem
                 SpriteBatch.Begin();
                 // Debug text
                 //
-                //SpriteBatch.DrawString(debugText, "PosX : " + scoreBorder.Transform.PosX, new Vector2(0, 300), Color.Red);
+                //SpriteBatch.DrawString(debugText, "PosY : " + player.Transform.PosY, new Vector2(0, 300), Color.Red);
                 
                 SpriteBatch.End();
             }
