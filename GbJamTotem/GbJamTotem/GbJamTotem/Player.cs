@@ -225,7 +225,7 @@ namespace GbJamTotem
 					& playerPos.Y < sections[i].Bottom + totemPos.Y)
 				{
 					sections[i].OnHit(toTheLeft, this, (float)(BasePushForce * SpeedMultiplier * direction));
-					SpeedMultiplier = Math.Min(SpeedMultiplier *1.05f, MaxSpeedMultiplier);
+					SpeedMultiplier = Math.Min(SpeedMultiplier *1.10f, MaxSpeedMultiplier);
 				}
 			}
 		}

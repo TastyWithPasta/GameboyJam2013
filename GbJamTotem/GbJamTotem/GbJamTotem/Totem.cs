@@ -239,8 +239,6 @@ namespace GbJamTotem
 			m_below = null;
 			m_above = null;
 
-			
-
 			m_generator.Generate(player.ComboCount, new object[] { m_transform.PositionGlobal, player });
 		}
 
@@ -312,7 +310,7 @@ namespace GbJamTotem
 			{
 				player.Bounce(toTheLeft);
                 player.ComboCount = 0;
-				Push(player, pushForce);
+				//Push(player, pushForce);
 			}
 		}
 
