@@ -28,6 +28,12 @@ namespace GbJamTotem
 
 		Totem m_totemInstance;
 
+        MoveToTransform m_walkingToTotem;
+        const int walkingDistance = 100;
+        const float walkingDuration = 5f;
+
+        const float climbingDuration = 1f;
+
 		Concurrent m_slashLR;
 		MoveToTransform m_movementLR;
 		DelayAction m_slashDelayLR;
@@ -44,15 +50,18 @@ namespace GbJamTotem
         MoveToTransform m_climbing;
         SingleActionManager m_actionManager;
 
-        Transform m_playerTransform;
+        Transform m_spriteTransform;
 		Transform m_soulHotspot;
         Transform m_leftTransform;
         Transform m_rightTransform;
 		Transform m_bounceTransform;
 
+        Vector2 m_initialPosition;
+        Transform m_climbingPosition;
+
         bool isToLeft;
         bool canClimb;
-        bool isPlaying;
+        bool isFalling;
 
 		float m_speedMultiplier = 1; //Permet d'accélérer le rythme d'action du joueur
 
@@ -64,9 +73,14 @@ namespace GbJamTotem
             set { comboCount = value; }
         }
 
+        public Transform PlayerTransform
+        {
+            get { return m_spriteTransform; }
+        }
+
 		public Transform SpriteTransform
 		{
-			get { return m_playerTransform; }
+			get { return m_spriteTransform; }
 		}
 
 		public Transform SoulHotspot
@@ -78,9 +92,6 @@ namespace GbJamTotem
 		{
 			get { return isToLeft; }
 		}
-
-        Vector2 m_initialPosition;
-        Transform m_climbingPosition;
 
 		public float SpeedMultiplier
 		{
@@ -112,23 +123,33 @@ namespace GbJamTotem
             m_climbingPosition = climbingPosition;
             isToLeft = true;
             canClimb = true;
-            isPlaying = false;
+            isFalling = false;
             comboCount = 0;
 
             m_actionManager = new SingleActionManager();
 
-            m_playerTransform = new Transform(m_transform, true);
+            m_spriteTransform = new Transform(m_transform, true);
             m_leftTransform = new Transform(m_transform, true);
             m_rightTransform = new Transform(m_transform, true);
 			m_bounceTransform = new Transform(m_transform, true);
-			m_soulHotspot = new Transform(m_playerTransform, true);
+			m_soulHotspot = new Transform(m_spriteTransform, true);
 			m_soulHotspot.Position = new Vector2(10, -10);
 
-            m_playerTransform.PosX = initialPosition.X;
+            m_transform.PosX = -walkingDistance;
+            m_spriteTransform.PosX = initialPosition.X;
             m_leftTransform.Position = initialPosition;
             m_rightTransform.Position = -initialPosition;
 
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("perso_destroy"), m_playerTransform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("perso_destroy"), m_spriteTransform);
+
+
+            // Mouvement walkingToTotem
+            // Mouvement d'introduction au jeu : on voit le personnage à distance, puis
+            // quand on commence, il se rapproche du totem
+            //
+            m_walkingToTotem = new MoveToTransform(Program.TheGame, m_transform, m_transform, new Transform(), 1) ;
+            m_walkingToTotem.Interpolator = new PSmoothstepInterpolation();
+            m_walkingToTotem.Timer.Interval = walkingDuration;
 
 			///
 			///	Slash left to right.
@@ -137,7 +158,7 @@ namespace GbJamTotem
 			///	Comme ça, le bloc peut être éjecté à un moment très précis, et il n'y a pas de collisions intempestives.
 			///	On a: Concurrent(Mouvement + Sequence(delai => test collision))
 			///
-			m_movementLR = new MoveToTransform(Program.TheGame, m_playerTransform, m_leftTransform, m_rightTransform, 1);
+			m_movementLR = new MoveToTransform(Program.TheGame, m_spriteTransform, m_leftTransform, m_rightTransform, 1);
 			m_movementLR.Interpolator = new PSmoothstepInterpolation();
 			m_movementLR.Timer.Interval = SlashDuration;
 			m_slashDelayLR = new DelayAction(Program.TheGame, CollisionDelayDuration);
@@ -147,14 +168,14 @@ namespace GbJamTotem
 			slashActionLR.AddAction(collisionLR);
 			m_slashLR = new Concurrent(new PastaGameLibrary.Action[] { slashActionLR, m_movementLR });
 
-			m_metalBounceLR = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_leftTransform, 1);
+			m_metalBounceLR = new MoveToTransform(Program.TheGame, m_spriteTransform, m_bounceTransform, m_leftTransform, 1);
 			m_metalBounceLR.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
 
 			///
 			/// Slash Right To Left
 			/// Même principe que l'autre sens
 			///
-			m_movementRL = new MoveToTransform(Program.TheGame, m_playerTransform, m_rightTransform, m_leftTransform, 1);
+			m_movementRL = new MoveToTransform(Program.TheGame, m_spriteTransform, m_rightTransform, m_leftTransform, 1);
 			m_movementRL.Interpolator = new PSmoothstepInterpolation();
 			m_movementRL.Timer.Interval = SlashDuration;
 
@@ -170,7 +191,7 @@ namespace GbJamTotem
 			//
 			// Mouvement de rebond volontaire gauche
 			//
-			MoveToTransform bounceMovementL = new MoveToTransform(Program.TheGame, m_playerTransform, m_leftTransform, m_bounceTransform, 1);
+			MoveToTransform bounceMovementL = new MoveToTransform(Program.TheGame, m_spriteTransform, m_leftTransform, m_bounceTransform, 1);
 			bounceMovementL.Timer.Interval = SlashDuration;
 			bounceMovementL.Interpolator = new PBounceInterpolation();
 			MethodAction actionL = new MethodAction(
@@ -184,7 +205,7 @@ namespace GbJamTotem
 			//
 			// Mouvement de rebond volontaire droite
 			//
-			MoveToTransform bounceMovementR = new MoveToTransform(Program.TheGame, m_playerTransform, m_rightTransform, m_bounceTransform, 1);
+			MoveToTransform bounceMovementR = new MoveToTransform(Program.TheGame, m_spriteTransform, m_rightTransform, m_bounceTransform, 1);
 			bounceMovementR.Timer.Interval = SlashDuration;
 			bounceMovementR.Interpolator = new PBounceInterpolation();
 			MethodAction actionR = new MethodAction(
@@ -195,12 +216,12 @@ namespace GbJamTotem
 				});
 			m_slashBounceRL = new Concurrent(new PastaGameLibrary.Action[] { actionR, slashActionRL, bounceMovementR });
 
-			m_metalBounceRL = new MoveToTransform(Program.TheGame, m_playerTransform, m_bounceTransform, m_rightTransform, 1);
+			m_metalBounceRL = new MoveToTransform(Program.TheGame, m_spriteTransform, m_bounceTransform, m_rightTransform, 1);
 			m_metalBounceRL.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
 
             m_climbing = new MoveToTransform(Program.TheGame, m_transform, m_transform, m_climbingPosition, 1);
             m_climbing.Interpolator = new PSmoothstepInterpolation();
-            m_climbing.Timer.Interval = 0.2f;
+            m_climbing.Timer.Interval = climbingDuration;
         }
 
 		public void Initialise(Totem totem)
@@ -231,7 +252,7 @@ namespace GbJamTotem
 		}
 		public void Bounce(bool toTheLeft)
 		{
-			m_bounceTransform.Position = m_playerTransform.Position;
+			m_bounceTransform.Position = m_spriteTransform.Position;
 			if (toTheLeft)
 			{
 				m_actionManager.StartNew(m_metalBounceRL);
@@ -256,32 +277,12 @@ namespace GbJamTotem
 				|| m_slashBounceLR.IsActive || m_slashBounceLR.IsActive
 				|| m_metalBounceLR.IsActive || m_metalBounceRL.IsActive;
 
-			if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt) && !animationIsActive)
-			{
-				if (isToLeft)
-				{
-					m_actionManager.StartNew(m_slashBounceLR);
-					isToLeft = true;
-				}
-				else
-				{
-					m_actionManager.StartNew(m_slashBounceRL);
-					isToLeft = false;
-				}
-			}
 
-            if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
+            // Introduction animation (walking to totem)
+            //
+            if (Game1.kbs.IsKeyDown(Keys.S) && Game1.old_kbs.IsKeyUp(Keys.S))
             {
-				if (isToLeft)
-				{
-					m_actionManager.StartNew(m_slashLR);
-					isToLeft = false;
-				}
-				else
-				{
-					m_actionManager.StartNew(m_slashRL);
-					isToLeft = true;
-				}
+                m_actionManager.StartNew(m_walkingToTotem);
             }
 
             // Activate climbing animation
@@ -293,19 +294,67 @@ namespace GbJamTotem
                 canClimb = false;
             }
 
-            if (!canClimb && this.Transform.PosY <= m_climbingPosition.PosY)
+            // TODO
+            // faire un compteur
+            // 1 - le perso décolle
+            // 2 - Il arrive à l'arc de son vol et commence à redescendre. => le décompte commence
+            // 3 - Vers la fin du compteur, les slides apparaissent
+            // 4 - Fin du compteur, le joueur atteint le top du totem et le joueur a le controle
+            //
+ 
+            // Start falling, unlock commands and other stuff
+            //
+            if (!canClimb && !isFalling && this.Transform.PosY <= m_climbingPosition.PosY)
             {
-                isPlaying = true;
+                isFalling = true;
+                Game1.scoreBorder.Slide(true);
+                Game1.mapBorder.Slide(true);
             }
 
-            if (isPlaying)
+            if (isFalling)
             {
-				this.Transform.PosY = this.Transform.PosY + (float)(BasePlayerSpeed * SpeedMultiplier * Program.TheGame.ElapsedTime);
 
+                if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt) && !animationIsActive)
+                {
+                    if (isToLeft)
+                    {
+                        m_actionManager.StartNew(m_slashBounceLR);
+                        isToLeft = true;
+                    }
+                    else
+                    {
+                        m_actionManager.StartNew(m_slashBounceRL);
+                        isToLeft = false;
+                    }
+                }
+
+                if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
+                {
+                    if (isToLeft)
+                    {
+                        m_actionManager.StartNew(m_slashLR);
+                        isToLeft = false;
+                    }
+                    else
+                    {
+                        m_actionManager.StartNew(m_slashRL);
+                        isToLeft = true;
+                    }
+                }
+
+                // Update falling
+                //
+                this.Transform.PosY = this.Transform.PosY + (float)(BasePlayerSpeed * SpeedMultiplier * Program.TheGame.ElapsedTime);
+
+                // Stop falling if on the floor 
+                //
                 if (this.Transform.PosY >= 0)
                 {
-                    isPlaying = false;
+                    isFalling = false;
                     canClimb = true;
+
+                    Game1.scoreBorder.Slide(false);
+                    Game1.mapBorder.Slide(false);
                 }
             }
 
