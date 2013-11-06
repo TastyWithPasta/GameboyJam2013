@@ -32,7 +32,11 @@ namespace GbJamTotem
         const int walkingDistance = 100;
         const float walkingDuration = 5f;
 
-        const float climbingDuration = 1f;
+        // Cannot be greather than 7, otherwise climbing animation will not
+        // switch at time with coun
+        //
+        const float climbingDuration = 20f;
+        const int deltaAboveClimbingAltitude = -200;
 
 		Concurrent m_slashLR;
 		MoveToTransform m_movementLR;
@@ -58,7 +62,7 @@ namespace GbJamTotem
 
         Vector2 m_initialPosition;
         Transform m_climbingPosition;
-
+       
         bool isToLeft;
         bool canClimb;
         bool isFalling;
@@ -120,7 +124,12 @@ namespace GbJamTotem
             : base()
         {
             m_initialPosition = initialPosition;
+
+            // Add delta for starting higher on the totem
+            //
             m_climbingPosition = climbingPosition;
+            m_climbingPosition.PosY = m_climbingPosition.PosY + deltaAboveClimbingAltitude;
+
             isToLeft = true;
             canClimb = true;
             isFalling = false;
@@ -300,50 +309,55 @@ namespace GbJamTotem
             // 3 - Vers la fin du compteur, les slides apparaissent
             // 4 - Fin du compteur, le joueur atteint le top du totem et le joueur a le controle
             //
- 
-            // Start falling, unlock commands and other stuff
+
+            // Stop animation in order to skip end of interpolation
             //
-            if (!canClimb && !isFalling && this.Transform.PosY <= m_climbingPosition.PosY)
+            if (m_climbing.IsActive && this.Transform.PosY <= m_climbingPosition.PosY - (deltaAboveClimbingAltitude/50))
+                m_actionManager.Stop();
+
+            // Start falling
+            // PosY <= m_climbing... becasue Y axis is negative
+            //
+            if (!canClimb && !isFalling && this.Transform.PosY <= m_climbingPosition.PosY - (deltaAboveClimbingAltitude/50) && !m_climbing.IsActive)
             {
                 isFalling = true;
-                Game1.scoreBorder.Slide(true);
-                Game1.mapBorder.Slide(true);
+                Game1.startingCountdown.activateCountdown();
             }
 
+            // Unlock commands if falling and countdownFinished are true
+            //
             if (isFalling)
             {
-
-                if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt) && !animationIsActive)
+                if (Game1.startingCountdown.CountdownHasFinished)
                 {
-                    if (isToLeft)
+                    if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt) && !animationIsActive)
                     {
-                        m_actionManager.StartNew(m_slashBounceLR);
-                        isToLeft = true;
+                        if (isToLeft)
+                        {
+                            m_actionManager.StartNew(m_slashBounceLR);
+                            isToLeft = true;
+                        }
+                        else
+                        {
+                            m_actionManager.StartNew(m_slashBounceRL);
+                            isToLeft = false;
+                        }
                     }
-                    else
+
+                    if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
                     {
-                        m_actionManager.StartNew(m_slashBounceRL);
-                        isToLeft = false;
+                        if (isToLeft)
+                        {
+                            m_actionManager.StartNew(m_slashLR);
+                            isToLeft = false;
+                        }
+                        else
+                        {
+                            m_actionManager.StartNew(m_slashRL);
+                            isToLeft = true;
+                        }
                     }
                 }
-
-                if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
-                {
-                    if (isToLeft)
-                    {
-                        m_actionManager.StartNew(m_slashLR);
-                        isToLeft = false;
-                    }
-                    else
-                    {
-                        m_actionManager.StartNew(m_slashRL);
-                        isToLeft = true;
-                    }
-                }
-
-                // Update falling
-                //
-                this.Transform.PosY = this.Transform.PosY + (float)(BasePlayerSpeed * SpeedMultiplier * Program.TheGame.ElapsedTime);
 
                 // Stop falling if on the floor 
                 //
@@ -354,7 +368,13 @@ namespace GbJamTotem
 
                     Game1.scoreBorder.Slide(false);
                     Game1.mapBorder.Slide(false);
+                    Game1.startingCountdown.resetCountdown();
                 }
+
+                // Update falling
+                //
+                this.Transform.PosY = this.Transform.PosY + (float)(BasePlayerSpeed * SpeedMultiplier * Program.TheGame.ElapsedTime);
+
             }
 
             m_actionManager.Update();
