@@ -74,6 +74,7 @@
   <ItemGroup>
     <Compile Include="Camera2D.cs" />
     <Compile Include="ComboNumber.cs" />
+    <Compile Include="Countdown.cs" />
     <Compile Include="GameboyDrawer.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="MapBorder.cs" />

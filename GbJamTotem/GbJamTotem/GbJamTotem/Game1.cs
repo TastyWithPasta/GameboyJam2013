@@ -33,6 +33,7 @@ namespace GbJamTotem
         int playerInitialPosition = -50;
 
         public static PauseScreen pauseScreen;
+        public static Countdown startingCountdown;
         public static ScoreBorder scoreBorder;
         public static MapBorder mapBorder;
         public static int normalTotemValue = 100;
@@ -96,6 +97,7 @@ namespace GbJamTotem
             // Pause screen & GUI initialisation
             //
             pauseScreen = new PauseScreen();
+            startingCountdown = new Countdown();
             scoreBorder = new ScoreBorder(ScreenHeight);
             mapBorder = new MapBorder();
 
@@ -141,6 +143,9 @@ namespace GbJamTotem
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
             }
 
+
+            startingCountdown.Update();
+
             pauseScreen.Update();
             if (pauseScreen.IsGamePaused) return;
            
@@ -185,6 +190,7 @@ namespace GbJamTotem
             // Drawing GUI
             //
             SpriteBatch.Begin();
+            startingCountdown.Draw();
             scoreBorder.Draw();
             mapBorder.Draw();
             SpriteBatch.End();
