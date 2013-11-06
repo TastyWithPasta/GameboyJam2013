@@ -22,7 +22,7 @@ namespace GbJamTotem
 		public const int GameboyHeight = 144;
 		public const int CameraOffset = 50;
 
-        public const int screenZoom = 2;
+        public const int screenZoom = 3;
 
 		public static Random Random = new Random();
 		public static ParticleSystem Souls;
@@ -42,7 +42,7 @@ namespace GbJamTotem
 
         Sprite floorBackground;
         Transform climbingAltitude;
-        int deltaAboveClimbingAltitude;
+        const int deltaAboveClimbingAltitude = -200;
 
 		Color m_bgColor = new Color(239, 255, 222);
 		GameboyDrawer m_drawer;
@@ -88,7 +88,6 @@ namespace GbJamTotem
 
             // Player initialisation
             //
-            deltaAboveClimbingAltitude = -100;
             climbingAltitude = new Transform();
             climbingAltitude.PosY = m_totem.Top + deltaAboveClimbingAltitude;
             player = new Player(new Vector2(playerInitialPosition, 0), climbingAltitude);
@@ -153,7 +152,7 @@ namespace GbJamTotem
             mapBorder.Update();
 
             GameCamera.Update();
-            GameCamera.Transform.PosX = player.Transform.PosX;
+            GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
             GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
 
             if (GameCamera.Transform.PosY > -CameraOffset)
@@ -216,9 +215,7 @@ namespace GbJamTotem
                 SpriteBatch.Begin();
                 // Debug text
                 //
-                //SpriteBatch.DrawString(debugText, "Score : " + scoreBorder.Score, new Vector2(0, 300), Color.Red);
-                //SpriteBatch.DrawString(debugText, "Max : " + m_totem.TotalAmountOfSections*normalTotemValue, new Vector2(0, 320), Color.Red);
-                //SpriteBatch.DrawString(debugText, "sclY : " + scoreBorder.m_graphicScore.Transform.SclY, new Vector2(0,340), Color.Red);
+                //SpriteBatch.DrawString(debugText, "PosX : " + scoreBorder.Transform.PosX, new Vector2(0, 300), Color.Red);
                 
                 SpriteBatch.End();
             }
