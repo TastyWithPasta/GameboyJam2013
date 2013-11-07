@@ -56,6 +56,7 @@ namespace GbJamTotem
 
         Transform m_spriteTransform;
 		Transform m_soulHotspot;
+        Transform m_soulAbsorptionPosition;
         Transform m_leftTransform;
         Transform m_rightTransform;
 		Transform m_bounceTransform;
@@ -91,6 +92,11 @@ namespace GbJamTotem
 		{
 			get { return m_soulHotspot; }
 		}
+
+        public Transform SoulAbsorptionPosition
+        {
+            get { return m_soulAbsorptionPosition; }
+        }
 
 		public bool IsToLeft
 		{
@@ -143,6 +149,8 @@ namespace GbJamTotem
 			m_bounceTransform = new Transform(m_transform, true);
 			m_soulHotspot = new Transform(m_spriteTransform, true);
 			m_soulHotspot.Position = new Vector2(10, -10);
+            m_soulAbsorptionPosition = new Transform(m_spriteTransform, true);
+            m_soulAbsorptionPosition.Position = new Vector2(0, 1);
 
             m_transform.PosX = -walkingDistance;
             m_spriteTransform.PosX = initialPosition.X;
@@ -374,6 +382,11 @@ namespace GbJamTotem
                 // Update falling
                 //
                 this.Transform.PosY = this.Transform.PosY + (float)(BasePlayerSpeed * SpeedMultiplier * Program.TheGame.ElapsedTime);
+
+                // TODO Concurrent?
+                //
+                m_soulAbsorptionPosition = this.PlayerTransform;
+                m_soulAbsorptionPosition.PosY = this.Transform.PosY;
 
             }
 
