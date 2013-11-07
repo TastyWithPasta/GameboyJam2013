@@ -37,6 +37,7 @@ namespace GbJamTotem
             m_transform.Position = new Vector2(-8, 72);
 
             m_graphicScore = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("score_foreground"), new Transform(m_transform, true));
+            m_graphicScore.Origin = new Vector2(0.5f, 1);
             m_graphicScore.Transform.Position = new Vector2(0,72);
             m_graphicScore.Transform.SclY = 0f;
 
@@ -61,7 +62,7 @@ namespace GbJamTotem
 
         public override void Update()
         {
-            m_graphicScore.Transform.SclY = ((float)score / ((float)Game1.m_totem.TotalAmountOfSections * (float)Game1.normalTotemValue))*2;
+            m_graphicScore.Transform.SclY = ((float)score / ((float)Game1.m_totem.TotalAmountOfSections * (float)Game1.normalTotemValue));
             m_actionManager.Update();
         }
 
