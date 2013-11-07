@@ -261,7 +261,7 @@ namespace GbJamTotem
 		public NormalSection(SectionType type)
 			: base(SectionType.Unilateral)
 		{
-			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_3"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 		}
 		public override void OnHit(bool toTheLeft, Player player, float pushForce)
@@ -280,7 +280,7 @@ namespace GbJamTotem
 		public MetalSection(SectionType type)
 			:base(type)
         {
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_3"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 
 			bool left = type == SectionType.Left || type == SectionType.Unilateral;
@@ -332,7 +332,7 @@ namespace GbJamTotem
         public SpikeSection(SectionType type)
             : base(type)
         {
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_temp"), m_transform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_3"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 
             bool left = type == SectionType.Left || type == SectionType.Unilateral;
@@ -340,15 +340,17 @@ namespace GbJamTotem
 
             if (left)
             {
-                m_spikeSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_spikes_left"), new Transform(m_transform, true));
-				m_spikeSpriteLeft.Transform.PosX = -4;
+                m_spikeSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_spikes_left_1"), new Transform(m_transform, true));
+				//m_spikeSpriteLeft.Transform.PosX = -4;
+                m_spikeSpriteLeft.Transform.PosX = -19;
 				m_spikeSpriteLeft.Origin = TotemSection.spriteOrigin;
             }
             if (right)
             {
-                m_spikeSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_spikes_right"), new Transform(m_transform, true));
+                m_spikeSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_spikes_right_1"), new Transform(m_transform, true));
                 m_spikeSpriteRight.Origin = TotemSection.spriteOrigin;
-				m_spikeSpriteRight.Transform.PosX = 4;
+				//m_spikeSpriteRight.Transform.PosX = 4;
+                m_spikeSpriteRight.Transform.PosX = 19;
             }
         }
 

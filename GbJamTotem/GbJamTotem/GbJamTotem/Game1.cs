@@ -44,7 +44,8 @@ namespace GbJamTotem
         Sprite floorBackground;
         Transform climbingAltitude;
 
-		Color m_bgColor = new Color(239, 255, 222);
+		//Color m_bgColor = new Color(239, 255, 222);
+        Color m_bgColor = new Color(166, 202, 240);
 		GameboyDrawer m_drawer;
 		public static Totem m_totem;
 
