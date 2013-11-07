@@ -127,15 +127,24 @@ namespace PastaGameLibrary
 	{
 		public delegate void ActionMethod();
 		ActionMethod m_actionMethod;
+		bool m_loop = false;
 
 		public MethodAction(ActionMethod actionMethod)
 			: base()
 		{
 			m_actionMethod = actionMethod;
 		}
+		public MethodAction(ActionMethod actionMethod, bool loop)
+			: base()
+		{
+			m_loop = loop;
+			m_actionMethod = actionMethod;
+		}
 
 		protected override void OnUpdate()
 		{
+			if (m_loop)
+				m_actionMethod();
 			//throw new NotImplementedException();
 		}
 
@@ -143,7 +152,8 @@ namespace PastaGameLibrary
 		{
 			base.OnStart();
 			m_actionMethod();
-			Stop();
+			if(!m_loop)
+				Stop();
 		}
 	}
 
