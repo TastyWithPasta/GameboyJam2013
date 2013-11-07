@@ -11,11 +11,9 @@ namespace GbJamTotem
 	{
 		const float BaseExplosionDuration = 0.5f;
 		const float BaseDuration = 0.5f;
-		MoveToStaticAction m_moveToExplosionPoint;
-		MoveToTransform m_moveToAnimation;
-        MoveToTransform m_moveToPlayer;
+		const float MoveToPlayerTime = 0.3f;
 
-        SingleActionManager m_actionManager;
+		Sequence m_animation;
 
         // TODO NOTE
         // Si besoin de créer des particules, il faut un générateur de particules ( ParticleGenerator<ClasseDeParticle> )
@@ -25,9 +23,6 @@ namespace GbJamTotem
 
         public Soul(Vector2 initialPosition, Player player)
 		{
-
-            m_actionManager = new SingleActionManager();
-
 			//m_transform.ParentTransform = player.Transform;
 			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("soul_temp"), m_transform);
 			Vector2 explodePosition;
@@ -37,34 +32,29 @@ namespace GbJamTotem
 			else
 				explodePosition.X = Program.Random.Next(20, 73) + 0.5f;
 			explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)player.Transform.PosY + 100) + 0.5f;
-			m_moveToExplosionPoint = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);
-			m_moveToExplosionPoint.StartPosition = initialPosition;
-			m_moveToExplosionPoint.Timer.Interval = BaseExplosionDuration / player.SpeedMultiplier;
-			m_moveToExplosionPoint.Interpolator = new PSmoothstepInterpolation();
-			m_moveToExplosionPoint.Start();
-			//Transform start = new Transform(player.Transform, true);
-			//start.Position = initialPosition - player.Transform.PositionGlobal;
-			//m_moveToAnimation = new MoveToTransform(Program.TheGame, m_transform, start, player.SpriteTransform, 1);
-			//m_moveToAnimation.Interpolator = new PSmoothstepInterpolation();
-			//m_moveToAnimation.Timer.Interval = BaseDuration / player.SpeedMultiplier;
-			//m_moveToAnimation.Start();
 
-            m_moveToPlayer = new MoveToTransform(Program.TheGame, m_transform, m_transform, player.SoulAbsorptionPosition, 1);
-            m_moveToExplosionPoint.Interpolator = new PSmoothstepInterpolation();
-            m_moveToPlayer.Timer.Interval = 1f;
-            
+			MoveToStaticAction moveToExplosionPoint = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);
+			moveToExplosionPoint.StartPosition = initialPosition;
+			moveToExplosionPoint.Timer.Interval = BaseExplosionDuration / player.SpeedMultiplier;
+			moveToExplosionPoint.Interpolator = new PSmoothstepInterpolation();
+			MoveToStaticAction moveToPlayer = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);
+			moveToPlayer.Interpolator = new PSquareInterpolation(1);
+			moveToPlayer.Timer.Interval = MoveToPlayerTime;
+			MethodAction positionRefresh = new MethodAction(delegate() { moveToPlayer.Target = player.SoulAbsorptionPosition.PositionGlobal; });
 
+			m_animation = new Sequence(1);
+			m_animation.AddAction(moveToExplosionPoint);
+			m_animation.AddAction(new Concurrent(new PastaGameLibrary.Action[]{ positionRefresh, moveToPlayer }));
+			m_animation.Start();
+		}
+
+		private void UpdateMoveToPlayer()
+		{ 
 		}
 
 		public override void Update()
 		{
-			m_moveToExplosionPoint.Update();
-			//m_moveToAnimation.Update();
-
-            if (m_moveToExplosionPoint.IsActive)
-                m_actionManager.StartNew(m_moveToPlayer);
-
-            m_actionManager.Update();
+			m_animation.Update();
 		}
 
 		public override void Draw()
@@ -75,7 +65,7 @@ namespace GbJamTotem
 
 		public bool RemoveMe()
 		{
-			return false;
+			return !m_animation.IsActive;
 			//return !m_moveToAnimation.IsActive;
 		}
 	}

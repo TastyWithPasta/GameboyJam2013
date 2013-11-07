@@ -78,11 +78,6 @@ namespace GbJamTotem
             set { comboCount = value; }
         }
 
-        public Transform PlayerTransform
-        {
-            get { return m_spriteTransform; }
-        }
-
 		public Transform SpriteTransform
 		{
 			get { return m_spriteTransform; }
@@ -382,12 +377,6 @@ namespace GbJamTotem
                 // Update falling
                 //
                 this.Transform.PosY = this.Transform.PosY + (float)(BasePlayerSpeed * SpeedMultiplier * Program.TheGame.ElapsedTime);
-
-                // TODO Concurrent?
-                //
-                m_soulAbsorptionPosition = this.PlayerTransform;
-                m_soulAbsorptionPosition.PosY = this.Transform.PosY;
-
             }
 
             m_actionManager.Update();
