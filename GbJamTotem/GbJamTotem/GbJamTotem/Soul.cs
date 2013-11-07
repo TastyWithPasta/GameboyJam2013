@@ -13,9 +13,21 @@ namespace GbJamTotem
 		const float BaseDuration = 0.5f;
 		MoveToStaticAction m_moveToExplosionPoint;
 		MoveToTransform m_moveToAnimation;
+        MoveToTransform m_moveToPlayer;
 
-		public Soul(Vector2 initialPosition, Player player)
+        SingleActionManager m_actionManager;
+
+        // TODO NOTE
+        // Si besoin de créer des particules, il faut un générateur de particules ( ParticleGenerator<ClasseDeParticle> )
+        /*
+         * "J'ai un système de particules statique deans Game1, Il te faut un générateur de particules pour créer des particules"
+         */
+
+        public Soul(Vector2 initialPosition, Player player)
 		{
+
+            m_actionManager = new SingleActionManager();
+
 			//m_transform.ParentTransform = player.Transform;
 			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("soul_temp"), m_transform);
 			Vector2 explodePosition;
@@ -36,12 +48,23 @@ namespace GbJamTotem
 			//m_moveToAnimation.Interpolator = new PSmoothstepInterpolation();
 			//m_moveToAnimation.Timer.Interval = BaseDuration / player.SpeedMultiplier;
 			//m_moveToAnimation.Start();
+
+            m_moveToPlayer = new MoveToTransform(Program.TheGame, m_transform, m_transform, player.SoulAbsorptionPosition, 1);
+            m_moveToExplosionPoint.Interpolator = new PSmoothstepInterpolation();
+            m_moveToPlayer.Timer.Interval = 1f;
+            
+
 		}
 
 		public override void Update()
 		{
 			m_moveToExplosionPoint.Update();
 			//m_moveToAnimation.Update();
+
+            if (m_moveToExplosionPoint.IsActive)
+                m_actionManager.StartNew(m_moveToPlayer);
+
+            m_actionManager.Update();
 		}
 
 		public override void Draw()
