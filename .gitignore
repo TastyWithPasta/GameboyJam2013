@@ -9,7 +9,7 @@ GbJamTotem/GbJamTotem/GbJamTotemContent/GbJamTotemContent.contentproj
 ## Eclipse
 #################
 
-.orig
+*.orig
 *.pydevproject
 .project
 .metadata
