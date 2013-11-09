@@ -25,8 +25,7 @@ namespace GbJamTotem
         public const int screenZoom = 4;
 
 		public static Random Random = new Random();
-		public static ParticleSystem Souls;
-
+        public static ParticleSystem Souls;
         public static ParticleSystem Explosions;
 
 		public static Camera2D GameCamera;
@@ -59,7 +58,26 @@ namespace GbJamTotem
 
         float scaleCombo = 0;
 
-		public Game1()
+        #region SOUND ATTRIBUTES
+
+        public static SoundEffectInstance normalTotemCollisionSound_Channel1;
+        public static SoundEffectInstance normalTotemCollisionSound_Channel2;
+
+        public static SoundEffectInstance metalTotemCollisionSound_Channel1;
+        public static SoundEffectInstance metalTotemCollisionSound_Channel2;
+
+        public static SoundEffectInstance swordSlashSound;
+        public static SoundEffectInstance moveLeftToRightSound;
+        public static SoundEffectInstance moveRightToLeftSound;
+
+        public static SoundEffectInstance musicT1P1;
+        public static SoundEffectInstance musicT1P2;
+        public static SoundEffectInstance musicT1P3;
+
+        #endregion
+
+
+        public Game1()
             : base(160 * screenZoom, 144 * screenZoom)
 		{
 			Souls = new ParticleSystem(this, 500);
@@ -82,7 +100,8 @@ namespace GbJamTotem
 
             debugText = Content.Load<SpriteFont>("Text/Debug");
 
-            //SoundEffectLibrary.LoadContent(Content, "SoundEffects");
+            SoundEffectLibrary.LoadContent(Content, "SoundEffects");
+
             m_drawer = new GameboyDrawer(this);
             GameCamera = new Camera2D(new Vector2(GameboyWidth * 0.5f, GameboyHeight * 0.5f));
             GameCamera.ScaleToZoom = true;
@@ -114,6 +133,21 @@ namespace GbJamTotem
             //
             floorBackground = new Sprite(this, TextureLibrary.GetSpriteSheet("floor_background"), new Transform());
             floorBackground.Transform.PosY = -20;
+
+            // Sound & musics
+            //
+            normalTotemCollisionSound_Channel1 = SoundEffectLibrary.Get("normal_collision_sound").CreateInstance();
+            normalTotemCollisionSound_Channel2 = SoundEffectLibrary.Get("normal_collision_sound").CreateInstance();
+            metalTotemCollisionSound_Channel1 = SoundEffectLibrary.Get("metal_collision_sound").CreateInstance();
+            metalTotemCollisionSound_Channel2 = SoundEffectLibrary.Get("metal_collision_sound").CreateInstance();
+            swordSlashSound = SoundEffectLibrary.Get("sword_slash").CreateInstance();
+            moveLeftToRightSound = SoundEffectLibrary.Get("move_left_to_right").CreateInstance();
+            moveRightToLeftSound = SoundEffectLibrary.Get("move_right_to_left").CreateInstance();
+
+            musicT1P1 = SoundEffectLibrary.Get("music_T1P1").CreateInstance();
+            musicT1P2 = SoundEffectLibrary.Get("music_T1P2").CreateInstance();
+            musicT1P3 = SoundEffectLibrary.Get("music_T1P3").CreateInstance();
+            musicT1P3.IsLooped = true;
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
@@ -164,6 +198,12 @@ namespace GbJamTotem
             pauseScreen.Update();
             if (pauseScreen.IsGamePaused) return;
            
+            // Playing music
+            //
+            if (startingCountdown.CountdownHasFinished && musicT1P3.State != SoundState.Playing)
+                musicT1P3.Play();
+
+
             // Update game if unpaused
             //
             player.Update();

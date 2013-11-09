@@ -33,7 +33,7 @@ namespace GbJamTotem
     {
 		const float BasePlayerSpeed = 60.0f;
 		const float BasePushForce = 4.0f;
-		const float SlashDuration = 0.15f;
+		const float SlashDuration = 0.4f;
 		const float CollisionDelayRatio = 0.5f;
 		const float CollisionDelayDuration = SlashDuration * CollisionDelayRatio;
 		const float MaxSpeedMultiplier = 2.75f;
@@ -353,6 +353,8 @@ namespace GbJamTotem
                 {
                     if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt) && !animationIsActive)
                     {
+                        Game1.swordSlashSound.Play();
+
                         if (isToLeft)
                         {
                             m_actionManager.StartNew(m_slashBounceLR);
@@ -367,13 +369,18 @@ namespace GbJamTotem
 
                     if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
                     {
+
+                        Game1.swordSlashSound.Play();
+
                         if (isToLeft)
                         {
+                            Game1.moveLeftToRightSound.Play();
                             m_actionManager.StartNew(m_slashLR);
                             isToLeft = false;
                         }
                         else
                         {
+                            Game1.moveRightToLeftSound.Play();
                             m_actionManager.StartNew(m_slashRL);
                             isToLeft = true;
                         }
