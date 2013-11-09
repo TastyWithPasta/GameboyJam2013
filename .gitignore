@@ -1,5 +1,6 @@
 ####Personnel
 *.png
+*.wav
 GbJamTotem/GbJamTotem.sln
 GbJamTotem/GbJamTotem/GbJamTotem/Game.ico
 GbJamTotem/GbJamTotem/GbJamTotem/Properties/AssemblyInfo.cs

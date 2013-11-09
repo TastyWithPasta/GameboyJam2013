@@ -5,6 +5,7 @@ using System.Text;
 using PastaGameLibrary;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 
 namespace GbJamTotem
 {
@@ -199,7 +200,8 @@ namespace GbJamTotem
 			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
-			m_generator = new ParticleGenerator<Soul>(Program.TheGame, Game1.Souls);
+
+            m_generator = new ParticleGenerator<Soul>(Program.TheGame, Game1.Souls);
 
             m_explosion = new ParticleGenerator<Explosion>(Program.TheGame, Game1.Explosions);
 		}
@@ -285,8 +287,15 @@ namespace GbJamTotem
 		public override void OnHit(bool toTheLeft, Player player, float pushForce)
 		{
 			Push(player, pushForce);
+            if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+            {
+                Game1.normalTotemCollisionSound_Channel2.Play();
+            }
+            else
+            {
+                Game1.normalTotemCollisionSound_Channel1.Play();
+            }
             player.ComboCount++;
-            // Game1.scoreBorder.Score += Game1.normalTotemValue; // TODO remove
 		}
 	}
 
@@ -328,12 +337,27 @@ namespace GbJamTotem
 				|| (!toTheLeft && m_type == SectionType.Right))
 			{
 				Push(player, pushForce);
+                if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                {
+                    Game1.normalTotemCollisionSound_Channel2.Play();
+                }
+                else
+                {
+                    Game1.normalTotemCollisionSound_Channel1.Play();
+                }
                 player.ComboCount++;
-                //Game1.scoreBorder.Score += Game1.normalTotemValue; // TODO Remove
 			}
 			else
 			{
 				player.Bounce(toTheLeft);
+                if (Game1.metalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                {
+                    Game1.metalTotemCollisionSound_Channel2.Play();
+                }
+                else
+                {
+                    Game1.metalTotemCollisionSound_Channel1.Play();
+                }
                 player.ComboCount = 0;
 				//Push(player, pushForce);
 			}
@@ -392,8 +416,15 @@ namespace GbJamTotem
 				|| (!toTheLeft && m_type == SectionType.Right))
 			{
 				Push(player, pushForce);
+                if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                {
+                    Game1.normalTotemCollisionSound_Channel2.Play();
+                }
+                else
+                {
+                    Game1.normalTotemCollisionSound_Channel1.Play();
+                }
                 player.ComboCount++;
-                //Game1.scoreBorder.Score += Game1.normalTotemValue; //TODO remove
 			}
 			else
 			{

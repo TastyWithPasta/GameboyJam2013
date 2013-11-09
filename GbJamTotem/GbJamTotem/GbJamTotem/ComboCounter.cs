@@ -31,9 +31,19 @@ namespace GbJamTotem
 			}
 
 			string comboIndex = "multiplier_x" + player.ComboCount.ToString();
-			if (player.ComboCount > 3)
-				player.ComboCount = 3;
-			m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("multiplier_x1");
+			if (player.ComboCount > Game1.scoreBorder.ScoreMultiplierMax)
+                player.ComboCount = Game1.scoreBorder.ScoreMultiplierMax;
+
+            // TODO Limiter le counter par rapport au sprite
+            //
+            if (player.ComboCount > 3)
+            {
+                m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("multiplier_x3");
+            }
+            else
+            {
+                m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet(comboIndex);
+            }
         }
 
         public override void Draw()

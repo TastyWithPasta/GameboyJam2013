@@ -73,7 +73,7 @@ namespace GbJamTotem
 
             for (int i = 0; i < Game1.totem.AttachedSections.Count; i++)
             {
-				nbSoulsCollectible += Game1.totem.AttachedSections[i].GetSoulCount();
+                nbSoulsCollectible += Game1.totem.AttachedSections[i].GetSoulCount();
 
                 // Count n first souls, else add scoreMultiplierMax
                 //

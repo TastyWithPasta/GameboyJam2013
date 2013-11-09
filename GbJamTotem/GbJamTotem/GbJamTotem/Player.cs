@@ -366,6 +366,8 @@ namespace GbJamTotem
                 {
                     if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt) && !animationIsActive)
                     {
+                        Game1.swordSlashSound.Play();
+
                         if (isToLeft)
                         {
                             m_actionManager.StartNew(m_slashBounceLR);
@@ -383,14 +385,19 @@ namespace GbJamTotem
 
                     if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
                     {
+
+                        Game1.swordSlashSound.Play();
+
                         if (isToLeft)
                         {
+                            Game1.moveLeftToRightSound.Play();
                             m_actionManager.StartNew(m_slashLR);
 							m_spriteAnimation.StartNew(m_spritAnimLR);
                             isToLeft = false;
                         }
                         else
                         {
+                            Game1.moveRightToLeftSound.Play();
                             m_actionManager.StartNew(m_slashRL);
 							m_spriteAnimation.StartNew(m_spritAnimRL);
                             isToLeft = true;
