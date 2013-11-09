@@ -46,7 +46,7 @@ namespace GbJamTotem
         public static SpriteFont debugText;
         bool debugMode = true;
 
-        Sprite floorBackground;
+        Sprite m_falaise;
 
 		//Color m_bgColor = new Color(239, 255, 222);
         Color m_bgColor = new Color(166, 202, 240);
@@ -108,8 +108,10 @@ namespace GbJamTotem
 
             // Background textures
             //
-            floorBackground = new Sprite(this, TextureLibrary.GetSpriteSheet("floor_background"), new Transform());
-            floorBackground.Transform.PosY = -20;
+			m_falaise = new Sprite(this, TextureLibrary.GetSpriteSheet("decors_sol_falaise"), new Transform());
+			m_falaise.Origin = new Vector2(0, 0.5f);
+            m_falaise.Transform.PosX = -60;
+			m_falaise.Transform.PosY = 10;
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
@@ -153,7 +155,7 @@ namespace GbJamTotem
 
 			if (Game1.kbs.IsKeyDown(Keys.C) && !Game1.isInGameplay)
 			{
-				player.Start(totem);
+				player.StartDebug(totem);
 			}
 
 			if (kbs.IsKeyDown(Keys.S) && old_kbs.IsKeyUp(Keys.S))
@@ -251,7 +253,7 @@ namespace GbJamTotem
             // Begin all drawing methods
             //
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
-            floorBackground.Draw();
+            m_falaise.Draw();
 			Cutscenes.crowd.DrawBack();
 			totem.Draw();
 			Cutscenes.cutscenePlayer.Draw();

@@ -9,18 +9,48 @@ namespace GbJamTotem
 {
 	public class CutscenePlayer : GameObject
 	{
+		const float CloudStartX = -200;
+		const float SwordStartX = 200;
+		const float SwordStartY = -250;
+		const double SwordStartAngle = Math.PI * 7;
 		const float CarryHeight = -20.0f;
+		const float SwordStartTimeRatio = 0.65f; //Ratio du temps de départ de l'épée par rapport à AscendDuration
+
+		const float SwordOffsetToPlayerX = 10;
+		const float SwordOffsetToPlayerY = -2;
+		const float CharacterOffsetToPlayerX = -7;
+		const float CharacterOffsetToPlayerY = -1;
+		const float CloudOffsetToPlayerX = -1;
+		const float CloudOffsetToPlayerY = 12;
+
+		const float ShlingScale = 4.0f;
+		const float ShlingTime = 1.0f;
+		const float ShlingSpin = 4.0f;
+
 		MoveToTransform m_moveToCrowd;
 		MoveToTransform m_ascendMovement;
 		Sequence m_carryAnimation;
 		Sequence m_ascend;
+		Concurrent m_shling;
+
 		SingleActionManager m_actionManager;
 
-		Transform m_swordTransform;
+		DelayAction m_swordDelay;
+		MoveToTransform m_swordMovement;
+		MoveToStaticAction m_cloudMovement;
+
 		Sprite m_swordSprite;
+		Sprite m_cloudSprite; //Cloud Strife lol
+		Sprite m_shlingSprite;
 
 		Totem m_totemInstance;
+		bool isVisible = true;
 
+		public bool IsVisible
+		{
+			get { return isVisible; }
+			set { isVisible = value; }
+		}
 
 		public float AscendDuration
 		{
@@ -33,10 +63,14 @@ namespace GbJamTotem
 		public CutscenePlayer()
 			: base()
 		{
-			m_swordTransform = new Transform(m_transform, true);
+			m_swordSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("sword"), new Transform(m_transform, true));
+			m_swordSprite.Transform.Direction = Math.PI * 10;
 
+			m_cloudSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("cloud"), new Transform(m_transform, true));
 
-			m_sprite = new PastaGameLibrary.Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("perso_foule"), m_transform);
+			m_shlingSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("shling"), new Transform(m_transform, true));
+
+			m_sprite = new PastaGameLibrary.Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("player_nosword"), m_transform);
 			m_sprite.Origin = new Vector2(0.5f, 0.5f);
 
 			m_moveToCrowd = new MoveToTransform(Program.TheGame, m_transform, null, null, 1);
@@ -55,11 +89,53 @@ namespace GbJamTotem
 			m_carryAnimation.AddAction(m_moveToCrowd);
 			m_carryAnimation.AddAction(bounceAnimation);
 
-			m_ascend = new Sequence(1);
-			m_ascend.AddAction(new DelayAction(Program.TheGame, Crowd.LaunchTensionTime));
+
+			//Sword movement
+			Transform start = new Transform(m_transform, true);
+			Transform end = new Transform(m_transform, true);
+			m_swordMovement = new MoveToTransform(Program.TheGame, m_swordSprite.Transform, start, end, 1);
+			end.PosX = SwordOffsetToPlayerX;
+			end.PosY = SwordOffsetToPlayerY;
+			m_swordDelay = new DelayAction(Program.TheGame, AscendDuration * SwordStartTimeRatio);
+
+			//Cloud movement
+			m_cloudMovement = new MoveToStaticAction(Program.TheGame, m_cloudSprite.Transform, new Vector2(CloudOffsetToPlayerX, CloudOffsetToPlayerY), 1);
+			m_cloudMovement.StartPosition = new Vector2(CloudStartX, 0);
+			m_cloudMovement.Interpolator = new PSquareInterpolation(0.25f);
+
+			//Delay of the ascend, then sword/cloud movement
+			Sequence swordAndCloudMovement = new Sequence(1);
+			swordAndCloudMovement.AddAction(m_swordDelay);
+			swordAndCloudMovement.AddAction(new Concurrent(new PastaGameLibrary.Action[] { m_swordMovement, m_cloudMovement }));
+			
 			m_ascendMovement = new MoveToTransform(Program.TheGame, m_transform, new Transform(), new Transform(), 1);
 			m_ascendMovement.Interpolator = new PSquareInterpolation(0.5f);
-			m_ascend.AddAction(m_ascendMovement);
+
+			MethodAction showPlayer = new MethodAction(delegate()
+			{
+				m_sprite.Transform.PosY -= 1;
+				Game1.player.IsVisible = true;
+				isVisible = false;
+			});
+
+			//Shling!
+			ScaleToAction shlingScale = new ScaleToAction(Program.TheGame, m_shlingSprite.Transform, new Vector2(ShlingScale, ShlingScale), 1);
+			shlingScale.Timer.Interval = ShlingTime;
+			shlingScale.StartScale = Vector2.Zero;
+			shlingScale.Interpolator = new PSquareInterpolation(3);
+
+			RotateToStaticAction shlingRotate = new RotateToStaticAction(Program.TheGame, m_shlingSprite.Transform, ShlingSpin, 1);
+			shlingRotate.Timer.Interval = ShlingTime;
+			m_shling = new Concurrent(new PastaGameLibrary.Action[] { shlingScale, shlingRotate });
+
+			m_ascend = new Sequence(1);
+			m_ascend.AddAction(new DelayAction(Program.TheGame, Crowd.LaunchTensionTime));
+			Concurrent ascendAndSword = new Concurrent(new PastaGameLibrary.Action[] { m_ascendMovement, swordAndCloudMovement });
+			m_ascend.AddAction(ascendAndSword);
+			m_ascend.AddAction(showPlayer);
+			m_ascend.AddAction(m_shling);
+			
+
 			m_actionManager = new SingleActionManager();
 		}
 
@@ -69,11 +145,25 @@ namespace GbJamTotem
 			if(m_transform.ParentTransform != null)
 				m_transform.Position += m_transform.ParentTransform.PositionGlobal;
 			m_transform.ParentTransform = null;
+
+			//Ascend movement
 			m_ascendMovement.Start.Position = m_transform.Position;
 			m_ascendMovement.Start.Direction = m_transform.Direction + Math.PI * 4;
-			m_ascendMovement.End.Position = Game1.player.SpriteTransform.PositionGlobal;
+			m_ascendMovement.End.Position = Game1.player.SpriteTransform.PositionGlobal + new Vector2(CharacterOffsetToPlayerX, CharacterOffsetToPlayerY);
 			m_ascendMovement.Timer.Interval = AscendDuration;
+
+			//Sword
+			m_swordDelay.Timer.Interval = AscendDuration * SwordStartTimeRatio;
+			m_swordMovement.Start.Position = new Vector2(SwordStartX, SwordStartY);
+			m_swordMovement.Start.Direction = SwordStartAngle;
+			m_swordMovement.Timer.Interval = AscendDuration * (1 - SwordStartTimeRatio);
 			m_actionManager.StartNew(m_ascend);
+
+			//Cloud
+			m_cloudMovement.Timer.Interval = AscendDuration * (1 - SwordStartTimeRatio);
+
+			//Shling
+			m_shlingSprite.Transform.ScaleUniform = 0.0f;
 		}
 
 		public void JumpOnCrowd()
@@ -93,7 +183,16 @@ namespace GbJamTotem
 
 		public override void Draw()
 		{
-			m_sprite.Draw();
+			if (isVisible)
+			{
+				if (m_cloudMovement.IsActive)
+					m_cloudSprite.Draw();
+					m_sprite.Draw();
+				if (m_swordMovement.IsActive)
+					m_swordSprite.Draw();
+			}
+			if (m_shling.IsActive)
+				m_shlingSprite.Draw();
 		}
 	}
 
@@ -109,10 +208,10 @@ namespace GbJamTotem
 		const float TimeToTotem = 1.0f;
 
 		//Main Menu
-		const float CameraMenuX = 350;
+		const float CameraMenuX = 200;
 		const float CameraMenuY = 30;
-		const float InitialCharacterPosition = 315;
-		const float InitialCrowdPosition = 260;
+		const float InitialCharacterPosition = 165;
+		const float InitialCrowdPosition = 110;
 
 		//Intro
 		const float CameraDelay = 1.5f;

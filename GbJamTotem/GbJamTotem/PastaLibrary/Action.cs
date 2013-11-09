@@ -309,7 +309,7 @@ namespace PastaGameLibrary
 		}
 		protected override void OnUpdate()
 		{
-			float progressRatio = Timer.ProgressRatio;
+			float progressRatio = Math.Min(Timer.ProgressRatio, 1);
 
 			if(TranslationActive)
 			m_transform.Position = new Vector2(Interpolator.GetInterpolation(m_start.PosX, m_end.PosX, progressRatio),

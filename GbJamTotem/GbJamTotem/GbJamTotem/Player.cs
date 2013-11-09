@@ -76,6 +76,7 @@ namespace GbJamTotem
 		SpriteSheetAnimation m_spritAnimRL;
 		SpriteSheetAnimation m_spritAnimRR;
 		SpriteSheetAnimation m_spritAnimLL;
+		SpriteSheetAnimation m_ready;
 
         MoveToTransform m_climbing;
 
@@ -92,11 +93,17 @@ namespace GbJamTotem
         bool isToLeft;
         bool canClimb;
         bool isFalling;
+		bool isVisible;
 
 		float m_speedMultiplier = 1; //Permet d'accélérer le rythme d'action du joueur
 
         int comboCount;
 
+		public bool IsVisible
+		{
+			get { return isVisible; }
+			set { isVisible = value; }
+		}
         public bool IsFalling
         {
             get { return isFalling; }
@@ -188,6 +195,7 @@ namespace GbJamTotem
             m_walkingToTotem.Interpolator = new PSmoothstepInterpolation();
             m_walkingToTotem.Timer.Interval = walkingDuration;
 
+			#region Slash Animations
 			///
 			///	Slash left to right.
 			///	Le mouvement est exécuté en parallèle avec une séquence délai + action.
@@ -223,6 +231,9 @@ namespace GbJamTotem
 			slashActionRL.AddAction(collisionRL);
 			m_slashRL = new Concurrent(new PastaGameLibrary.Action[] { slashActionRL, m_movementRL });
 
+			#endregion
+
+			#region Bounce Animations
 			//
 			// Mouvement de rebond volontaire gauche
 			//
@@ -254,11 +265,14 @@ namespace GbJamTotem
 			m_metalBounceRL = new MoveToTransform(Program.TheGame, m_spriteTransform, m_bounceTransform, m_rightTransform, 1);
 			m_metalBounceRL.Timer.Interval = SlashDuration - CollisionDelayDuration; //Le reste de temps après la collision
 
+			#endregion
 
 			m_spritAnimLR = new SpriteSheetAnimation(m_sprite, 0, 7, SlashDuration, 1);
 			m_spritAnimRL = new SpriteSheetAnimation(m_sprite, 8, 15, SlashDuration, 1);
 			m_spritAnimLL = new SpriteSheetAnimation(m_sprite, 16, 23, SlashDuration, 1);
 			m_spritAnimRR = new SpriteSheetAnimation(m_sprite, 23, 30, SlashDuration, 1);
+			m_ready = new SpriteSheetAnimation(m_sprite, 0, 4, SlashDuration, 1);
+			m_ready.Timer.Interval = 0.5f;
         }
 
 		public void Initialise(Totem totem)
@@ -266,10 +280,11 @@ namespace GbJamTotem
 			m_totemInstance = totem;
 			m_transform.PosX = 0;
 			m_transform.PosY = totem.Top + DeltaAboveClimbingAltitude;
+			isVisible = false;
 		}
 
 		//Pour debug
-		public void Start(Totem totem)
+		public void StartDebug(Totem totem)
 		{
 			m_totemInstance = totem;
 			m_transform.PosX = 0;
@@ -277,6 +292,7 @@ namespace GbJamTotem
 			isFalling = true;
 			Game1.startingCountdown.activateCountdown();
 			Game1.isInGameplay = true;
+			isVisible = true;
 		}
 
 		/// <summary>
@@ -405,6 +421,8 @@ namespace GbJamTotem
         }
         public override void Draw()
         {
+			if (!isVisible)
+				return;
             m_sprite.Draw();
         }
     }
