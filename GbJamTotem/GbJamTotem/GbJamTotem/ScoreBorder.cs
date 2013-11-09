@@ -62,7 +62,7 @@ namespace GbJamTotem
 
         public override void Update()
         {
-            m_graphicScore.Transform.SclY = ((float)score / ((float)Game1.m_totem.TotalAmountOfSections * (float)Game1.normalTotemValue));
+            m_graphicScore.Transform.SclY = ((float)score / ((float)Game1.totem.TotalAmountOfSections * (float)Game1.normalTotemValue));
             m_actionManager.Update();
         }
 

@@ -202,7 +202,6 @@ namespace GbJamTotem
 			m_above = sectionAbove;
 			m_below = sectionBelow;
 		}
-
 		private void ChainPush()
 		{
 			m_physics.Throw(0, 0, 0);
@@ -214,11 +213,9 @@ namespace GbJamTotem
 
 		protected void Push(Player player, float force)
 		{
-
 			m_physics.Throw(force, -5, (float)Program.Random.NextDouble());
 			m_physics.GroundLevel = 0;
 			m_totemInstance.Detach(this);
-
 
 			if(m_below != null)
 				m_below.m_above = m_above;

@@ -10,13 +10,25 @@ namespace GbJamTotem
 {
 	class PBounceInterpolation : IPInterpolation<float>
 	{
+		float m_offset;
+		int m_factor = 1;
+		public PBounceInterpolation(float offset)
+		{
+			m_offset = offset;
+		}
+		public PBounceInterpolation(float offset, int factor)
+		{
+			m_offset = offset;
+			m_factor = factor;
+		}
 		public float GetInterpolation(float from, float to, float ratio)
 		{
-			ratio = 1 - (float)Math.Abs(Math.Sin((ratio + 0.5f) * Math.PI));
+			ratio = 1 - (float)Math.Abs(Math.Sin((ratio + m_offset) * Math.PI));
+			ratio = (float)Math.Pow(ratio, m_factor);
 			return from + (to - from) * ratio;
 		}
 	}
-
+		
     public class Player : GameObject
     {
 		const float BasePlayerSpeed = 60.0f;
@@ -205,7 +217,7 @@ namespace GbJamTotem
 			//
 			MoveToTransform bounceMovementL = new MoveToTransform(Program.TheGame, m_spriteTransform, m_leftTransform, m_bounceTransform, 1);
 			bounceMovementL.Timer.Interval = SlashDuration;
-			bounceMovementL.Interpolator = new PBounceInterpolation();
+			bounceMovementL.Interpolator = new PBounceInterpolation(0.5f);
 			MethodAction actionL = new MethodAction(
 				delegate()
 				{
@@ -219,7 +231,7 @@ namespace GbJamTotem
 			//
 			MoveToTransform bounceMovementR = new MoveToTransform(Program.TheGame, m_spriteTransform, m_rightTransform, m_bounceTransform, 1);
 			bounceMovementR.Timer.Interval = SlashDuration;
-			bounceMovementR.Interpolator = new PBounceInterpolation();
+			bounceMovementR.Interpolator = new PBounceInterpolation(0.5f);
 			MethodAction actionR = new MethodAction(
 				delegate()
 				{
@@ -291,10 +303,10 @@ namespace GbJamTotem
 
             // Introduction animation (walking to totem)
             //
-            if (Game1.kbs.IsKeyDown(Keys.S) && Game1.old_kbs.IsKeyUp(Keys.S))
-            {
-                m_actionManager.StartNew(m_walkingToTotem);
-            }
+			//if (Game1.kbs.IsKeyDown(Keys.S) && Game1.old_kbs.IsKeyUp(Keys.S))
+			//{
+			//    m_actionManager.StartNew(m_walkingToTotem);
+			//}
 
             // Activate climbing animation
             //
