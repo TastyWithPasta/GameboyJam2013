@@ -285,6 +285,18 @@ namespace PastaGameLibrary
 		Transform m_transform = null;
 		Transform m_start, m_end;
 
+		public Transform End
+		{
+			get { return m_end; }
+			set { m_end = value; }
+		}
+
+		public Transform Start
+		{
+			get { return m_start; }
+			set { m_start = value; }
+		}
+
 		public MoveToTransform(MyGame theGame, Transform transform, Transform start, Transform end, int playAmount)
 			: base(theGame, playAmount)
 		{
@@ -506,7 +518,10 @@ namespace PastaGameLibrary
 		}
 		public bool IsActive
 		{
-			get { return m_currentAction.IsActive; }
+			get {
+				if (m_currentAction == null)
+					return false;
+				return m_currentAction.IsActive; }
 		}
 		public void Stop()
 		{

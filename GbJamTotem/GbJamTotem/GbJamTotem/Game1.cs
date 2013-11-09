@@ -22,7 +22,7 @@ namespace GbJamTotem
 		public const int GameboyHeight = 144;
 		public const int CameraOffset = 50;
 
-        public const int screenZoom = 3;
+        public const int screenZoom = 4;
 
 		public static Random Random = new Random();
 		public static ParticleSystem Souls;
@@ -42,6 +42,8 @@ namespace GbJamTotem
         public static ComboCounter comboCounter;
         public static int normalTotemValue = 100;
 
+		public static bool isInGameplay = false;
+
         public static SpriteFont debugText;
         bool debugMode = true;
 
@@ -51,7 +53,7 @@ namespace GbJamTotem
 		//Color m_bgColor = new Color(239, 255, 222);
         Color m_bgColor = new Color(166, 202, 240);
 		GameboyDrawer m_drawer;
-		public static Totem m_totem;
+		public static Totem totem;
 
 		public static DrawingList Foreground = new DrawingList();
 
@@ -87,18 +89,18 @@ namespace GbJamTotem
 
 			// Totem
 			//
-			m_totem = new Totem();
-			m_totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			m_totem.AddSections(new SectionData(typeof(MetalSection), 5, 5, 7));
-			m_totem.AddSections(new SectionData(typeof(SpikeSection), 3, 3, 7));
-			m_totem.Build();
+			totem = new Totem();
+			totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			totem.AddSections(new SectionData(typeof(MetalSection), 5, 5, 7));
+			totem.AddSections(new SectionData(typeof(SpikeSection), 3, 3, 7));
+			totem.Build();
 
             // Player initialisation
             //
             climbingAltitude = new Transform();
-            climbingAltitude.PosY = m_totem.Top;
+            climbingAltitude.PosY = totem.Top;
             player = new Player(new Vector2(playerInitialPosition, 0), climbingAltitude);
-			player.Initialise(m_totem);
+			player.Initialise(totem);
 
             // Pause screen & GUI initialisation
             //
@@ -113,6 +115,9 @@ namespace GbJamTotem
             floorBackground = new Sprite(this, TextureLibrary.GetSpriteSheet("floor_background"), new Transform());
             floorBackground.Transform.PosY = -20;
 
+			//Foule et joueur porté
+			Cutscenes.Initalise();
+			Cutscenes.StartMainMenu();
         }
 
 		/// <summary>
@@ -136,10 +141,10 @@ namespace GbJamTotem
 
             if (debugMode)
             {
-                if (kbs.IsKeyDown(Keys.Left))
-                    GameCamera.Transform.PosX -= 1f;
+				if (kbs.IsKeyDown(Keys.Left))
+					Cutscenes.crowd.Transform.PosX -= 1.0f;
                 if (kbs.IsKeyDown(Keys.Right))
-                    GameCamera.Transform.PosX += 1;
+					Cutscenes.crowd.Transform.PosX += 1.0f;
                 if (kbs.IsKeyDown(Keys.Up))
                     GameCamera.Transform.PosY -= 1f;
                 if (kbs.IsKeyDown(Keys.Down))
@@ -149,7 +154,10 @@ namespace GbJamTotem
                 if (kbs.IsKeyDown(Keys.RightControl))
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
             }
-
+			if (kbs.IsKeyDown(Keys.S) && old_kbs.IsKeyUp(Keys.S))
+			{
+				Cutscenes.GoToTotem(totem);
+			}
 
             startingCountdown.Update();
 
@@ -159,19 +167,23 @@ namespace GbJamTotem
             // Update game if unpaused
             //
             player.Update();
-            m_totem.Update();
+            totem.Update();
             scoreBorder.Update();
             mapBorder.Update();
             comboCounter.Update();
 
-            GameCamera.Update();
-            GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
-            GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
+			if (isInGameplay)
+			{
+				GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
+				GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
+			}
 
-            if (GameCamera.Transform.PosY > -CameraOffset)
-                GameCamera.Transform.PosY = -CameraOffset;
+            GameCamera.Update();
+			//if (GameCamera.Transform.PosY > -CameraOffset)
+			//    GameCamera.Transform.PosY = -CameraOffset;
 
 			Souls.Update();
+			Cutscenes.Update();
             Explosions.Update();
 
             base.Update(gameTime);
@@ -234,8 +246,13 @@ namespace GbJamTotem
             //
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             floorBackground.Draw();
-			m_totem.Draw();
+			Cutscenes.crowd.DrawBack();
+			totem.Draw();
+			Cutscenes.cutscenePlayer.Draw();
+			Cutscenes.crowd.DrawFront();
+
             player.Draw();
+			
 			Souls.Draw();
             Explosions.Draw();
 			SpriteBatch.End();

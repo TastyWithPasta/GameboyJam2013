@@ -33,8 +33,8 @@ namespace GbJamTotem
 
             // Get the highest point of totem at start
             //
-            if (Game1.m_totem.Top != 0)
-                topTotem = Game1.m_totem.Top;
+            if (Game1.totem.Top != 0)
+                topTotem = Game1.totem.Top;
 
             pixelPlayer = new Sprite(Program.TheGame, TextureLibrary.PixelSpriteSheet, new Transform(m_transform, true));
             pixelPlayer.Transform.PosX = -4;
@@ -72,7 +72,7 @@ namespace GbJamTotem
             //
 
             float ratioPlayerPosition = Game1.player.Transform.PosY / topTotem;
-            float ratioTotemState = Game1.m_totem.Top / topTotem;
+            float ratioTotemState = Game1.totem.Top / topTotem;
 
             pixelPlayer.Transform.PosY = (ratioPlayerPosition * -m_mapCeiling) + m_mapFloor;
             pixelTotem.Transform.SclY = (ratioTotemState * m_mapCeiling);

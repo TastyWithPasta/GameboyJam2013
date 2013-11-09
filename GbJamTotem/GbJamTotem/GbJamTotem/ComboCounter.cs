@@ -22,24 +22,18 @@ namespace GbJamTotem
         {
             if (Game1.kbs.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.W))
             {
-                    m_sprite.SourceRectangle = new Rectangle(0,0, (int)(m_sprite.Width/2), (int)m_sprite.Height);
+                m_sprite.SourceRectangle = new Rectangle(0,0, (int)(m_sprite.Width/2), (int)m_sprite.Height);
             }
+			if (player.ComboCount == 0)
+			{
+				m_transform.SclX = 0;
+				return;
+			}
 
-
-            if (player.ComboCount == 0)
-            {
-                m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("multiplier_x1"), m_transform);
-                m_sprite.Transform.Scale = new Vector2(0);
-            }
-            else if (player.ComboCount > 3)
-            {
-                m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("multiplier_x3"), m_transform);
-            }
-            else
-            {
-                m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("multiplier_x" + player.ComboCount), m_transform);
-            }
-
+			string comboIndex = "multiplier_x" + player.ComboCount.ToString();
+			if (player.ComboCount > 3)
+				player.ComboCount = 3;
+			m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("multiplier_x1");
         }
 
         public override void Draw()
