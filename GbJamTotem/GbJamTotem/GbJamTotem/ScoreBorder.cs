@@ -10,7 +10,9 @@ namespace GbJamTotem
     public class ScoreBorder : GameObject
     {
         int score;
-        int scoreBarHeight;
+        int scoreBarMaxValue;
+        int scoreMultiplierMax = 9;
+
         public Sprite m_graphicScore;
 
         MoveToStaticAction m_slideToScreen;
@@ -27,12 +29,24 @@ namespace GbJamTotem
             set { score = value; }
         }
 
-        public ScoreBorder(int heightMax)
+        public int ScoreBarMaxValue
+        {
+            get { return scoreBarMaxValue; }
+        }
+
+        public int ScoreMultiplierMax
+        {
+            get { return scoreMultiplierMax; }
+        }
+
+        public ScoreBorder()
         {
             m_actionManager = new SingleActionManager();
 
             score = 0;
-            scoreBarHeight = heightMax;
+
+            scoreBarMaxValue = calculateScoreMax();
+
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("score_background"), m_transform);
             m_transform.Position = new Vector2(-8, 72);
 
@@ -49,6 +63,32 @@ namespace GbJamTotem
             m_slideOutOfScreen.StartPosition = positionOnScreen;
             m_slideOutOfScreen.Interpolator = new PSmoothstepInterpolation();
             m_slideOutOfScreen.Timer.Interval = durationSlide;
+
+        }
+
+        public int calculateScoreMax()
+        {
+            int nbSoulsCollectible = 0;
+            int multiplierFactor = 0;
+
+            for (int i = 0; i < Game1.m_totem.AttachedSections.Count; i++)
+            {
+                nbSoulsCollectible += Game1.m_totem.AttachedSections[i].GetSoulCount();
+
+                // Count n first souls, else add scoreMultiplierMax
+                //
+                if (multiplierFactor < scoreMultiplierMax)
+                {
+                    multiplierFactor += i;
+                }
+                else
+                {
+                    multiplierFactor += scoreMultiplierMax;
+                }
+
+            }
+
+            return nbSoulsCollectible + multiplierFactor;
         }
 
         public void Slide(bool onScreen)
@@ -62,7 +102,8 @@ namespace GbJamTotem
 
         public override void Update()
         {
-            m_graphicScore.Transform.SclY = ((float)score / ((float)Game1.totem.TotalAmountOfSections * (float)Game1.normalTotemValue));
+            //m_graphicScore.Transform.SclY = ((float)score / ((float)Game1.m_totem.TotalAmountOfSections * (float)Game1.normalTotemValue));
+            m_graphicScore.Transform.SclY = (float)score/(float)scoreBarMaxValue;
             m_actionManager.Update();
         }
 

@@ -72,7 +72,15 @@ namespace GbJamTotem
 
 		public bool RemoveMe()
 		{
-			return !m_animation.IsActive;
+
+            // Add 1 soul when dying
+            //
+			bool removeMe = !m_animation.IsActive;
+            if (removeMe)
+            {
+                Game1.scoreBorder.Score++;
+            }
+            return removeMe;
 			//return !m_moveToAnimation.IsActive;
 		}
 	}

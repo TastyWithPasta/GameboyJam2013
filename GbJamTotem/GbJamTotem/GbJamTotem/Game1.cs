@@ -102,7 +102,7 @@ namespace GbJamTotem
             //
             pauseScreen = new PauseScreen();
             startingCountdown = new Countdown();
-            scoreBorder = new ScoreBorder(ScreenHeight);
+            scoreBorder = new ScoreBorder();
             mapBorder = new MapBorder();
             comboCounter = new ComboCounter(player);
 
@@ -286,7 +286,7 @@ namespace GbJamTotem
                 SpriteBatch.Begin();
                 // Debug text
                 //
-                //SpriteBatch.DrawString(debugText, "PosY : " + player.Transform.PosY, new Vector2(0, 300), Color.Red);
+                SpriteBatch.DrawString(debugText, "Soul : " + scoreBorder.Score + "/"+ scoreBorder.ScoreBarMaxValue , new Vector2(0, 300), Color.Red);
                 
                 SpriteBatch.End();
             }

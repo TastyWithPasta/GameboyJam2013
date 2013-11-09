@@ -12,7 +12,7 @@ namespace GbJamTotem
 	{
  		Left,
 		Right,
-		Unilateral,
+		Bilateral,
 	}
 
 	public class SectionData
@@ -35,7 +35,7 @@ namespace GbJamTotem
 			for (int i = 0; i < m_amountRight; ++i)
 				result.Add((TotemSection)Activator.CreateInstance(m_typeToSpawn, SectionType.Right));
 			for (int i = 0; i < m_amountBoth; ++i)
-				result.Add((TotemSection)Activator.CreateInstance(m_typeToSpawn, SectionType.Unilateral));
+				result.Add((TotemSection)Activator.CreateInstance(m_typeToSpawn, SectionType.Bilateral));
 			return result;
 		}
 	}
@@ -175,6 +175,10 @@ namespace GbJamTotem
 
         private ParticleGenerator<Explosion> m_explosion;
 
+        public virtual int GetSoulCount()
+        {
+            return 1;
+        }
 		public SectionType Type
 		{
 			get { return m_type; }
@@ -245,7 +249,14 @@ namespace GbJamTotem
                 m_explosion.Generate(10, new Object[] { m_transform.PositionGlobal, player });
             }
 
-			m_generator.Generate(player.ComboCount, new object[] { m_transform.PositionGlobal, player });
+            if (player.ComboCount >= Game1.scoreBorder.ScoreMultiplierMax)
+            {
+                m_generator.Generate(Game1.scoreBorder.ScoreMultiplierMax, new object[] { m_transform.PositionGlobal, player });
+            }
+            else
+            {
+                m_generator.Generate(player.ComboCount, new object[] { m_transform.PositionGlobal, player });
+            }
 		}
 
 		public override void Update()
@@ -266,7 +277,7 @@ namespace GbJamTotem
 	public class NormalSection : TotemSection
 	{
 		public NormalSection(SectionType type)
-			: base(SectionType.Unilateral)
+			: base(SectionType.Bilateral)
 		{
 			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_2"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
@@ -275,7 +286,7 @@ namespace GbJamTotem
 		{
 			Push(player, pushForce);
             player.ComboCount++;
-            Game1.scoreBorder.Score += Game1.normalTotemValue;
+            // Game1.scoreBorder.Score += Game1.normalTotemValue; // TODO remove
 		}
 	}
 
@@ -284,14 +295,21 @@ namespace GbJamTotem
         Sprite m_metalSpriteLeft = null;
         Sprite m_metalSpriteRight = null;
 
+        public override int GetSoulCount()
+        {
+            if (m_type == SectionType.Bilateral) 
+                return 0;
+            return 1;
+        }
+
 		public MetalSection(SectionType type)
 			:base(type)
         {
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_2"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 
-			bool left = type == SectionType.Left || type == SectionType.Unilateral;
-			bool right = type == SectionType.Right || type == SectionType.Unilateral;
+			bool left = type == SectionType.Left || type == SectionType.Bilateral;
+			bool right = type == SectionType.Right || type == SectionType.Bilateral;
 			if (left)
 			{
 				m_metalSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_left"), new Transform(m_transform, true));
@@ -311,7 +329,7 @@ namespace GbJamTotem
 			{
 				Push(player, pushForce);
                 player.ComboCount++;
-                Game1.scoreBorder.Score += Game1.normalTotemValue;
+                //Game1.scoreBorder.Score += Game1.normalTotemValue; // TODO Remove
 			}
 			else
 			{
@@ -336,14 +354,21 @@ namespace GbJamTotem
         Sprite m_spikeSpriteLeft = null;
         Sprite m_spikeSpriteRight = null;
 
+        public override int GetSoulCount()
+        {
+            if (m_type == SectionType.Bilateral)
+                return 0;
+            return 1;
+        }
+
         public SpikeSection(SectionType type)
             : base(type)
         {
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_2"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 
-            bool left = type == SectionType.Left || type == SectionType.Unilateral;
-            bool right = type == SectionType.Right || type == SectionType.Unilateral;
+            bool left = type == SectionType.Left || type == SectionType.Bilateral;
+            bool right = type == SectionType.Right || type == SectionType.Bilateral;
 
             if (left)
             {
@@ -368,7 +393,7 @@ namespace GbJamTotem
 			{
 				Push(player, pushForce);
                 player.ComboCount++;
-                Game1.scoreBorder.Score += Game1.normalTotemValue;
+                //Game1.scoreBorder.Score += Game1.normalTotemValue; //TODO remove
 			}
 			else
 			{
