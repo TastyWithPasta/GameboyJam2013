@@ -15,7 +15,7 @@ namespace GbJamTotem
 		const float ExplosionBreadth = 75;
 
 		Player m_playerInstance;
-		MoveToStaticAction m_moveToPlayer;
+		//MoveToStaticAction m_moveToPlayer;
 		Sequence m_animation;
 
         // TODO NOTE
@@ -36,12 +36,16 @@ namespace GbJamTotem
 			else
 				explodePosition.X = Program.Random.Next(20, 73) + 0.5f;*/
 
-            explodePosition.X = Program.Random.Next((int)player.Transform.PosX + 50, (int)(player.Transform.PosX + 50 + ExplosionBreadth * m_playerInstance.SpeedMultiplier)) + 0.5f;
-			explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)(player.Transform.PosY + 50 + ExplosionBreadth * m_playerInstance.SpeedMultiplier)) + 0.5f;
+            explodePosition.X = Program.Random.Next((int)(player.Transform.PosX - ExplosionBreadth), (int)(player.Transform.PosX + ExplosionBreadth));
+            explodePosition.Y = Program.Random.Next((int)(player.Transform.PosY - ExplosionBreadth), (int)(player.Transform.PosY + ExplosionBreadth));
+
+
+            //explodePosition.X = Program.Random.Next((int)player.Transform.PosX + 50, (int)(player.Transform.PosX + 50 + ExplosionBreadth * m_playerInstance.SpeedMultiplier)) + 0.5f;
+			//explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)(player.Transform.PosY + 50 + ExplosionBreadth * m_playerInstance.SpeedMultiplier)) + 0.5f;
 
 			MoveToStaticAction moveToExplosionPoint = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);
 			moveToExplosionPoint.StartPosition = initialPosition;
-            moveToExplosionPoint.Timer.Interval = BaseExplosionDuration / player.SpeedMultiplier;
+            moveToExplosionPoint.Timer.Interval = BaseExplosionDuration;/// player.SpeedMultiplier;
 			moveToExplosionPoint.Interpolator = new PSmoothstepInterpolation();
 
             

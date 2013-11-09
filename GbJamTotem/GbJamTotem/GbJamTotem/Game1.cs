@@ -39,6 +39,7 @@ namespace GbJamTotem
         public static Countdown startingCountdown;
         public static ScoreBorder scoreBorder;
         public static MapBorder mapBorder;
+        public static ComboCounter comboCounter;
         public static int normalTotemValue = 100;
 
         public static SpriteFont debugText;
@@ -105,6 +106,7 @@ namespace GbJamTotem
             startingCountdown = new Countdown();
             scoreBorder = new ScoreBorder(ScreenHeight);
             mapBorder = new MapBorder();
+            comboCounter = new ComboCounter(player);
 
             // Background textures
             //
@@ -160,6 +162,7 @@ namespace GbJamTotem
             m_totem.Update();
             scoreBorder.Update();
             mapBorder.Update();
+            comboCounter.Update();
 
             GameCamera.Update();
             GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
@@ -169,6 +172,7 @@ namespace GbJamTotem
                 GameCamera.Transform.PosY = -CameraOffset;
 
 			Souls.Update();
+            Explosions.Update();
 
             base.Update(gameTime);
 		}
@@ -184,9 +188,16 @@ namespace GbJamTotem
 
             // Drawing combo score behind all sprites
             //
+
+            SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null);
+            comboCounter.Draw();
+            SpriteBatch.End();
+
+            #region Combo Multiplier with SpriteFont
             // TODO
             // Mettre un vrai texte comme spritefont
             //
+            /*
             if (player.ComboCount > 1 && player.IsFalling)
             {
                 Vector2 posCombo;
@@ -214,6 +225,10 @@ namespace GbJamTotem
                 if (scaleCombo < 1)
                     scaleCombo += 0.1f;
             }
+             * */
+            #endregion
+
+
 
             // Begin all drawing methods
             //
