@@ -33,7 +33,6 @@ namespace GbJamTotem
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
         public static Player player;
-        int playerInitialPosition = -50;
 
         public static PauseScreen pauseScreen;
         public static Countdown startingCountdown;
@@ -48,7 +47,6 @@ namespace GbJamTotem
         bool debugMode = true;
 
         Sprite floorBackground;
-        Transform climbingAltitude;
 
 		//Color m_bgColor = new Color(239, 255, 222);
         Color m_bgColor = new Color(166, 202, 240);
@@ -95,11 +93,9 @@ namespace GbJamTotem
 			totem.AddSections(new SectionData(typeof(SpikeSection), 3, 3, 7));
 			totem.Build();
 
-            // Player initialisation
+            // Player initialisation	
             //
-            climbingAltitude = new Transform();
-            climbingAltitude.PosY = totem.Top;
-            player = new Player(new Vector2(playerInitialPosition, 0), climbingAltitude);
+            player = new Player();
 			player.Initialise(totem);
 
             // Pause screen & GUI initialisation
@@ -154,9 +150,19 @@ namespace GbJamTotem
                 if (kbs.IsKeyDown(Keys.RightControl))
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
             }
+
+			if (Game1.kbs.IsKeyDown(Keys.C) && !Game1.isInGameplay)
+			{
+				player.Start(totem);
+			}
+
 			if (kbs.IsKeyDown(Keys.S) && old_kbs.IsKeyUp(Keys.S))
 			{
 				Cutscenes.GoToTotem(totem);
+			}
+			if (kbs.IsKeyDown(Keys.V) && old_kbs.IsKeyUp(Keys.V))
+			{
+				Cutscenes.ThrowPlayer(totem);
 			}
 
             startingCountdown.Update();

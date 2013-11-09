@@ -11,14 +11,33 @@ namespace GbJamTotem
 	{
 		const float CarryHeight = -20.0f;
 		MoveToTransform m_moveToCrowd;
+		MoveToTransform m_ascendMovement;
 		Sequence m_carryAnimation;
+		Sequence m_ascend;
 		SingleActionManager m_actionManager;
+
+		Transform m_swordTransform;
+		Sprite m_swordSprite;
+
+		Totem m_totemInstance;
+
+
+		public float AscendDuration
+		{
+			get {
+				return 4.5f;
+				return Math.Abs(m_totemInstance.Top * 0.002f);
+			}
+		}
 
 		public CutscenePlayer()
 			: base()
 		{
+			m_swordTransform = new Transform(m_transform, true);
+
+
 			m_sprite = new PastaGameLibrary.Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("perso_foule"), m_transform);
-			m_sprite.Origin = new Vector2(0.5f, 1.0f);
+			m_sprite.Origin = new Vector2(0.5f, 0.5f);
 
 			m_moveToCrowd = new MoveToTransform(Program.TheGame, m_transform, null, null, 1);
 			m_moveToCrowd.Timer.Interval = 0.1f;
@@ -36,7 +55,25 @@ namespace GbJamTotem
 			m_carryAnimation.AddAction(m_moveToCrowd);
 			m_carryAnimation.AddAction(bounceAnimation);
 
+			m_ascend = new Sequence(1);
+			m_ascend.AddAction(new DelayAction(Program.TheGame, Crowd.LaunchTensionTime));
+			m_ascendMovement = new MoveToTransform(Program.TheGame, m_transform, new Transform(), new Transform(), 1);
+			m_ascendMovement.Interpolator = new PSquareInterpolation(0.5f);
+			m_ascend.AddAction(m_ascendMovement);
 			m_actionManager = new SingleActionManager();
+		}
+
+		public void Launch(Totem totem)
+		{
+			m_totemInstance = totem;
+			if(m_transform.ParentTransform != null)
+				m_transform.Position += m_transform.ParentTransform.PositionGlobal;
+			m_transform.ParentTransform = null;
+			m_ascendMovement.Start.Position = m_transform.Position;
+			m_ascendMovement.Start.Direction = m_transform.Direction + Math.PI * 4;
+			m_ascendMovement.End.Position = Game1.player.SpriteTransform.PositionGlobal;
+			m_ascendMovement.Timer.Interval = AscendDuration;
+			m_actionManager.StartNew(m_ascend);
 		}
 
 		public void JumpOnCrowd()
@@ -81,7 +118,7 @@ namespace GbJamTotem
 		const float CameraDelay = 1.5f;
 		const float TimeToFirstTotem = 2.0f;
 		static MoveToStaticAction moveTo;
-		static Sequence goToTotem;
+		static MoveToTransform m_moveToPlayer;
 		static Sequence cameraIntro;
 
 		//Totem positions
@@ -110,6 +147,10 @@ namespace GbJamTotem
 			cameraIntro.AddAction(cameraDelay);
 			cameraIntro.AddAction(moveCrowd);
 			cameraIntro.AddAction(moveToTotem);
+
+			m_moveToPlayer = new MoveToTransform(Program.TheGame, Game1.GameCamera.Transform, new Transform(), cutscenePlayer.Transform, 1);
+			m_moveToPlayer.Interpolator = new PSquareInterpolation(0.1f);
+			m_moveToPlayer.RotationActive = false;
 		}
 
 		public static void StartMainMenu()
@@ -119,9 +160,14 @@ namespace GbJamTotem
 			Game1.GameCamera.Transform.Position = new Vector2(CameraMenuX, CameraMenuY);
 		}
 
-		public static void ThrowPlayer()
+		public static void ThrowPlayer(Totem totem)
 		{
- 
+			crowd.LaunchPlayer();
+			Game1.player.Initialise(totem);
+			m_moveToPlayer.Start.Position = Game1.GameCamera.Transform.Position;
+			cutscenePlayer.Launch(totem);
+			m_moveToPlayer.Timer.Interval = cutscenePlayer.AscendDuration + Crowd.LaunchTensionTime; //Total time of animation = crowd stretch + throwing time
+			actionManager.StartNew(m_moveToPlayer);
 		}
 
 		public static void GoToTotem(Totem totem)

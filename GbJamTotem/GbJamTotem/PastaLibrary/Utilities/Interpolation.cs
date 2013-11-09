@@ -20,13 +20,12 @@ namespace PastaGameLibrary
 	}
 	public class PSquareInterpolation : IPInterpolation<float>
 	{
-		int m_factor = 2;
+		float m_factor = 2;
 
-		public PSquareInterpolation(int factor)
+		public PSquareInterpolation(float factor)
 		{
 			m_factor = factor;
 		}
-
 		public float GetInterpolation(float from, float to, float ratio)
 		{
 			return from + (to - from) * (float)Math.Pow(ratio, m_factor);
@@ -51,7 +50,7 @@ namespace PastaGameLibrary
 	{
 		public float GetInterpolation(float from, float to, float ratio)
 		{
-			return from + (to - from) * (float)Math.Sqrt(ratio);
+			return from + (to - from) * (float)Math.Log10(ratio);
 		}
 	}
 	public class PSineHalfInterpolation : IPInterpolation<float>

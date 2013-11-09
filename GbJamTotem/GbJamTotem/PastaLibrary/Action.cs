@@ -284,6 +284,9 @@ namespace PastaGameLibrary
 	{
 		Transform m_transform = null;
 		Transform m_start, m_end;
+		public bool RotationActive = true;
+		public bool ScaleActive = true;
+		public bool TranslationActive = true;
 
 		public Transform End
 		{
@@ -308,10 +311,13 @@ namespace PastaGameLibrary
 		{
 			float progressRatio = Timer.ProgressRatio;
 
+			if(TranslationActive)
 			m_transform.Position = new Vector2(Interpolator.GetInterpolation(m_start.PosX, m_end.PosX, progressRatio),
 												Interpolator.GetInterpolation(m_start.PosY, m_end.PosY, progressRatio));
+			if(ScaleActive)
 			m_transform.Scale = new Vector2(Interpolator.GetInterpolation(m_start.SclX, m_end.SclX, progressRatio),
 												Interpolator.GetInterpolation(m_start.SclY, m_end.SclY, progressRatio));
+			if(RotationActive)
 			m_transform.Direction = Interpolator.GetInterpolation((float)m_start.Direction, (float)m_end.Direction, progressRatio);
 
 		}
