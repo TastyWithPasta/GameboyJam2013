@@ -72,7 +72,11 @@ namespace GbJamTotem
 
         public static SoundEffectInstance musicT1P1;
         public static SoundEffectInstance musicT1P2;
-        public static SoundEffectInstance musicT1P3;
+
+        public static SoundEffectInstance musicT1P3L1;
+        public static SoundEffectInstance musicT1P3L2;
+        public static SoundEffectInstance musicT1P3L3;
+        public static SoundEffectInstance musicT1P3L4;
 
         #endregion
 
@@ -146,8 +150,17 @@ namespace GbJamTotem
 
             musicT1P1 = SoundEffectLibrary.Get("music_T1P1").CreateInstance();
             musicT1P2 = SoundEffectLibrary.Get("music_T1P2").CreateInstance();
-            musicT1P3 = SoundEffectLibrary.Get("music_T1P3").CreateInstance();
-            musicT1P3.IsLooped = true;
+
+            musicT1P3L1 = SoundEffectLibrary.Get("music_T1P3L1").CreateInstance();
+            musicT1P3L2 = SoundEffectLibrary.Get("music_T1P3L2").CreateInstance();
+            musicT1P3L3 = SoundEffectLibrary.Get("music_T1P3L3").CreateInstance();
+            musicT1P3L4 = SoundEffectLibrary.Get("music_T1P3L4").CreateInstance();
+
+
+            musicT1P3L1.IsLooped = true;
+            musicT1P3L2.IsLooped = true;
+            musicT1P3L3.IsLooped = true;
+            musicT1P3L4.IsLooped = true;
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
@@ -200,9 +213,36 @@ namespace GbJamTotem
            
             // Playing music
             //
-            if (startingCountdown.CountdownHasFinished && musicT1P3.State != SoundState.Playing)
-                musicT1P3.Play();
 
+            // Starting playing music
+            //
+            if (startingCountdown.CountdownHasFinished && musicT1P3L1.State != SoundState.Playing)
+            {
+                musicT1P3L1.Play();
+                musicT1P3L2.Play();
+                musicT1P3L3.Play();
+                musicT1P3L4.Play();
+
+                musicT1P3L2.Volume = 0f;
+                musicT1P3L3.Volume = 0f;
+                musicT1P3L4.Volume = 0f;
+            }
+
+            if (player.ComboCount == 3)
+                musicT1P3L2.Volume = 1f;
+
+            if(player.ComboCount == 6)
+                musicT1P3L3.Volume = 1f;
+
+            if (player.ComboCount == 9)
+                musicT1P3L4.Volume = 1f;
+
+            if (player.ComboCount == 0)
+            {
+                musicT1P3L2.Volume = 0f;
+                musicT1P3L3.Volume = 0f;
+                musicT1P3L4.Volume = 0f;
+            }
 
             // Update game if unpaused
             //
