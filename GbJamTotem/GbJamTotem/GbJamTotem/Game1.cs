@@ -26,6 +26,9 @@ namespace GbJamTotem
 
 		public static Random Random = new Random();
 		public static ParticleSystem Souls;
+
+        public static ParticleSystem Explosions;
+
 		public static Camera2D GameCamera;
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
@@ -51,11 +54,13 @@ namespace GbJamTotem
 
 		public static DrawingList Foreground = new DrawingList();
 
+        float scaleCombo = 0;
 
 		public Game1()
             : base(160 * screenZoom, 144 * screenZoom)
 		{
 			Souls = new ParticleSystem(this, 500);
+            Explosions = new ParticleSystem(this, 100);
 		}
 		protected override void Initialize()
 		{
@@ -177,14 +182,47 @@ namespace GbJamTotem
 			m_drawer.SetRenderTarget();
 			GraphicsDevice.Clear(m_bgColor);
 
+            // Drawing combo score behind all sprites
+            //
+            // TODO
+            // Mettre un vrai texte comme spritefont
+            //
+            if (player.ComboCount > 1 && player.IsFalling)
+            {
+                Vector2 posCombo;
+
+                if (old_kbs.IsKeyDown(Keys.Space) && kbs.IsKeyDown(Keys.Space))
+                {
+                    scaleCombo = 0;
+                }
+
+                if (player.IsToLeft)
+                {
+                    posCombo = new Vector2(100, 72);
+                }
+                else
+                {
+                    posCombo = new Vector2(20, 72);
+                }
+
+
+                SpriteBatch.Begin();
+                SpriteBatch.DrawString(debugText, "x " + player.ComboCount, posCombo, Color.White, 0, new Vector2(0, (float)(debugText.MeasureString("9").Y / 2)), scaleCombo, SpriteEffects.None, 0);
+                //SpriteBatch.DrawString(debugText, "Combo : " + player.ComboCount, new Vector2(), Color.Red);
+                SpriteBatch.End();
+
+                if (scaleCombo < 1)
+                    scaleCombo += 0.1f;
+            }
+
             // Begin all drawing methods
             //
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             floorBackground.Draw();
-			
 			m_totem.Draw();
             player.Draw();
 			Souls.Draw();
+            Explosions.Draw();
 			SpriteBatch.End();
 
             // Drawing GUI
@@ -203,18 +241,7 @@ namespace GbJamTotem
             // (Has spriteBatch inside)
             //
             pauseScreen.Draw();
-
             
-
-            // TODO
-            // Mettre un vrai texte comme spritefont
-            //
-            if (player.ComboCount > 0)
-            {
-                SpriteBatch.Begin();
-                SpriteBatch.DrawString(debugText, "Combo : " + player.ComboCount, new Vector2(), Color.Red);
-                SpriteBatch.End();
-            }
 
             if (debugMode)
             {
