@@ -84,6 +84,11 @@ namespace GbJamTotem
 
         int comboCount;
 
+        public bool IsFalling
+        {
+            get { return isFalling; }
+        }
+
         public int ComboCount
         {
             get { return comboCount; }

@@ -173,6 +173,8 @@ namespace GbJamTotem
 		protected TotemSection m_below = null;
 		private ParticleGenerator<Soul> m_generator;
 
+        private ParticleGenerator<Explosion> m_explosion;
+
 		public SectionType Type
 		{
 			get { return m_type; }
@@ -194,6 +196,8 @@ namespace GbJamTotem
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
 			m_generator = new ParticleGenerator<Soul>(Program.TheGame, Game1.Souls);
+
+            m_explosion = new ParticleGenerator<Explosion>(Program.TheGame, Game1.Explosions);
 		}
 
 		public void PlaceOnTotem(Totem totem, TotemSection sectionAbove, TotemSection sectionBelow)
@@ -235,6 +239,12 @@ namespace GbJamTotem
 			m_below = null;
 			m_above = null;
 
+            if (Game1.old_kbs.IsKeyDown(Keys.Space))
+            {
+                m_transform.Scale = new Vector2(0);
+                m_explosion.Generate(10, new Object[] { m_transform.PositionGlobal, player });
+            }
+
 			m_generator.Generate(player.ComboCount, new object[] { m_transform.PositionGlobal, player });
 		}
 
@@ -249,6 +259,7 @@ namespace GbJamTotem
 		public override void Draw()
 		{
 			m_sprite.Draw();
+            
 		}
 	}
 
