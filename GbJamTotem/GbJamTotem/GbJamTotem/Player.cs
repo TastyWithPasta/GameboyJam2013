@@ -316,8 +316,9 @@ namespace GbJamTotem
             // Activate climbing animation
             //
             if (Game1.kbs.IsKeyDown(Keys.C)
-                && !m_climbing.IsActive && canClimb)
+                && !m_climbing.IsActive && canClimb && !Game1.isInGameplay)
             {
+				Game1.isInGameplay = true;
                 m_actionManager.StartNew(m_climbing);
                 canClimb = false;
             }

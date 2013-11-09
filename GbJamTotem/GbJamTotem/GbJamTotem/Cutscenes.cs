@@ -98,7 +98,7 @@ namespace GbJamTotem
 		{
 			cutscenePlayer = new CutscenePlayer();
 			cutscenePlayer.Transform.PosX = -100;
-			crowd = new Crowd(28, 20, new Vector2(2.5f, 0.5f));
+			crowd = new Crowd(25, 25, new Vector2(2.5f, 0.5f));
 
 			DelayAction cameraDelay = new DelayAction(Program.TheGame, CameraDelay);
 			MoveToStaticAction moveToTotem = new MoveToStaticAction(Program.TheGame, Game1.GameCamera.Transform, new Vector2(Totem1Position, CameraHeightOnGround), 1);
@@ -117,6 +117,11 @@ namespace GbJamTotem
 			crowd.Transform.Position = new Vector2(InitialCrowdPosition, 0);
 			cutscenePlayer.Transform.Position = new Vector2(InitialCharacterPosition, 0);
 			Game1.GameCamera.Transform.Position = new Vector2(CameraMenuX, CameraMenuY);
+		}
+
+		public static void ThrowPlayer()
+		{
+ 
 		}
 
 		public static void GoToTotem(Totem totem)

@@ -42,6 +42,8 @@ namespace GbJamTotem
         public static ComboCounter comboCounter;
         public static int normalTotemValue = 100;
 
+		public static bool isInGameplay = false;
+
         public static SpriteFont debugText;
         bool debugMode = true;
 
@@ -170,10 +172,13 @@ namespace GbJamTotem
             mapBorder.Update();
             comboCounter.Update();
 
-            GameCamera.Update();
-            //GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
-            //GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
+			if (isInGameplay)
+			{
+				GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
+				GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
+			}
 
+            GameCamera.Update();
 			//if (GameCamera.Transform.PosY > -CameraOffset)
 			//    GameCamera.Transform.PosY = -CameraOffset;
 
