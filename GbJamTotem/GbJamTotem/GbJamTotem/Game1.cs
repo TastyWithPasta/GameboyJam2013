@@ -187,9 +187,11 @@ namespace GbJamTotem
             if (debugMode)
             {
 				if (kbs.IsKeyDown(Keys.Left))
-					Cutscenes.crowd.Transform.PosX -= 1.0f;
+					GameCamera.Transform.PosX -= 1f;
+					//Cutscenes.crowd.Transform.PosX -= 1.0f;
                 if (kbs.IsKeyDown(Keys.Right))
-					Cutscenes.crowd.Transform.PosX += 1.0f;
+					//Cutscenes.crowd.Transform.PosX += 1.0f;
+					GameCamera.Transform.PosX += 1f;
                 if (kbs.IsKeyDown(Keys.Up))
                     GameCamera.Transform.PosY -= 1f;
                 if (kbs.IsKeyDown(Keys.Down))
@@ -259,12 +261,6 @@ namespace GbJamTotem
             scoreBorder.Update();
             mapBorder.Update();
             comboCounter.Update();
-
-			if (isInGameplay)
-			{
-				GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
-				GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
-			}
 
             GameCamera.Update();
 			//if (GameCamera.Transform.PosY > -CameraOffset)

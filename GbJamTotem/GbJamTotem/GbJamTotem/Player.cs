@@ -292,7 +292,10 @@ namespace GbJamTotem
 
 		public void StartCountDown()
 		{
- 
+			isFalling = true;
+			Game1.startingCountdown.activateCountdown();
+			Game1.isInGameplay = true;
+			isVisible = true;
 		}
 
 		//Pour debug

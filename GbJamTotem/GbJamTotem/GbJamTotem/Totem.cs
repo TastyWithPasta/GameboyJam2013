@@ -62,7 +62,6 @@ namespace GbJamTotem
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
 
 
-
         #region ACCESSORS & MUTATORS
 
         public int TotalAmountOfSections
@@ -163,7 +162,7 @@ namespace GbJamTotem
 	{
 		const float Mass = 7.0f;
 		const float Bounciness = 0.5f;
-		const int PerspectiveOffset = 3;
+		const int PerspectiveOffset = 8;
 
         public static Vector2 spriteOrigin = new Vector2(0.5f, 1.0f);
 
@@ -200,7 +199,6 @@ namespace GbJamTotem
 			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
 			m_physics.Mass = Mass;
 			m_physics.Restitution = Bounciness;
-
             m_generator = new ParticleGenerator<Soul>(Program.TheGame, Game1.Souls);
 
             m_explosion = new ParticleGenerator<Explosion>(Program.TheGame, Game1.Explosions);
@@ -281,7 +279,7 @@ namespace GbJamTotem
 		public NormalSection(SectionType type)
 			: base(SectionType.Bilateral)
 		{
-			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_2"), m_transform);
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_1"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 		}
 		public override void OnHit(bool toTheLeft, Player player, float pushForce)
@@ -314,7 +312,7 @@ namespace GbJamTotem
 		public MetalSection(SectionType type)
 			:base(type)
         {
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_2"), m_transform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_1"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 
 			bool left = type == SectionType.Left || type == SectionType.Bilateral;
@@ -388,7 +386,7 @@ namespace GbJamTotem
         public SpikeSection(SectionType type)
             : base(type)
         {
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_2"), m_transform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_1"), m_transform);
             m_sprite.Origin = TotemSection.spriteOrigin;
 
             bool left = type == SectionType.Left || type == SectionType.Bilateral;
