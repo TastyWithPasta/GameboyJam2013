@@ -119,6 +119,7 @@ namespace GbJamTotem
 				else
 					comboCount = value;
 				Program.TheGame.UpdateComboEffects();
+				Game1.comboCounter.SetCounter(value, isFalling);
 			}
         }
 
@@ -292,6 +293,8 @@ namespace GbJamTotem
 			isToLeft = true;
 			isVisible = false;
 			isFalling = false;
+			SpeedMultiplier = 1.0f;
+			ComboCount = 1;
 		}
 
 		public void GetReady()

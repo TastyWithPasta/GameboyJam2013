@@ -61,7 +61,6 @@ namespace GbJamTotem
 
             if (isActive)
             {
-
                 // Positionning arrow
                 //
                 if (choice == MenuState.START)
@@ -135,33 +134,33 @@ namespace GbJamTotem
             //
             if (choice == MenuState.CHALLENGE_CHOICE && canLauchChallenge)
             {
-                if (challengeChoice == ChallengeState.CHALL_1)
-                {
                     HideMenu();
+					Program.TheGame.LoadLevel((int)challengeChoice);
                     //Game1.totem.BuildFromFile("Level1_p1");
                     //Game1.scoreBorder.ScoreBarMaxValue = Game1.scoreBorder.calculateScoreMax();
                     //Game1.mapBorder.setTopTotem();
                     canLauchChallenge = false;
-                    Cutscenes.GoToTotem(Game1.totem);
-                }
+					Game1.SetupNextLevel();
+					Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f);
+					//Cutscenes.GoToTotem(Game1.CurrentTotem, 3.0f);
             }
 
             // Start random game
             //
             if (choice == MenuState.START)
             {
-                HideMenu();
-                Game1.totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-                Game1.totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-                Game1.totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
-                Game1.totem.BuildRandom();
+				//HideMenu();
+				//Game1.CurrentTotem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+				//Game1.CurrentTotem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+				//Game1.CurrentTotemt.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+				//Game1.CurrentTotem.BuildRandom();
 
-                // Set informations for slides
-                //
-                Game1.scoreBorder.ScoreBarMaxValue = Game1.scoreBorder.calculateScoreMax();
-                Game1.mapBorder.setTopTotem();
+				//// Set informations for slides
+				////
+				//Game1.scoreBorder.ScoreBarMaxValue = Game1.scoreBorder.calculateScoreMax();
+				//Game1.mapBorder.setTopTotem();
 
-                Cutscenes.GoToTotem(Game1.totem);
+				//Cutscenes.GoToTotem(Game1.totem);
             }
 
             if (choice == MenuState.CHALLENGES)

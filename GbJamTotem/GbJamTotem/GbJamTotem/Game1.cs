@@ -18,6 +18,9 @@ namespace GbJamTotem
 	/// </summary>
 	public class Game1 : MyGame
 	{
+		public const int InitialTotemPosition = 0;
+		public const int TotemSpacing = 90;
+
 		public const int GameboyWidth = 160;
 		public const int GameboyHeight = 144;
 		public const int CameraOffset = 50;
@@ -56,15 +59,27 @@ namespace GbJamTotem
         Color m_bgColor = blue;
 
 		GameboyDrawer m_drawer;
-		static int currentTotem = 0;
+		static int currentIndex = 0;
 		public static Totem[] totems = new Totem[3];
+		public static DynamicMusic[] musics = new DynamicMusic[3];
+
 		public static Totem CurrentTotem
 		{
 			get
 			{
-				if (currentTotem >= totems.Length)
+				if (currentIndex >= totems.Length || currentIndex < 0)
 					return null;
-				return totems[currentTotem];
+				return totems[currentIndex];
+			}
+		}
+
+		public static DynamicMusic CurrentMusic
+		{
+			get
+			{
+				if (currentIndex >= musics.Length || currentIndex < 0)
+					return null;
+				return musics[currentIndex];
 			}
 		}
 
@@ -93,22 +108,6 @@ namespace GbJamTotem
         public static bool feedbackLock; // Avoid looping sound if combo remains the same
         public static bool isComboBreakerSoundPossible; // Activate comboBreakerSound sound when comboCount >= comboMax;
 
-        public static SoundEffectInstance musicT1P1L1;
-        public static SoundEffectInstance musicT1P1L2;
-        public static SoundEffectInstance musicT1P1L3;
-        public static SoundEffectInstance musicT1P1L4;
-
-        public static SoundEffectInstance musicT1P2L1;
-        public static SoundEffectInstance musicT1P2L2;
-        public static SoundEffectInstance musicT1P2L3;
-        public static SoundEffectInstance musicT1P2L4;
-
-        public static SoundEffectInstance musicT1P3L1;
-        public static SoundEffectInstance musicT1P3L2;
-        public static SoundEffectInstance musicT1P3L3;
-        public static SoundEffectInstance musicT1P3L4;
-
-        public static DynamicMusic dynamicMusic;
 
         #endregion
 
@@ -147,13 +146,15 @@ namespace GbJamTotem
 
 			// Totem
 			//
-			totems[0] = new Totem();
-			//testTotem.BuildFromFile("Level1_p1");
-			totems[0].AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			totems[0].AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-			totems[0].AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
-			totems[0].BuildRandom();
-			totems[0].Transform.PosX = 100;
+
+			LoadLevel(1);
+			//totems[0] = new Totem();
+			////testTotem.BuildFromFile("Level1_p1");
+			//totems[0].AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			//totems[0].AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+			//totems[0].AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+			//totems[0].BuildRandom();
+			//totems[0].Transform.PosX = 100;
 
 
             // Player initialisation	
@@ -196,24 +197,6 @@ namespace GbJamTotem
             feedbackLock = true;
             isComboBreakerSoundPossible = false;
 
-            musicT1P1L1 = SoundEffectLibrary.Get("music_T1P1L1").CreateInstance();
-            musicT1P1L2 = SoundEffectLibrary.Get("music_T1P1L2").CreateInstance();
-            musicT1P1L3 = SoundEffectLibrary.Get("music_T1P1L3").CreateInstance();
-            musicT1P1L4 = SoundEffectLibrary.Get("music_T1P1L4").CreateInstance();
-
-            musicT1P2L1 = SoundEffectLibrary.Get("music_T1P2L1").CreateInstance();
-            musicT1P2L2 = SoundEffectLibrary.Get("music_T1P2L2").CreateInstance();
-            musicT1P2L3 = SoundEffectLibrary.Get("music_T1P2L3").CreateInstance();
-            musicT1P2L4 = SoundEffectLibrary.Get("music_T1P2L4").CreateInstance();
-
-            musicT1P3L1 = SoundEffectLibrary.Get("music_T1P3L1").CreateInstance();
-            musicT1P3L2 = SoundEffectLibrary.Get("music_T1P3L2").CreateInstance();
-            musicT1P3L3 = SoundEffectLibrary.Get("music_T1P3L3").CreateInstance();
-            musicT1P3L4 = SoundEffectLibrary.Get("music_T1P3L4").CreateInstance();
-
-            //dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
-            dynamicMusic = new DynamicMusic(musicT1P2L1, musicT1P2L2, musicT1P2L3, musicT1P2L4);
-
 			//Foule et joueur porté
 			Cutscenes.Initalise();
 			Cutscenes.StartMainMenu();
@@ -231,18 +214,21 @@ namespace GbJamTotem
 
 		public static void SetupNextLevel()
 		{
-			currentTotem = -1;
+			currentIndex = -1;
 			SetupNextRound();
 		}
 		public static void SetupNextRound()
 		{
-			currentTotem++;
+			if (CurrentMusic != null)
+				CurrentMusic.StopDynamicMusic();
+
+			currentIndex++;
 			player.Initialise(CurrentTotem);
 			startingCountdown.resetCountdown();
 		}
 		public void LoadLevel(int index)
 		{
-			string path = "Levels/Level_" + index;
+			string path = "Level_" + index;
 
 			totems[0] = new Totem();
 			totems[0].BuildFromFile(path + "/Level" + index + "_1");
@@ -250,12 +236,26 @@ namespace GbJamTotem
 			totems[1].BuildFromFile(path + "/Level" + index + "_2");
 			totems[2] = new Totem();
 			totems[2].BuildFromFile(path + "/Level" + index + "_3");
+
+			for (int i = 0; i < 3; ++i)
+			{
+				SoundEffectInstance musicL1 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L1").CreateInstance();
+				SoundEffectInstance musicL2 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L2").CreateInstance();
+				SoundEffectInstance musicL3 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L3").CreateInstance();
+				SoundEffectInstance musicL4 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L4").CreateInstance();
+				musics[i] = new DynamicMusic(musicL1, musicL2, musicL3, musicL4);
+			}
+			
+			PlaceTotems();
 		}
 
-		public void PlaceTotems()
-		{ }
+		private void PlaceTotems()
+		{
+			for (int i = 0; i < totems.Length; ++i)
+				totems[i].Transform.PosX = InitialTotemPosition + i * TotemSpacing;
+		}
 
-        public void Flash(float time)
+		public void Flash(float time)
         {
             m_bgColor = white;
 			m_flashComboTimer.Interval = time;
@@ -265,7 +265,7 @@ namespace GbJamTotem
 
 		public void UpdateComboEffects()
 		{
-			if (dynamicMusic.State == DynamicMusic.dynamicMusicState.PLAYING)
+			if (CurrentMusic.State == DynamicMusic.dynamicMusicState.PLAYING)
 			{
 				switch (player.ComboCount)
 				{
@@ -276,7 +276,7 @@ namespace GbJamTotem
 							feedbackLock = true;
 							isComboBreakerSoundPossible = false;
 						}
-						dynamicMusic.ResetSecondaryLayers();
+						CurrentMusic.ResetSecondaryLayers();
 						Cutscenes.ZoomToStage(0);
 						break;
 					case 3:
@@ -286,7 +286,7 @@ namespace GbJamTotem
 							Flash(0.5f);
 							feedbackLock = true;
 						}
-						dynamicMusic.EnableLayer(2);
+						CurrentMusic.EnableLayer(2);
 						Cutscenes.ZoomToStage(1);
 						break;
 					case 6:
@@ -296,7 +296,7 @@ namespace GbJamTotem
 							Flash(0.5f);
 							feedbackLock = true;
 						}
-						dynamicMusic.EnableLayer(3);
+						CurrentMusic.EnableLayer(3);
 						Cutscenes.ZoomToStage(2);
 						break;
 					case 9:
@@ -306,7 +306,7 @@ namespace GbJamTotem
 							Flash(0.5f);
 							feedbackLock = true;
 						}
-						dynamicMusic.EnableLayer(4);
+						CurrentMusic.EnableLayer(4);
 						isComboBreakerSoundPossible = true;
 						Cutscenes.ZoomToStage(3);
 						break;
@@ -343,20 +343,6 @@ namespace GbJamTotem
                 if (kbs.IsKeyDown(Keys.RightControl))
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
             }
-
-			if (Game1.kbs.IsKeyDown(Keys.C) && !Game1.isInGameplay)
-			{
-				player.StartDebug(CurrentTotem);
-			}
-
-			if (kbs.IsKeyDown(Keys.S) && old_kbs.IsKeyUp(Keys.S))
-			{
-				Cutscenes.GoToTotem(CurrentTotem, 1.0f);
-			}
-			if (kbs.IsKeyDown(Keys.V) && old_kbs.IsKeyUp(Keys.V))
-			{
-				Cutscenes.ThrowPlayer(CurrentTotem);
-			}
 
             startingCountdown.Update();
 
@@ -407,7 +393,8 @@ namespace GbJamTotem
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             m_falaise.Draw();
 			Cutscenes.crowd.DrawBack();
-			CurrentTotem.Draw();
+			for (int i = 0; i < totems.Length; ++i)
+				totems[i].Draw();
 			Cutscenes.cutscenePlayer.Draw();
 			Cutscenes.crowd.DrawFront();
 

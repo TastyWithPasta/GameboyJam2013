@@ -198,13 +198,14 @@ namespace GbJamTotem
 				{
 					m_physics.OnBounce = null;
 					m_physics.Throw(1.0f, -2.0f, 0);
-					Game1.dynamicMusic.StopDynamicMusic();
+					Game1.CurrentMusic.StopDynamicMusic();
 					SoundEffectLibrary.Get("sword_slash").Play();
 				}));
 			m_jumpFromTotem.AddAction(new DelayAction(Program.TheGame, 0.75f));
 			m_jumpFromTotem.AddAction(new MethodAction(delegate()
 			{
-				Cutscenes.crowd.PickupPlayer(0.5f);
+				Game1.SetupNextRound();
+				Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f);
 			}));
 			m_actionManager = new SingleActionManager();
 
@@ -277,7 +278,7 @@ namespace GbJamTotem
 		public void HitSpikes()
 		{
 			float horizontalHitForce = 1.5f;
-			Game1.dynamicMusic.StopDynamicMusic();
+			Game1.CurrentMusic.StopDynamicMusic();
 
 			m_transform.ParentTransform = null;
 			m_transform.Position = Game1.player.SpriteTransform.PositionGlobal + new Vector2(CharacterOffsetToPlayerX, CharacterOffsetToPlayerY);
@@ -321,6 +322,7 @@ namespace GbJamTotem
 			m_actionManager.StartNew(m_hitSpikes);
 			Game1.scoreBorder.Slide(false);
 			Game1.mapBorder.Slide(false);
+			Game1.SetupNextRound();
 		}
 
 		public void DropFromCrowd(float fx, float fy)
@@ -373,7 +375,7 @@ namespace GbJamTotem
 		static MoveToStaticAction moveTo;
 		static MoveToTransform moveToAscendingPlayer;
 		static MoveToStaticAction moveToTotem;
-		static Sequence cameraIntro;
+		static Sequence intro;
 
 		//Ready
 		static MoveToTransform moveToFallingPlayer;
@@ -409,10 +411,11 @@ namespace GbJamTotem
 			moveToTotem.Timer.Interval = TimeToFirstTotem;
 			MethodAction moveCrowd = new MethodAction(delegate() { 
 				crowd.MoveTo(currentTotemPosition + TotemCrowdOffset, TimeToFirstTotem); });
-			cameraIntro = new Sequence(1);
-			cameraIntro.AddAction(cameraDelay);
-			cameraIntro.AddAction(moveCrowd);
-			cameraIntro.AddAction(moveToTotem);
+			intro = new Sequence(1);
+			intro.AddAction(cameraDelay);
+			intro.AddAction(moveCrowd);
+			intro.AddAction(moveToTotem);
+			intro.AddAction(new MethodAction(delegate() { Cutscenes.ThrowPlayer(Game1.CurrentTotem); }));
 
 			moveToAscendingPlayer = new MoveToTransform(Program.TheGame, Game1.GameCamera.Transform, new Transform(), cutscenePlayer.Transform, 1);
 			moveToAscendingPlayer.Interpolator = new PSquareInterpolation(0.1f);
@@ -485,10 +488,8 @@ namespace GbJamTotem
 			moveToTotem.StartPosition = Game1.GameCamera.Transform.Position;
 			moveToTotem.Target = new Vector2(totem.Transform.PosX, CameraHeightOnGround);
 			currentTotemPosition = totem.Transform.PosX;
-			if (actionManager.IsActive)
-				return;
 			crowd.PickupPlayer(time);
-			actionManager.StartNew(cameraIntro);
+			actionManager.StartNew(intro);
 		}
 		public static void FinishTotem()
 		{

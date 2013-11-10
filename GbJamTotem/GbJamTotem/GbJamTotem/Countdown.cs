@@ -84,7 +84,7 @@ namespace GbJamTotem
         }
 		private void OnFinish()
 		{
-			Game1.dynamicMusic.PlayDynamicMusic();
+			Game1.CurrentMusic.PlayDynamicMusic();
 		}
         public override void Draw()
         {

@@ -26,8 +26,8 @@ namespace GbJamTotem
 
         public void setTopTotem()
         {
-            if (Game1.totem.Top != 0)
-                topTotem = Game1.totem.Top;
+            if (Game1.CurrentTotem.Top != 0)
+				topTotem = Game1.CurrentTotem.Top;
         }
 
         public MapBorder()
