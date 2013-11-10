@@ -38,7 +38,7 @@ namespace GbJamTotem
                 Program.TheGame.SpriteBatch.DrawString(Game1.debugText, "PAUSE",
                     new Vector2(Program.TheGame.ScreenWidth / 2 - Game1.debugText.MeasureString("PAUSE").X / 2,
                         Program.TheGame.ScreenHeight / 2 - Game1.debugText.MeasureString("PAUSE").Y / 2),
-                        Color.Red);
+                        Color.Black);
                 Program.TheGame.SpriteBatch.End();
             }
         }

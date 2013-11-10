@@ -50,13 +50,17 @@ namespace GbJamTotem
         Transform climbingAltitude;
 
 		//Color m_bgColor = new Color(239, 255, 222);
-        Color m_bgColor = new Color(166, 202, 240);
+        
+        static Color blue = new Color(166, 202, 240);
+        static Color white = new Color(255, 251, 240);
+        Color m_bgColor = blue;
+
 		GameboyDrawer m_drawer;
 		public static Totem totem;
 
 		public static DrawingList Foreground = new DrawingList();
 
-        float scaleCombo = 0;
+        PTimer m_flashComboTimer;
 
         #region SOUND ATTRIBUTES
 
@@ -70,13 +74,29 @@ namespace GbJamTotem
         public static SoundEffectInstance moveLeftToRightSound;
         public static SoundEffectInstance moveRightToLeftSound;
 
-        public static SoundEffectInstance musicT1P1;
-        public static SoundEffectInstance musicT1P2;
+        public static SoundEffectInstance feedback_combo3;
+        public static SoundEffectInstance feedback_combo6;
+        public static SoundEffectInstance feedback_combo9;
+        public static SoundEffectInstance feedback_comboBreaker;
+        public static bool feedbackLock; // Avoid looping sound if combo remains the same
+        public static bool isComboBreakerSoundPossible; // Activate comboBreakerSound sound when comboCount >= comboMax;
+
+        public static SoundEffectInstance musicT1P1L1;
+        public static SoundEffectInstance musicT1P1L2;
+        public static SoundEffectInstance musicT1P1L3;
+        public static SoundEffectInstance musicT1P1L4;
+
+        public static SoundEffectInstance musicT1P2L1;
+        public static SoundEffectInstance musicT1P2L2;
+        public static SoundEffectInstance musicT1P2L3;
+        public static SoundEffectInstance musicT1P2L4;
 
         public static SoundEffectInstance musicT1P3L1;
         public static SoundEffectInstance musicT1P3L2;
         public static SoundEffectInstance musicT1P3L3;
         public static SoundEffectInstance musicT1P3L4;
+
+        public static DynamicMusic dynamicMusic;
 
         #endregion
 
@@ -90,6 +110,8 @@ namespace GbJamTotem
 		protected override void Initialize()
 		{
 			// TODO: Add your initialization logic here
+            m_flashComboTimer = new PTimer(this.TimerManager, delegate() { m_bgColor = blue; });
+            m_flashComboTimer.Interval = 0.1f;
 			base.Initialize();
 		}
 
@@ -144,23 +166,35 @@ namespace GbJamTotem
             normalTotemCollisionSound_Channel2 = SoundEffectLibrary.Get("normal_collision_sound").CreateInstance();
             metalTotemCollisionSound_Channel1 = SoundEffectLibrary.Get("metal_collision_sound").CreateInstance();
             metalTotemCollisionSound_Channel2 = SoundEffectLibrary.Get("metal_collision_sound").CreateInstance();
+
             swordSlashSound = SoundEffectLibrary.Get("sword_slash").CreateInstance();
             moveLeftToRightSound = SoundEffectLibrary.Get("move_left_to_right").CreateInstance();
             moveRightToLeftSound = SoundEffectLibrary.Get("move_right_to_left").CreateInstance();
 
-            musicT1P1 = SoundEffectLibrary.Get("music_T1P1").CreateInstance();
-            musicT1P2 = SoundEffectLibrary.Get("music_T1P2").CreateInstance();
+            feedback_combo3 = SoundEffectLibrary.Get("feedback_combo3").CreateInstance();
+            feedback_combo6 = SoundEffectLibrary.Get("feedback_combo6").CreateInstance();
+            feedback_combo9 = SoundEffectLibrary.Get("feedback_combo9").CreateInstance();
+            feedback_comboBreaker = SoundEffectLibrary.Get("feedback_comboBreaker").CreateInstance();
+            feedbackLock = true;
+            isComboBreakerSoundPossible = false;
+
+            musicT1P1L1 = SoundEffectLibrary.Get("music_T1P1L1").CreateInstance();
+            musicT1P1L2 = SoundEffectLibrary.Get("music_T1P1L2").CreateInstance();
+            musicT1P1L3 = SoundEffectLibrary.Get("music_T1P1L3").CreateInstance();
+            musicT1P1L4 = SoundEffectLibrary.Get("music_T1P1L4").CreateInstance();
+
+            musicT1P2L1 = SoundEffectLibrary.Get("music_T1P2L1").CreateInstance();
+            musicT1P2L2 = SoundEffectLibrary.Get("music_T1P2L2").CreateInstance();
+            musicT1P2L3 = SoundEffectLibrary.Get("music_T1P2L3").CreateInstance();
+            musicT1P2L4 = SoundEffectLibrary.Get("music_T1P2L4").CreateInstance();
 
             musicT1P3L1 = SoundEffectLibrary.Get("music_T1P3L1").CreateInstance();
             musicT1P3L2 = SoundEffectLibrary.Get("music_T1P3L2").CreateInstance();
             musicT1P3L3 = SoundEffectLibrary.Get("music_T1P3L3").CreateInstance();
             musicT1P3L4 = SoundEffectLibrary.Get("music_T1P3L4").CreateInstance();
 
-
-            musicT1P3L1.IsLooped = true;
-            musicT1P3L2.IsLooped = true;
-            musicT1P3L3.IsLooped = true;
-            musicT1P3L4.IsLooped = true;
+            //dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
+            dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
@@ -176,6 +210,12 @@ namespace GbJamTotem
 			// TODO: Unload any non ContentManager content here
 		}
 
+        public void Flash()
+        {
+            m_bgColor = white;
+            m_flashComboTimer.Stop();
+            m_flashComboTimer.Start();
+        }
 
 		protected override void Update(GameTime gameTime)
 		{
@@ -216,32 +256,57 @@ namespace GbJamTotem
 
             // Starting playing music
             //
-            if (startingCountdown.CountdownHasFinished && musicT1P3L1.State != SoundState.Playing)
-            {
-                musicT1P3L1.Play();
-                musicT1P3L2.Play();
-                musicT1P3L3.Play();
-                musicT1P3L4.Play();
 
-                musicT1P3L2.Volume = 0f;
-                musicT1P3L3.Volume = 0f;
-                musicT1P3L4.Volume = 0f;
+            if (startingCountdown.CountdownHasFinished && dynamicMusic.State != DynamicMusic.dynamicMusicState.PLAYING)
+            {
+                dynamicMusic.PlayDynamicMusic();
             }
 
-            if (player.ComboCount == 3)
-                musicT1P3L2.Volume = 1f;
-
-            if(player.ComboCount == 6)
-                musicT1P3L3.Volume = 1f;
-
-            if (player.ComboCount == 9)
-                musicT1P3L4.Volume = 1f;
-
-            if (player.ComboCount == 0)
+            if (dynamicMusic.State == DynamicMusic.dynamicMusicState.PLAYING)
             {
-                musicT1P3L2.Volume = 0f;
-                musicT1P3L3.Volume = 0f;
-                musicT1P3L4.Volume = 0f;
+                switch (player.ComboCount)
+                {
+                    case 0:
+                        if (isComboBreakerSoundPossible)
+                        {
+                            feedback_comboBreaker.Play();
+                            feedbackLock = true;
+                            isComboBreakerSoundPossible = false;
+                        }
+                        dynamicMusic.ResetSecondaryLayers();
+                        break;
+                    case 3:
+                        if (!feedbackLock)
+                        {
+                            feedback_combo3.Play();
+                            Flash();
+                            feedbackLock = true;
+                        }
+                        dynamicMusic.EnableLayer(2);
+                        break;
+                    case 6:
+                        if (!feedbackLock)
+                        {
+                            feedback_combo6.Play();
+                            Flash();
+                            feedbackLock = true;
+                        }
+                        dynamicMusic.EnableLayer(3);
+                        break;
+                    case 9:
+                        if (!feedbackLock)
+                        {
+                            feedback_combo9.Play();
+                            Flash();
+                            feedbackLock = true;
+                        }
+                        dynamicMusic.EnableLayer(4);
+                        isComboBreakerSoundPossible = true;
+                        break;
+                    default:
+                        feedbackLock = false;
+                        break;
+                }
             }
 
             // Update game if unpaused
@@ -360,8 +425,8 @@ namespace GbJamTotem
                 SpriteBatch.Begin();
                 // Debug text
                 //
-                SpriteBatch.DrawString(debugText, "Soul : " + scoreBorder.Score + "/"+ scoreBorder.ScoreBarMaxValue , new Vector2(0, 300), Color.Red);
-                
+                //SpriteBatch.DrawString(debugText, "FeedbackLock : " + feedbackLock , new Vector2(0, 300), Color.Red);
+                //SpriteBatch.DrawString(debugText, "isCBSP : " + isComboBreakerSoundPossible, new Vector2(0, 320), Color.Red);
                 SpriteBatch.End();
             }
 

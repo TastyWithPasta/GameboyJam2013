@@ -78,6 +78,7 @@
     <Compile Include="Countdown.cs" />
     <Compile Include="Crowd.cs" />
     <Compile Include="Cutscenes.cs" />
+    <Compile Include="DynamicMusic.cs" />
     <Compile Include="Explosion.cs" />
     <Compile Include="GameboyDrawer.cs" />
     <Compile Include="GameObject.cs" />

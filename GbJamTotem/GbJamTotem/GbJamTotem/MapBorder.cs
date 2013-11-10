@@ -37,10 +37,12 @@ namespace GbJamTotem
                 topTotem = Game1.totem.Top;
 
             pixelPlayer = new Sprite(Program.TheGame, TextureLibrary.PixelSpriteSheet, new Transform(m_transform, true));
+            pixelPlayer.Colour = new Vector4((float)255/(float)255, (float)251/(float)255, (float)240/(float)255, 1);
             pixelPlayer.Transform.PosX = -4;
             pixelPlayer.Transform.Scale = new Vector2(2, 2);
 
             pixelTotem = new Sprite(Program.TheGame, TextureLibrary.PixelSpriteSheet, new Transform(m_transform, true));
+            pixelTotem.Colour = new Vector4((float)255 / (float)255, (float)251 / (float)255, (float)240 / (float)255, 1);
             pixelTotem.Origin = new Vector2(0.5f, 1);
             pixelTotem.Transform.PosY = m_mapFloor;
             pixelTotem.Transform.Scale = new Vector2(2, m_mapCeiling);
