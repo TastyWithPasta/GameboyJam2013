@@ -113,8 +113,12 @@ namespace GbJamTotem
         {
             get { return comboCount; }
             set {
+				if (value > Game1.scoreBorder.ScoreMultiplierMax)
+					comboCount = Game1.scoreBorder.ScoreMultiplierMax;
+				else
+					comboCount = value;
 				Program.TheGame.UpdateComboEffects();
-				comboCount = value; }
+			}
         }
 
 		public Transform SpriteTransform
