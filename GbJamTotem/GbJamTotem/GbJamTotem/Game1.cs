@@ -239,7 +239,7 @@ namespace GbJamTotem
 						if (!feedbackLock)
 						{
 							feedback_combo3.Play();
-							Flash(0.75f);
+							Flash(0.5f);
 							feedbackLock = true;
 						}
 						dynamicMusic.EnableLayer(2);
@@ -249,7 +249,7 @@ namespace GbJamTotem
 						if (!feedbackLock)
 						{
 							feedback_combo6.Play();
-							Flash(0.75f);
+							Flash(0.5f);
 							feedbackLock = true;
 						}
 						dynamicMusic.EnableLayer(3);
@@ -259,7 +259,7 @@ namespace GbJamTotem
 						if (!feedbackLock)
 						{
 							feedback_combo9.Play();
-							Flash(0.75f);
+							Flash(0.5f);
 							feedbackLock = true;
 						}
 						dynamicMusic.EnableLayer(4);
@@ -388,14 +388,13 @@ namespace GbJamTotem
             mapBorder.Draw();
             SpriteBatch.End();
 
+            SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null);
+            pauseScreen.Draw();
+            SpriteBatch.End(); 
+
 			// End drawing
             //
-            m_drawer.Draw();            
-            
-            // Drawing separately pause screen
-            // (Has spriteBatch inside)
-            //
-            pauseScreen.Draw();
+            m_drawer.Draw();                  
             
 
             if (debugMode)
@@ -404,7 +403,7 @@ namespace GbJamTotem
                 // Debug text
                 //
                 SpriteBatch.DrawString(debugText, "Souls : " + scoreBorder.Score + "/" + scoreBorder.ScoreBarMaxValue, new Vector2(0, 300), Color.Red);
-                SpriteBatch.DrawString(debugText, "Mx Max : " + scoreBorder.ScoreMultiplierMax, new Vector2(0, 320), Color.Red);
+                SpriteBatch.DrawString(debugText, "sw : " + ScreenWidth, new Vector2(0, 320), Color.Red);
                 //SpriteBatch.DrawString(debugText, "FeedbackLock : " + feedbackLock , new Vector2(0, 300), Color.Red);
                 //SpriteBatch.DrawString(debugText, "isCBSP : " + isComboBreakerSoundPossible, new Vector2(0, 320), Color.Red);
                 SpriteBatch.End();
