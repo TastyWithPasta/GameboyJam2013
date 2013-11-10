@@ -28,7 +28,7 @@ namespace GbJamTotem
             timer = 0;
             activeTimer = false;
             countdownHasFinished = false;
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter3"), m_transform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter_3"), m_transform);
             m_sprite.Transform.Position = new Vector2(Game1.GameboyWidth/2, Game1.GameboyHeight/2);
             m_sprite.Transform.Scale = new Vector2();
         }
@@ -46,7 +46,7 @@ namespace GbJamTotem
 			timeCounter = TimerMaxValue;
             activeTimer = false;
             countdownHasFinished = false;
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter3"), m_transform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter_3"), m_transform);
         }
 
         public override void Update()
@@ -61,12 +61,12 @@ namespace GbJamTotem
 
                 if (timeCounter < 1.0f)
                 {
-                    m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter2"), m_transform);
+                    m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter_2"), m_transform);
                 }
 
                 if (timeCounter < 0.5f)
                 {
-                    m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter1"), m_transform);
+                    m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter_1"), m_transform);
                 }
 
                 if (timeCounter < 0)

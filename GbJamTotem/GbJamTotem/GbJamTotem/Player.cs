@@ -431,6 +431,7 @@ namespace GbJamTotem
                             m_actionManager.StartNew(m_slashLR);
 							m_spriteAnimation.StartNew(m_spritAnimLR);
                             isToLeft = false;
+                            Game1.comboCounter.RestartScrolling();
                         }
                         else
                         {
@@ -438,6 +439,7 @@ namespace GbJamTotem
                             m_actionManager.StartNew(m_slashRL);
 							m_spriteAnimation.StartNew(m_spritAnimRL);
                             isToLeft = true;
+                            Game1.comboCounter.RestartScrolling();
                         }
                     }
 

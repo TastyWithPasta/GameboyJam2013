@@ -137,11 +137,11 @@ namespace GbJamTotem
 			// Totem
 			//
 			testTotem = new Totem();
-			//totem.BuildFromFile("Level_1/Level1_3");
-			testTotem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			testTotem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-			testTotem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
-			testTotem.BuildRandom();
+			//totem.BuildFromFile("Level1_p1");
+			totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+			totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+			totem.BuildRandom();
 			testTotem.Transform.PosX = 100;
 
             // Player initialisation	
@@ -200,7 +200,7 @@ namespace GbJamTotem
             musicT1P3L4 = SoundEffectLibrary.Get("music_T1P3L4").CreateInstance();
 
             //dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
-            dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
+            dynamicMusic = new DynamicMusic(musicT1P2L1, musicT1P2L2, musicT1P2L3, musicT1P2L4);
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
@@ -253,7 +253,7 @@ namespace GbJamTotem
 						if (!feedbackLock)
 						{
 							feedback_combo3.Play();
-							Flash(0.75f);
+							Flash(0.5f);
 							feedbackLock = true;
 						}
 						dynamicMusic.EnableLayer(2);
@@ -263,7 +263,7 @@ namespace GbJamTotem
 						if (!feedbackLock)
 						{
 							feedback_combo6.Play();
-							Flash(0.75f);
+							Flash(0.5f);
 							feedbackLock = true;
 						}
 						dynamicMusic.EnableLayer(3);
@@ -273,7 +273,7 @@ namespace GbJamTotem
 						if (!feedbackLock)
 						{
 							feedback_combo9.Play();
-							Flash(0.75f);
+							Flash(0.5f);
 							feedbackLock = true;
 						}
 						dynamicMusic.EnableLayer(4);
@@ -369,43 +369,6 @@ namespace GbJamTotem
             comboCounter.Draw();
             SpriteBatch.End();
 
-            #region Combo Multiplier with SpriteFont
-            // TODO
-            // Mettre un vrai texte comme spritefont
-            //
-            /*
-            if (player.ComboCount > 1 && player.IsFalling)
-            {
-                Vector2 posCombo;
-
-                if (old_kbs.IsKeyDown(Keys.Space) && kbs.IsKeyDown(Keys.Space))
-                {
-                    scaleCombo = 0;
-                }
-
-                if (player.IsToLeft)
-                {
-                    posCombo = new Vector2(100, 72);
-                }
-                else
-                {
-                    posCombo = new Vector2(20, 72);
-                }
-
-
-                SpriteBatch.Begin();
-                SpriteBatch.DrawString(debugText, "x " + player.ComboCount, posCombo, Color.White, 0, new Vector2(0, (float)(debugText.MeasureString("9").Y / 2)), scaleCombo, SpriteEffects.None, 0);
-                //SpriteBatch.DrawString(debugText, "Combo : " + player.ComboCount, new Vector2(), Color.Red);
-                SpriteBatch.End();
-
-                if (scaleCombo < 1)
-                    scaleCombo += 0.1f;
-            }
-             * */
-            #endregion
-
-
-
             // Begin all drawing methods
             //
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
@@ -429,14 +392,13 @@ namespace GbJamTotem
             mapBorder.Draw();
             SpriteBatch.End();
 
+            SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null);
+            pauseScreen.Draw();
+            SpriteBatch.End(); 
+
 			// End drawing
             //
-            m_drawer.Draw();            
-            
-            // Drawing separately pause screen
-            // (Has spriteBatch inside)
-            //
-            pauseScreen.Draw();
+            m_drawer.Draw();                  
             
 
             if (debugMode)
@@ -444,6 +406,8 @@ namespace GbJamTotem
                 SpriteBatch.Begin();
                 // Debug text
                 //
+                SpriteBatch.DrawString(debugText, "Souls : " + scoreBorder.Score + "/" + scoreBorder.ScoreBarMaxValue, new Vector2(0, 300), Color.Red);
+                SpriteBatch.DrawString(debugText, "sw : " + ScreenWidth, new Vector2(0, 320), Color.Red);
                 //SpriteBatch.DrawString(debugText, "FeedbackLock : " + feedbackLock , new Vector2(0, 300), Color.Red);
                 //SpriteBatch.DrawString(debugText, "isCBSP : " + isComboBreakerSoundPossible, new Vector2(0, 320), Color.Red);
                 SpriteBatch.End();
