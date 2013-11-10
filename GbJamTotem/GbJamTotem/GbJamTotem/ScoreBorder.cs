@@ -32,6 +32,7 @@ namespace GbJamTotem
         public int ScoreBarMaxValue
         {
             get { return scoreBarMaxValue; }
+            set { scoreBarMaxValue = value; }
         }
 
         public int ScoreMultiplierMax
@@ -88,7 +89,7 @@ namespace GbJamTotem
 
             }
 
-            return nbSoulsCollectible + multiplierFactor;
+            return nbSoulsCollectible + multiplierFactor - (nbSoulsCollectible + multiplierFactor)/3;
         }
 
         public void Slide(bool onScreen)

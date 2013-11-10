@@ -24,6 +24,12 @@ namespace GbJamTotem
 
         SingleActionManager m_actionManager;
 
+        public void setTopTotem()
+        {
+            if (Game1.totem.Top != 0)
+                topTotem = Game1.totem.Top;
+        }
+
         public MapBorder()
         {
             m_actionManager = new SingleActionManager();
