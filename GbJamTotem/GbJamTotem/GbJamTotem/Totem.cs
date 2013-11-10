@@ -86,6 +86,13 @@ namespace GbJamTotem
 				return m_attachedSections[0].Top;
 			}
 		}
+		public Vector2 StopHotspot
+		{
+			get
+			{
+				return new Vector2(40, m_attachedSections[0].Top + 20);
+			}
+		}
 
 		public List<TotemSection> AttachedSections
 		{
@@ -110,7 +117,8 @@ namespace GbJamTotem
 
 		public void BuildFromFile(string filename)
 		{
-			string[] lines = System.IO.File.ReadAllLines("Content/Levels/" + filename + ".txt");
+			string file = "Content/Levels/" + filename + ".txt";
+			string[] lines = System.IO.File.ReadAllLines(file);
 			List<TotemSection> sectionsToAdd = new List<TotemSection>();
 			for(int i = lines.Length - 1; i > -1; --i)
 			{
@@ -545,7 +553,6 @@ namespace GbJamTotem
                 }
                 else
                 {
-                    player.Bounce(toTheLeft);
                     player.ComboCount = 0; // TODO Utile ici?
                 }
 			}

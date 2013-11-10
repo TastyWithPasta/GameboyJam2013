@@ -41,17 +41,18 @@ namespace GbJamTotem
 		
     public class Player : GameObject
     {
-		public const float DistanceFromTotemCenter = -50;
+		public const float DistanceFromTotemCenter = -40;
 
 		const float BasePlayerSpeed = 60.0f;
 		const float BasePushForce = 4.0f;
-		const float SlashDuration = 0.4f;
+		const float SlashDuration = 0.3f;
 		const float CollisionDelayRatio = 0.5f;
 		const float CollisionDelayDuration = SlashDuration * CollisionDelayRatio;
 		const float SpeedMultiplierIncrement = 1.05f;
 		const float MaxSpeedMultiplier = 2.5f;
 		const int DeltaAboveClimbingAltitude = -100;
         bool isPoweredUp;
+		const int DecelerationPointFromBaseX = -100;
 
 		Totem m_totemInstance;
 
@@ -124,6 +125,7 @@ namespace GbJamTotem
 				else
 					comboCount = value;
 				Program.TheGame.UpdateComboEffects();
+				Game1.comboCounter.SetCounter(value, isFalling);
 			}
         }
 
@@ -287,14 +289,20 @@ namespace GbJamTotem
 			m_spritAnimRR = new SpriteSheetAnimation(m_sprite, 23, 30, SlashDuration, 1);
 			m_ready = new SpriteSheetAnimation(m_sprite, 0, 4, SlashDuration, 1);
 			m_ready.Timer.Interval = 0.5f;
-        }
+
+		}
 
 		public void Initialise(Totem totem)
 		{ 
 			m_totemInstance = totem;
 			m_transform.PosX = totem.Transform.PosX;
 			m_transform.PosY = totem.Top + DeltaAboveClimbingAltitude;
+			m_spriteTransform.Position = m_leftTransform.Position;
+			isToLeft = true;
 			isVisible = false;
+			isFalling = false;
+			SpeedMultiplier = 1.0f;
+			ComboCount = 1;
 		}
 
 		public void GetReady()
@@ -365,12 +373,21 @@ namespace GbJamTotem
             comboCount = 0;
 
 		}
+		public void HitSpikes()
+		{
+			Game1.isInGameplay = false;
+			isVisible = false;
+			isFalling = false;
+			Cutscenes.cutscenePlayer.HitSpikes();
+			Game1.spikeHitSound.Play();
+		}
 
 		public void FinishTotem()
 		{
 			isFalling = false;
 			isVisible = false;
 		}
+
 		public override void Update()
         {
 			bool animationIsActive = m_slashLR.IsActive || m_slashRL.IsActive 
@@ -447,17 +464,6 @@ namespace GbJamTotem
 							m_sprite.SetFrame(12);
                 }
 
-                // Stop falling if on the floor 
-                //
-                if (this.Transform.PosY >= 0)
-                {
-                    isFalling = false;
-                    canClimb = true;
-
-                    Game1.scoreBorder.Slide(false);
-                    Game1.mapBorder.Slide(false);
-                    Game1.startingCountdown.resetCountdown();
-                }
 
                 // Update falling
                 //

@@ -10,6 +10,7 @@ namespace GbJamTotem
 {
 	public class PhysicsComponent : IPUpdatable
 	{
+		public delegate void BounceDelegate();
 		MyGame m_myGame;
 		Transform m_transform;
 
@@ -21,10 +22,16 @@ namespace GbJamTotem
 		private float m_angleIncrement;
 		private bool m_isProjected;
 		private Vector2 m_velocity;
+		private BounceDelegate m_onBounce;
 
 		public bool IsProjected
 		{
 			get { return m_isProjected; }
+		}
+
+		public BounceDelegate OnBounce
+		{
+			set { m_onBounce = value; }
 		}
 
 		public PhysicsComponent(MyGame theGame, Transform transform)
@@ -82,6 +89,8 @@ namespace GbJamTotem
 			{
 				m_transform.PosY = GroundLevel;
 				m_velocity.Y *= -0.4f * Restitution;
+				if(m_onBounce != null)
+					m_onBounce();
 			}
 
 			if (m_previousY == m_transform.PosY)

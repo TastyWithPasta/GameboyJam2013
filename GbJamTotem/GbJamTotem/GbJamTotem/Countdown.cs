@@ -76,11 +76,16 @@ namespace GbJamTotem
                     countdownHasFinished = true;
                     Game1.scoreBorder.Slide(true);
                     Game1.mapBorder.Slide(true);
+					
+					OnFinish();
                 }
             }
 
         }
-
+		private void OnFinish()
+		{
+			Game1.CurrentMusic.PlayDynamicMusic();
+		}
         public override void Draw()
         {
             m_sprite.Draw();

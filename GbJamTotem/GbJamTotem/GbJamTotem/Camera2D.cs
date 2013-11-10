@@ -14,6 +14,10 @@ namespace GbJamTotem
 			Transform m_transform;
 			Matrix m_centerMatrix, m_cameraMatrix;
 			bool m_scaleToZoom = false;
+			PTimer m_cameraShakeTimer;
+			float m_shakeBreadth;
+			Vector2 m_shakeOffset;
+			bool m_shakeFlag;
 
 			public Transform Transform
 			{
@@ -48,9 +52,32 @@ namespace GbJamTotem
 				}
 			}
 
+			public void Shake(float breadth, float time)
+			{
+				m_shakeBreadth = breadth;
+				m_cameraShakeTimer.Interval = time;
+				m_cameraShakeTimer.Stop();
+				m_cameraShakeTimer.Start();
+				m_shakeFlag = true;
+			}
+
+			private void StopShake()
+			{
+				m_cameraShakeTimer.Stop();
+				m_shakeOffset = Vector2.Zero;
+				m_shakeFlag = false;
+			}
+			
+
 			private void UpdateCameraMatrix()
 			{
 				Matrix rotM, scaleM, posM, temp;
+
+				if (m_shakeFlag)
+				{
+					m_shakeOffset.X = (float)(Program.Random.NextDouble() * 2 * m_shakeBreadth) -m_shakeBreadth;
+					m_shakeOffset.Y = (float)(Program.Random.NextDouble() * 2 * m_shakeBreadth) - m_shakeBreadth;
+				}
 
 				Vector2 posGlobal = m_transform.PositionGlobal;
 				Matrix.CreateRotationZ((float)m_transform.Direction, out rotM);
@@ -63,7 +90,7 @@ namespace GbJamTotem
 					//    m_zoom--;
 				}
 				Matrix.CreateScale(m_zoom, m_zoom, 1, out scaleM);
-				Matrix.CreateTranslation(-posGlobal.X, -posGlobal.Y, 0, out posM);
+				Matrix.CreateTranslation(-posGlobal.X + m_shakeOffset.X, -posGlobal.Y + m_shakeOffset.Y, 0, out posM);
 
 				//Different order than transform matrix!
 				Matrix.Multiply(ref posM, ref scaleM, out temp);
@@ -74,6 +101,7 @@ namespace GbJamTotem
 			{
 				m_transform = new Transform();
 				m_centerMatrix = Matrix.CreateTranslation(focusPoint.X, focusPoint.Y, 0);
+				m_cameraShakeTimer = new PTimer(Program.TheGame.TimerManager, StopShake);
 			}
 
 			public void Update()
