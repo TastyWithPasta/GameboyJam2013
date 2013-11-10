@@ -133,10 +133,12 @@ namespace GbJamTotem
 			// Totem
 			//
 			totem = new Totem();
-			totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			totem.AddSections(new SectionData(typeof(MetalSection), 5, 5, 7));
-			totem.AddSections(new SectionData(typeof(SpikeSection), 3, 3, 7));
-			totem.Build();
+			totem.BuildFromFile("Level1_p1");
+			//totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			//totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+			//totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+			totem.BuildRandom();
+			totem.Transform.PosX = 100;
 
             // Player initialisation	
             //
@@ -154,7 +156,7 @@ namespace GbJamTotem
             // Background textures
             //
 			m_falaise = new Sprite(this, TextureLibrary.GetSpriteSheet("decors_sol_falaise"), new Transform());
-			m_falaise.Origin = new Vector2(0, 0.5f);
+			m_falaise.Origin = new Vector2(0, 0.32f);
             m_falaise.Transform.PosX = -60;
 			m_falaise.Transform.PosY = 10;
 
@@ -227,9 +229,11 @@ namespace GbJamTotem
             if (debugMode)
             {
 				if (kbs.IsKeyDown(Keys.Left))
-					Cutscenes.crowd.Transform.PosX -= 1.0f;
+					GameCamera.Transform.PosX -= 1f;
+					//Cutscenes.crowd.Transform.PosX -= 1.0f;
                 if (kbs.IsKeyDown(Keys.Right))
-					Cutscenes.crowd.Transform.PosX += 1.0f;
+					//Cutscenes.crowd.Transform.PosX += 1.0f;
+					GameCamera.Transform.PosX += 1f;
                 if (kbs.IsKeyDown(Keys.Up))
                     GameCamera.Transform.PosY -= 1f;
                 if (kbs.IsKeyDown(Keys.Down))
@@ -282,6 +286,7 @@ namespace GbJamTotem
                             isComboBreakerSoundPossible = false;
                         }
                         dynamicMusic.ResetSecondaryLayers();
+						Cutscenes.ZoomToStage(0);
                         break;
                     case 3:
                         if (!feedbackLock)
@@ -291,6 +296,7 @@ namespace GbJamTotem
                             feedbackLock = true;
                         }
                         dynamicMusic.EnableLayer(2);
+						Cutscenes.ZoomToStage(1);
                         break;
                     case 6:
                         if (!feedbackLock)
@@ -300,6 +306,7 @@ namespace GbJamTotem
                             feedbackLock = true;
                         }
                         dynamicMusic.EnableLayer(3);
+						Cutscenes.ZoomToStage(2);
                         break;
                     case 9:
                         if (!feedbackLock)
@@ -310,6 +317,7 @@ namespace GbJamTotem
                         }
                         dynamicMusic.EnableLayer(4);
                         isComboBreakerSoundPossible = true;
+						Cutscenes.ZoomToStage(3);
                         break;
                     default:
                         feedbackLock = false;
@@ -324,12 +332,6 @@ namespace GbJamTotem
             scoreBorder.Update();
             mapBorder.Update();
             comboCounter.Update();
-
-			if (isInGameplay)
-			{
-				GameCamera.Transform.PosX = player.Transform.PosX;//player.SpriteTransform.PosX;
-				GameCamera.Transform.PosY = player.Transform.PosY + CameraOffset;
-			}
 
             GameCamera.Update();
 			//if (GameCamera.Transform.PosY > -CameraOffset)
