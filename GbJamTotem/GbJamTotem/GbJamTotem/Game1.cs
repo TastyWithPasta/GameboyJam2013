@@ -133,10 +133,10 @@ namespace GbJamTotem
 			// Totem
 			//
 			totem = new Totem();
-			totem.BuildFromFile("Level1_p1");
-			//totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			//totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-			//totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+			//totem.BuildFromFile("Level1_p1");
+			totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+			totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
 			totem.BuildRandom();
 			totem.Transform.PosX = 100;
 
@@ -360,43 +360,6 @@ namespace GbJamTotem
             comboCounter.Draw();
             SpriteBatch.End();
 
-            #region Combo Multiplier with SpriteFont
-            // TODO
-            // Mettre un vrai texte comme spritefont
-            //
-            /*
-            if (player.ComboCount > 1 && player.IsFalling)
-            {
-                Vector2 posCombo;
-
-                if (old_kbs.IsKeyDown(Keys.Space) && kbs.IsKeyDown(Keys.Space))
-                {
-                    scaleCombo = 0;
-                }
-
-                if (player.IsToLeft)
-                {
-                    posCombo = new Vector2(100, 72);
-                }
-                else
-                {
-                    posCombo = new Vector2(20, 72);
-                }
-
-
-                SpriteBatch.Begin();
-                SpriteBatch.DrawString(debugText, "x " + player.ComboCount, posCombo, Color.White, 0, new Vector2(0, (float)(debugText.MeasureString("9").Y / 2)), scaleCombo, SpriteEffects.None, 0);
-                //SpriteBatch.DrawString(debugText, "Combo : " + player.ComboCount, new Vector2(), Color.Red);
-                SpriteBatch.End();
-
-                if (scaleCombo < 1)
-                    scaleCombo += 0.1f;
-            }
-             * */
-            #endregion
-
-
-
             // Begin all drawing methods
             //
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
@@ -435,6 +398,8 @@ namespace GbJamTotem
                 SpriteBatch.Begin();
                 // Debug text
                 //
+                SpriteBatch.DrawString(debugText, "Souls : " + scoreBorder.Score + "/" + scoreBorder.ScoreBarMaxValue, new Vector2(0, 300), Color.Red);
+                SpriteBatch.DrawString(debugText, "Mx Max : " + scoreBorder.ScoreMultiplierMax, new Vector2(0, 320), Color.Red);
                 //SpriteBatch.DrawString(debugText, "FeedbackLock : " + feedbackLock , new Vector2(0, 300), Color.Red);
                 //SpriteBatch.DrawString(debugText, "isCBSP : " + isComboBreakerSoundPossible, new Vector2(0, 320), Color.Red);
                 SpriteBatch.End();

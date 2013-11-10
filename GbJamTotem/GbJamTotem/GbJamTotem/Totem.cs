@@ -344,13 +344,15 @@ namespace GbJamTotem
 			bool right = type == SectionType.Right || type == SectionType.Bilateral;
 			if (left)
 			{
-				m_metalSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_left"), new Transform(m_transform, true));
+				m_metalSpriteLeft = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_metal_left"), new Transform(m_transform, true));
+                m_metalSpriteLeft.Transform.PosX = -3;
 				m_metalSpriteLeft.Origin = TotemSection.spriteOrigin;
 			}
 			if (right)
 			{
-				m_metalSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_metal_right"), new Transform(m_transform, true));
-				m_metalSpriteRight.Origin = TotemSection.spriteOrigin;
+				m_metalSpriteRight = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_metal_right"), new Transform(m_transform, true));
+                m_metalSpriteRight.Transform.PosX = 3;
+                m_metalSpriteRight.Origin = TotemSection.spriteOrigin;
 			}
         }
 
