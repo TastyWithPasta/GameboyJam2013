@@ -133,10 +133,10 @@ namespace GbJamTotem
 			// Totem
 			//
 			totem = new Totem();
-			totem.BuildFromFile("Level1_p1");
-			//totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			//totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-			//totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+			//totem.BuildFromFile("Level1_p1");
+			totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+			totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
 			totem.BuildRandom();
 			totem.Transform.PosX = 100;
 
@@ -201,6 +201,7 @@ namespace GbJamTotem
 			Cutscenes.StartMainMenu();
         }
 
+
 		/// <summary>
 		/// UnloadContent will be called once per game and is the place to unload
 		/// all content.
@@ -210,12 +211,67 @@ namespace GbJamTotem
 			// TODO: Unload any non ContentManager content here
 		}
 
-        public void Flash()
+        public void Flash(float time)
         {
             m_bgColor = white;
+			m_flashComboTimer.Interval = time;
             m_flashComboTimer.Stop();
             m_flashComboTimer.Start();
         }
+
+		public void UpdateComboEffects()
+		{
+			if (dynamicMusic.State == DynamicMusic.dynamicMusicState.PLAYING)
+			{
+				switch (player.ComboCount)
+				{
+					case 0:
+						if (isComboBreakerSoundPossible)
+						{
+							feedback_comboBreaker.Play();
+							feedbackLock = true;
+							isComboBreakerSoundPossible = false;
+						}
+						dynamicMusic.ResetSecondaryLayers();
+						Cutscenes.ZoomToStage(0);
+						break;
+					case 3:
+						if (!feedbackLock)
+						{
+							feedback_combo3.Play();
+							Flash(0.75f);
+							feedbackLock = true;
+						}
+						dynamicMusic.EnableLayer(2);
+						Cutscenes.ZoomToStage(1);
+						break;
+					case 6:
+						if (!feedbackLock)
+						{
+							feedback_combo6.Play();
+							Flash(0.75f);
+							feedbackLock = true;
+						}
+						dynamicMusic.EnableLayer(3);
+						Cutscenes.ZoomToStage(2);
+						break;
+					case 9:
+						if (!feedbackLock)
+						{
+							feedback_combo9.Play();
+							Flash(0.75f);
+							feedbackLock = true;
+						}
+						dynamicMusic.EnableLayer(4);
+						isComboBreakerSoundPossible = true;
+						Cutscenes.ZoomToStage(3);
+						break;
+					default:
+						feedbackLock = false;
+						break;
+				}
+			}
+		}
 
 		protected override void Update(GameTime gameTime)
 		{
@@ -272,57 +328,6 @@ namespace GbJamTotem
             if (startingCountdown.CountdownHasFinished && dynamicMusic.State != DynamicMusic.dynamicMusicState.PLAYING)
             {
                 dynamicMusic.PlayDynamicMusic();
-            }
-
-            if (dynamicMusic.State == DynamicMusic.dynamicMusicState.PLAYING)
-            {
-                switch (player.ComboCount)
-                {
-                    case 0:
-                        if (isComboBreakerSoundPossible)
-                        {
-                            feedback_comboBreaker.Play();
-                            feedbackLock = true;
-                            isComboBreakerSoundPossible = false;
-                        }
-                        dynamicMusic.ResetSecondaryLayers();
-						Cutscenes.ZoomToStage(0);
-                        break;
-                    case 3:
-                        if (!feedbackLock)
-                        {
-                            feedback_combo3.Play();
-                            Flash();
-                            feedbackLock = true;
-                        }
-                        dynamicMusic.EnableLayer(2);
-						Cutscenes.ZoomToStage(1);
-                        break;
-                    case 6:
-                        if (!feedbackLock)
-                        {
-                            feedback_combo6.Play();
-                            Flash();
-                            feedbackLock = true;
-                        }
-                        dynamicMusic.EnableLayer(3);
-						Cutscenes.ZoomToStage(2);
-                        break;
-                    case 9:
-                        if (!feedbackLock)
-                        {
-                            feedback_combo9.Play();
-                            Flash();
-                            feedbackLock = true;
-                        }
-                        dynamicMusic.EnableLayer(4);
-                        isComboBreakerSoundPossible = true;
-						Cutscenes.ZoomToStage(3);
-                        break;
-                    default:
-                        feedbackLock = false;
-                        break;
-                }
             }
 
             // Update game if unpaused

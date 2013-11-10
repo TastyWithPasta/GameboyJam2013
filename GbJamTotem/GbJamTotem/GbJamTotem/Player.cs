@@ -112,7 +112,9 @@ namespace GbJamTotem
         public int ComboCount
         {
             get { return comboCount; }
-            set { comboCount = value; }
+            set {
+				Program.TheGame.UpdateComboEffects();
+				comboCount = value; }
         }
 
 		public Transform SpriteTransform

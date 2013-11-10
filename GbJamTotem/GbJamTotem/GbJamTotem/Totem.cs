@@ -57,7 +57,6 @@ namespace GbJamTotem
 	public class Totem : GameObject
 	{
 		List<TotemSection> m_sectionsToPlace = new List<TotemSection>();
-
 		List<TotemSection> m_allSections = new List<TotemSection>();
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
@@ -120,12 +119,19 @@ namespace GbJamTotem
 				if (lines[i].StartsWith("{}"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Bilateral));
 			}
+			TotemBase totemBase  = new TotemBase();
+			m_allSections.Add(totemBase);
+			m_attachedSections.Add(totemBase);
 			m_allSections.AddRange(sectionsToAdd);
 			m_attachedSections.AddRange(sectionsToAdd);
 		}
 
 		public void BuildRandom()
 		{
+			TotemBase totemBase = new TotemBase();
+			m_allSections.Add(totemBase);
+			m_attachedSections.Add(totemBase);
+
 			//Set the order of the totem sections
 			int amountOfSections = m_sectionsToPlace.Count;
 			for (int i = 0; i < amountOfSections; ++i)
@@ -135,7 +141,6 @@ namespace GbJamTotem
 				m_attachedSections.Add(m_sectionsToPlace[index]);
 				m_sectionsToPlace.RemoveAt(index);
 			}
-
 			//Place the totem sections in the world
 			TotemSection above = null, below = null;
 			for (int i = 0; i < m_allSections.Count; ++i)
@@ -163,6 +168,8 @@ namespace GbJamTotem
 
 				m_allSections[i].Transform.ParentTransform = m_transform;
 				m_allSections[i].PlaceOnTotem(this, above, below);
+
+
 			}
 		}
 
@@ -296,6 +303,20 @@ namespace GbJamTotem
 		{
 			m_sprite.Draw();
             
+		}
+	}
+
+	public class TotemBase : TotemSection
+	{
+		public TotemBase()
+			: base(SectionType.Bilateral)
+		{
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_base"), m_transform);
+			m_sprite.Origin = TotemSection.spriteOrigin;
+		}
+		public override void OnHit(bool toTheLeft, Player player, float pushForce)
+		{
+			return;
 		}
 	}
 

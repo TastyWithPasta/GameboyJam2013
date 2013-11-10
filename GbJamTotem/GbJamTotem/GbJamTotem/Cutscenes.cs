@@ -248,7 +248,7 @@ namespace GbJamTotem
 		static SingleActionManager actionManager = new SingleActionManager();
 
 		//Gameplay Zoom
-		static float[] TargetZooms = new float[] { 1.0f, 0.9f, 0.8f, 0.7f };
+		static float[] TargetZooms = new float[] { 1.0f, 0.92f, 0.84f, 0.76f };
 		static ScaleToAction cameraZoom;
 
 		public static bool IsReady
@@ -291,6 +291,7 @@ namespace GbJamTotem
 
 			cameraZoom = new ScaleToAction(Program.TheGame, Game1.GameCamera.Transform, Vector2.Zero, 1);
 			cameraZoom.Interpolator = new PSmoothstepInterpolation();
+			cameraZoom.Timer.Interval = 0.3f;
 		}
 
 		public static void ZoomToStage(int stageNumber)
@@ -298,6 +299,7 @@ namespace GbJamTotem
 			float targetZoom = TargetZooms[Math.Max(0, Math.Min(3, stageNumber))];
 			cameraZoom.StartScale = Game1.GameCamera.Transform.Scale;
 			cameraZoom.Target = new Vector2(targetZoom, targetZoom);
+			actionManager.StartNew(cameraZoom);
 		}
 
 		public static void StartMainMenu()
