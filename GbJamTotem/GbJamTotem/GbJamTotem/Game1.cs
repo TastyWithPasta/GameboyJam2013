@@ -48,7 +48,7 @@ namespace GbJamTotem
 
         public static SpriteFont menuText;
         public static SpriteFont debugText;
-        bool debugMode = true;
+        bool debugMode = false;
 
         Sprite m_falaise;
 
@@ -84,8 +84,6 @@ namespace GbJamTotem
 		}
 
 		public static DrawingList Foreground = new DrawingList();
-
-        PowerUp p;
 
         PTimer m_flashComboTimer;
 
@@ -187,9 +185,6 @@ namespace GbJamTotem
             mapBorder = new MapBorder();
             comboCounter = new ComboCounter(player);
 
-            p = new PowerUp(true);
-            p.Transform.Position = new Vector2(40, -1800);
-
             // Background textures
             //
 			m_falaise = new Sprite(this, TextureLibrary.GetSpriteSheet("decors_sol_falaise"), new Transform());
@@ -261,7 +256,11 @@ namespace GbJamTotem
 			if (CurrentMusic != null)
 				CurrentMusic.StopDynamicMusic();
 
+            if (CurrentTotem != null)
+                CurrentTotem.HidePowerUp();
+
 			currentIndex++;
+            CurrentTotem.ShowPowerUp();
 			player.Initialise(CurrentTotem);
 			startingCountdown.resetCountdown();
 		}
@@ -275,6 +274,10 @@ namespace GbJamTotem
 			totems[1].BuildFromFile(path + "/Level" + index + "_2");
 			totems[2] = new Totem();
 			totems[2].BuildFromFile(path + "/Level" + index + "_3");
+
+            totems[0].ShowPowerUp();
+            totems[1].HidePowerUp();
+            totems[2].HidePowerUp();
 
 			for (int i = 0; i < 3; ++i)
 			{
@@ -399,8 +402,6 @@ namespace GbJamTotem
             mapBorder.Update();
             comboCounter.Update();
 
-            p.Update();
-
             GameCamera.Update();
 			//if (GameCamera.Transform.PosY > -CameraOffset)
 			//    GameCamera.Transform.PosY = -CameraOffset;
@@ -440,8 +441,6 @@ namespace GbJamTotem
 			Cutscenes.crowd.DrawFront();
 
             player.Draw();
-
-            p.Draw();
 			
 			Souls.Draw();
             Explosions.Draw();
@@ -484,7 +483,7 @@ namespace GbJamTotem
                 //SpriteBatch.DrawString(debugText, "Souls : " + scoreBorder.Score + "/" + scoreBorder.ScoreBarMaxValue, new Vector2(0, 300), Color.Red);
                 //SpriteBatch.DrawString(debugText, "Chall : " + menuScreen.challengeChoice, new Vector2(0, 320), Color.Red);
                 //SpriteBatch.DrawString(menuText, "Test", new Vector2(20, 350), Color.Black);
-                SpriteBatch.DrawString(debugText, "player posY : " +player.Transform.PosY , new Vector2(0, 300), Color.Red);
+                //SpriteBatch.DrawString(debugText, "player posY : " +player.Transform.PosY , new Vector2(0, 300), Color.Red);
                 //SpriteBatch.DrawString(debugText, "isCBSP : " + isComboBreakerSoundPossible, new Vector2(0, 320), Color.Red);
                 SpriteBatch.End();
             }

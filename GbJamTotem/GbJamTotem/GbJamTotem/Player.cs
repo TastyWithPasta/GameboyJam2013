@@ -54,6 +54,8 @@ namespace GbJamTotem
         bool isPoweredUp;
 		const int DecelerationPointFromBaseX = -100;
 
+        Sprite m_spriteAura;
+
 		Totem m_totemInstance;
 
         MoveToTransform m_walkingToTotem;
@@ -201,6 +203,9 @@ namespace GbJamTotem
             m_rightTransform.Position = new Vector2(-DistanceFromTotemCenter, 0);
 
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("player", 4, 8), m_spriteTransform);
+
+                        m_spriteAura = new Sprite(Program.TheGame,TextureLibrary.GetSpriteSheet("aura_PowerUp_left"), new Transform(m_spriteTransform, true));
+            m_spriteAura.Transform.Scale = new Vector2(0);
 
 
             // Mouvement walkingToTotem
@@ -457,6 +462,25 @@ namespace GbJamTotem
                         }
                     }
 
+                    if (isPoweredUp)
+                    {
+                        if (isToLeft)
+                        {
+                            m_spriteAura.SpriteSheet = TextureLibrary.GetSpriteSheet("aura_PowerUp_left");
+                            m_spriteAura.Transform.PosX = 1;
+                        }
+                        else
+                        {
+                            m_spriteAura.SpriteSheet = TextureLibrary.GetSpriteSheet("aura_PowerUp_right");
+                            m_spriteAura.Transform.PosX = 0;
+                        }
+                        m_spriteAura.Transform.Scale = new Vector2(1);
+                    }
+                    else
+                    {
+                        m_spriteAura.Transform.Scale = new Vector2(0);
+                    }
+
 					if (!animationIsActive)
 						if (isToLeft)
 							m_sprite.SetFrame(4);
@@ -484,6 +508,7 @@ namespace GbJamTotem
 			if (!isVisible)
 				return;
             m_sprite.Draw();
+            m_spriteAura.Draw();
         }
     }
 }

@@ -12,9 +12,26 @@ namespace GbJamTotem
 
         bool isPickedUp;
         bool isToLeft;
+        int indexTotemToPlacePowerUp;
 
-        public PowerUp(bool isToLeft)
+        public bool IsPickedUp
         {
+            get { return isPickedUp; }
+        }
+
+        public bool IsToLeft
+        {
+            get { return isToLeft; }
+        }
+
+        public int IndexTotemToPlacePowerUp
+        {
+            get { return indexTotemToPlacePowerUp; }
+        }
+
+        public PowerUp(int index, bool isToLeft)
+        {
+            indexTotemToPlacePowerUp = index;
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("power_up"), m_transform);
             isPickedUp = false;
             this.isToLeft = isToLeft;
@@ -24,14 +41,26 @@ namespace GbJamTotem
         {
             if (Game1.player.IsFalling && !isPickedUp)
             {
-                if ( (isToLeft == Game1.player.IsToLeft || !isToLeft != Game1.player.IsToLeft)
-                    && Math.Abs(this.m_transform.PosY - Game1.player.Transform.PosY) < 5)
+                if ( ( (Game1.player.SpriteTransform.PosX > 0 && m_transform.PosX > 0)
+                    || (Game1.player.SpriteTransform.PosX < 0 && m_transform.PosX < 0)
+                    )
+                    && Math.Abs(this.m_transform.PosY - Game1.player.Transform.PosY) < 7)
                 {
-                    m_transform.Scale = new Vector2(0);
+                    this.Hide();
                     Game1.player.IsPoweredUp = true;
                     isPickedUp = true;
                 }
             }
+        }
+
+        public void Show()
+        {
+            m_transform.Scale = new Vector2(1);
+        }
+
+        public void Hide()
+        {
+            m_transform.Scale = new Vector2(0);
         }
 
         public override void Draw()
