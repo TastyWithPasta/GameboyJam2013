@@ -553,7 +553,7 @@ namespace GbJamTotem
                 }
                 else
                 {
-                    player.ComboCount = 0; // TODO Utile ici?
+                    player.HitSpikes();
                 }
 			}
         }

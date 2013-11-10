@@ -234,7 +234,7 @@ namespace GbJamTotem
 
             //dynamicMusic = new DynamicMusic(musicT1P1L1, musicT1P1L2, musicT1P1L3, musicT1P1L4);
             //dynamicMusic = new DynamicMusic(musicT1P2L1, musicT1P2L2, musicT1P2L3, musicT1P2L4);
-            dynamicMusic = new DynamicMusic(musicT4P2L1, musicT4P2L2, musicT4P2L3, musicT4P2L4);
+            //dynamicMusic = new DynamicMusic(musicT4P2L1, musicT4P2L2, musicT4P2L3, musicT4P2L4);
             //dynamicMusic = new DynamicMusic(musicT4P3L1, musicT4P3L2, musicT4P3L3, musicT4P3L4);
 			//Foule et joueur porté
 			Cutscenes.Initalise();
