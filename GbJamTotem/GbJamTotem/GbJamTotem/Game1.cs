@@ -54,9 +54,17 @@ namespace GbJamTotem
         Color m_bgColor = blue;
 
 		GameboyDrawer m_drawer;
-		static int currentTotem;
-		public static Totem[] totems;
-		public static Totem testTotem;
+		static int currentTotem = 0;
+		public static Totem[] totems = new Totem[3];
+		public static Totem CurrentTotem
+		{
+			get
+			{
+				if (currentTotem >= totems.Length)
+					return null;
+				return totems[currentTotem];
+			}
+		}
 
 		public static DrawingList Foreground = new DrawingList();
 
@@ -136,18 +144,17 @@ namespace GbJamTotem
 
 			// Totem
 			//
-			testTotem = new Totem();
-			//totem.BuildFromFile("Level1_p1");
-			totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-			totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
-			totem.BuildRandom();
-			testTotem.Transform.PosX = 100;
+			totems[0] = new Totem();
+			//testTotem.BuildFromFile("Level1_p1");
+			totems[0].AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			totems[0].AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+			totems[0].AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+			totems[0].BuildRandom();
+			totems[0].Transform.PosX = 100;
 
             // Player initialisation	
             //
             player = new Player();
-			player.Initialise(testTotem);
 
             // Pause screen & GUI initialisation
             //
@@ -205,8 +212,8 @@ namespace GbJamTotem
 			//Foule et joueur porté
 			Cutscenes.Initalise();
 			Cutscenes.StartMainMenu();
+			SetupNextLevel();
         }
-
 
 		/// <summary>
 		/// UnloadContent will be called once per game and is the place to unload
@@ -217,13 +224,31 @@ namespace GbJamTotem
 			// TODO: Unload any non ContentManager content here
 		}
 
-		public static Totem GetNextTotem()
+		public static void SetupNextLevel()
+		{
+			currentTotem = -1;
+			SetupNextRound();
+		}
+		public static void SetupNextRound()
 		{
 			currentTotem++;
-			if (totems[currentTotem] != null)
-				return totems[currentTotem];
-			return null;
+			player.Initialise(CurrentTotem);
+			startingCountdown.resetCountdown();
 		}
+		public void LoadLevel(int index)
+		{
+			string path = "Levels/Level_" + index;
+
+			totems[0] = new Totem();
+			totems[0].BuildFromFile(path + "/Level" + index + "_1");
+			totems[1] = new Totem();
+			totems[1].BuildFromFile(path + "/Level" + index + "_2");
+			totems[2] = new Totem();
+			totems[2].BuildFromFile(path + "/Level" + index + "_3");
+		}
+
+		public void PlaceTotems()
+		{ }
 
         public void Flash(float time)
         {
@@ -316,17 +341,16 @@ namespace GbJamTotem
 
 			if (Game1.kbs.IsKeyDown(Keys.C) && !Game1.isInGameplay)
 			{
-				player.StartDebug(testTotem);
+				player.StartDebug(CurrentTotem);
 			}
 
 			if (kbs.IsKeyDown(Keys.S) && old_kbs.IsKeyUp(Keys.S))
 			{
-				Cutscenes.GoToTotem(testTotem, 1.0f);
+				Cutscenes.GoToTotem(CurrentTotem, 1.0f);
 			}
 			if (kbs.IsKeyDown(Keys.V) && old_kbs.IsKeyUp(Keys.V))
 			{
-				Cutscenes.ThrowPlayer(testTotem);
-				startingCountdown.resetCountdown();
+				Cutscenes.ThrowPlayer(CurrentTotem);
 			}
 
             startingCountdown.Update();
@@ -337,7 +361,7 @@ namespace GbJamTotem
             // Update game if unpaused
             //
             player.Update();
-            testTotem.Update();
+            CurrentTotem.Update();
             scoreBorder.Update();
             mapBorder.Update();
             comboCounter.Update();
@@ -374,7 +398,7 @@ namespace GbJamTotem
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             m_falaise.Draw();
 			Cutscenes.crowd.DrawBack();
-			testTotem.Draw();
+			CurrentTotem.Draw();
 			Cutscenes.cutscenePlayer.Draw();
 			Cutscenes.crowd.DrawFront();
 

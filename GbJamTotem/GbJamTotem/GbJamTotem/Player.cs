@@ -288,7 +288,10 @@ namespace GbJamTotem
 			m_totemInstance = totem;
 			m_transform.PosX = totem.Transform.PosX;
 			m_transform.PosY = totem.Top + DeltaAboveClimbingAltitude;
+			m_spriteTransform.Position = m_leftTransform.Position;
+			isToLeft = true;
 			isVisible = false;
+			isFalling = false;
 		}
 
 		public void GetReady()
@@ -450,17 +453,6 @@ namespace GbJamTotem
 							m_sprite.SetFrame(12);
                 }
 
-                // Stop falling if on the floor 
-                //
-                if (this.Transform.PosY >= 0)
-                {
-                    isFalling = false;
-                    canClimb = true;
-
-                    Game1.scoreBorder.Slide(false);
-                    Game1.mapBorder.Slide(false);
-                    Game1.startingCountdown.resetCountdown();
-                }
 
                 // Update falling
                 //

@@ -217,7 +217,7 @@ namespace GbJamTotem
 			m_hitSpikes.AddAction(m_moveToCrashingPlayer);
 			m_hitSpikes.AddAction(new DelayAction(Program.TheGame, 0.5f));
 			m_hitSpikes.AddAction(new MethodAction(delegate() { 
-				Cutscenes.GoToTotem(Game1.testTotem, 1.0f); 
+				Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f); 
 				m_sprite.SetFrame(0);
 				m_physics.OnBounce = null;
 				m_physics.Throw(0, -2, 0);
