@@ -48,6 +48,7 @@ namespace GbJamTotem
 		Sequence m_saut;
 
 		Sequence m_throw;
+		ScaleToAction m_throwStretch;
 		MoveToStaticAction m_walk;
 
 		SingleActionManager m_actionManager;
@@ -91,15 +92,14 @@ namespace GbJamTotem
 			///
 			///Throw player animation
 			///
-			m_throw = new Sequence(-1);
+			m_throw = new Sequence(1);
 			float intensity = 1 - Math.Min(1, m_transform.Position.Length() * 0.02f);
-			ScaleToAction throwStretch = new ScaleToAction(Program.TheGame, m_jumpTransform, new Vector2(1.0f, 1 - intensity * 0.5f), 1);
-			throwStretch.Timer.Interval = 1.0f;
-			throwStretch.Interpolator = new PSmoothstepInterpolation();
+			m_throwStretch = new ScaleToAction(Program.TheGame, m_jumpTransform, new Vector2(1.0f, 1 - intensity * 0.5f), 1);
+			m_throwStretch.Interpolator = new PSmoothstepInterpolation();
 			ScaleToAction throwDestretch = new ScaleToAction(Program.TheGame, m_jumpTransform, new Vector2(1.0f, 1.0f), 1);
 			throwDestretch.Timer.Interval = 0.1f;
 
-			m_throw.AddAction(throwStretch);
+			m_throw.AddAction(m_throwStretch);
 
 			MoveToStaticAction throwMovement = new MoveToStaticAction(Program.TheGame, m_jumpTransform, Vector2.Zero, 1);
 			throwMovement.StartPosition = new Vector2(0, -20 - 30 * intensity);
@@ -122,8 +122,9 @@ namespace GbJamTotem
 		{
 			m_walk.Stop();
 		}
-		public void LaunchPlayer()
+		public void LaunchPlayer(float stretchTime)
 		{
+			m_throwStretch.Timer.Interval = stretchTime;
 			m_actionManager.StartNew(m_throw);
 		}
 
@@ -143,6 +144,7 @@ namespace GbJamTotem
 
 	public class Crowd : GameObject
 	{
+		public const float LaunchTensionTime = 1.0f;
 		const float FrontToBackRatio = 0.5f; //Pourcentage de personnage sur la tranche avant de la foule
 		const float MoveSpeed = 0.25f; //Value between 0 and 1
 		List<Individual> m_people = new List<Individual>();
@@ -225,13 +227,11 @@ namespace GbJamTotem
 			for (int i = 0; i < m_people.Count; ++i)
 				m_people[i].Jump();
 		}
-
 		public void LaunchPlayer()
 		{
 			for (int i = 0; i < m_people.Count; ++i)
-				m_people[i].LaunchPlayer();
+				m_people[i].LaunchPlayer(LaunchTensionTime);
 		}
-
 		public void MoveTo(float position, float time)
 		{
 			for (int i = 0; i < m_people.Count; ++i)
@@ -289,7 +289,6 @@ namespace GbJamTotem
 			for (int i = 0; i < m_frontPeople.Count; ++i)
 				m_frontPeople[i].Draw();
 		}
-
 		public void DrawBack()
 		{
 			for (int i = 0; i < m_backPeople.Count; ++i)
@@ -298,7 +297,6 @@ namespace GbJamTotem
 		public override void Draw()
 		{
 			throw new NotImplementedException();
-			
 		}
 	}
 }
