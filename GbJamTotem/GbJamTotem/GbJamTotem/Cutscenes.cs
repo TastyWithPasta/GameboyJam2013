@@ -234,7 +234,7 @@ namespace GbJamTotem
 		const float CameraDelay = 1.5f;
 		const float TimeToFirstTotem = 2.0f;
 		static MoveToStaticAction moveTo;
-		static MoveToTransform moveToPlayer;
+		static MoveToTransform moveToAscendingPlayer;
 		static MoveToStaticAction moveToTotem;
 		static Sequence cameraIntro;
 
@@ -250,6 +250,8 @@ namespace GbJamTotem
 		//Gameplay Zoom
 		static float[] TargetZooms = new float[] { 1.0f, 0.92f, 0.84f, 0.76f };
 		static ScaleToAction cameraZoom;
+
+		static MoveToTransform moveToPlayerOnGround;
 
 		public static bool IsReady
 		{
@@ -274,9 +276,9 @@ namespace GbJamTotem
 			cameraIntro.AddAction(moveCrowd);
 			cameraIntro.AddAction(moveToTotem);
 
-			moveToPlayer = new MoveToTransform(Program.TheGame, Game1.GameCamera.Transform, new Transform(), cutscenePlayer.Transform, 1);
-			moveToPlayer.Interpolator = new PSquareInterpolation(0.1f);
-			moveToPlayer.RotationActive = false;
+			moveToAscendingPlayer = new MoveToTransform(Program.TheGame, Game1.GameCamera.Transform, new Transform(), cutscenePlayer.Transform, 1);
+			moveToAscendingPlayer.Interpolator = new PSquareInterpolation(0.1f);
+			moveToAscendingPlayer.RotationActive = false;
 
 			readySequence = new Sequence(1);
 			Transform end = new Transform(Game1.player.Transform, true);
@@ -293,7 +295,7 @@ namespace GbJamTotem
 			cameraZoom.Interpolator = new PSmoothstepInterpolation();
 			cameraZoom.Timer.Interval = 0.3f;
 
-			
+			moveToPlayerOnGround = new MoveToTransform(Program.TheGame, Game1.GameCamera.Transform, new Transform(), cutscenePlayer.Transform, 1);
 		}
 
 		public static void ZoomToStage(int stageNumber)
@@ -315,10 +317,10 @@ namespace GbJamTotem
 		{
 			crowd.LaunchPlayer();
 			Game1.player.Initialise(totem);
-			moveToPlayer.Start.Position = Game1.GameCamera.Transform.Position;
+			moveToAscendingPlayer.Start.Position = Game1.GameCamera.Transform.Position;
 			cutscenePlayer.Launch(totem);
-			moveToPlayer.Timer.Interval = cutscenePlayer.AscendDuration + Crowd.LaunchTensionTime; //Total time of animation = crowd stretch + throwing time
-			actionManager.StartNew(moveToPlayer);
+			moveToAscendingPlayer.Timer.Interval = cutscenePlayer.AscendDuration + Crowd.LaunchTensionTime; //Total time of animation = crowd stretch + throwing time
+			actionManager.StartNew(moveToAscendingPlayer);
 		}
 
 		public static void FinishTotem()
