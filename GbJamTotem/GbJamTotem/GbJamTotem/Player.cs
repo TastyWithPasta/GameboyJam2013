@@ -41,16 +41,17 @@ namespace GbJamTotem
 		
     public class Player : GameObject
     {
-		public const float DistanceFromTotemCenter = -50;
+		public const float DistanceFromTotemCenter = -40;
 
 		const float BasePlayerSpeed = 60.0f;
 		const float BasePushForce = 4.0f;
-		const float SlashDuration = 0.4f;
+		const float SlashDuration = 0.3f;
 		const float CollisionDelayRatio = 0.5f;
 		const float CollisionDelayDuration = SlashDuration * CollisionDelayRatio;
 		const float SpeedMultiplierIncrement = 1.05f;
 		const float MaxSpeedMultiplier = 2.5f;
 		const int DeltaAboveClimbingAltitude = -100;
+		const int DecelerationPointFromBaseX = -100;
 
 		Totem m_totemInstance;
 
@@ -279,7 +280,8 @@ namespace GbJamTotem
 			m_spritAnimRR = new SpriteSheetAnimation(m_sprite, 23, 30, SlashDuration, 1);
 			m_ready = new SpriteSheetAnimation(m_sprite, 0, 4, SlashDuration, 1);
 			m_ready.Timer.Interval = 0.5f;
-        }
+
+		}
 
 		public void Initialise(Totem totem)
 		{ 
@@ -357,12 +359,21 @@ namespace GbJamTotem
             comboCount = 0;
 
 		}
+		public void HitSpikes()
+		{
+			Game1.isInGameplay = false;
+			isVisible = false;
+			isFalling = false;
+			Cutscenes.cutscenePlayer.HitSpikes();
+			Game1.spikeHitSound.Play();
+		}
 
 		public void FinishTotem()
 		{
 			isFalling = false;
 			isVisible = false;
 		}
+
 		public override void Update()
         {
 			bool animationIsActive = m_slashLR.IsActive || m_slashRL.IsActive 

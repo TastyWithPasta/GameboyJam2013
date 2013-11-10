@@ -86,6 +86,13 @@ namespace GbJamTotem
 				return m_attachedSections[0].Top;
 			}
 		}
+		public Vector2 StopHotspot
+		{
+			get
+			{
+				return new Vector2(40, m_attachedSections[0].Top + 20);
+			}
+		}
 
 		public List<TotemSection> AttachedSections
 		{
@@ -509,7 +516,7 @@ namespace GbJamTotem
 			}
 			else
 			{
-				player.Bounce(toTheLeft);
+				player.HitSpikes();
                 player.ComboCount = 0; // TODO Utile ici?
 			}
         }

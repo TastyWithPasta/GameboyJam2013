@@ -213,15 +213,15 @@ namespace GbJamTotem
 			m_animationManager = new SingleActionManager();
 		}
 
-		public void PickupPlayer()
+		public void PickupPlayer(float time)
 		{
 			for (int i = 0; i < m_people.Count; ++i)
 				m_people[i].StartWalk();
 			m_moveToMovement.StartPosition = m_transform.Position;
 			m_moveToMovement.Target = Cutscenes.cutscenePlayer.Transform.Position;
+			m_moveToMovement.Timer.Interval = time;
 			m_animationManager.StartNew(m_pickupPlayer);
 		}
-
 		public void Jump()
 		{
 			for (int i = 0; i < m_people.Count; ++i)

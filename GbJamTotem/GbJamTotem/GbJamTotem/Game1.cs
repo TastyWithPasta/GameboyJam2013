@@ -54,7 +54,9 @@ namespace GbJamTotem
         Color m_bgColor = blue;
 
 		GameboyDrawer m_drawer;
-		public static Totem totem;
+		static int currentTotem;
+		public static Totem[] totems;
+		public static Totem testTotem;
 
 		public static DrawingList Foreground = new DrawingList();
 
@@ -71,6 +73,8 @@ namespace GbJamTotem
         public static SoundEffectInstance swordSlashSound;
         public static SoundEffectInstance moveLeftToRightSound;
         public static SoundEffectInstance moveRightToLeftSound;
+		public static SoundEffectInstance spikeHitSound;
+		public static SoundEffectInstance groundImpact;
 
         public static SoundEffectInstance feedback_combo3;
         public static SoundEffectInstance feedback_combo6;
@@ -132,18 +136,18 @@ namespace GbJamTotem
 
 			// Totem
 			//
-			totem = new Totem();
-			totem.BuildFromFile("Level_1/Level1_3");
-			//totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			//totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-			//totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
-			//totem.BuildRandom();
-			totem.Transform.PosX = 100;
+			testTotem = new Totem();
+			//totem.BuildFromFile("Level_1/Level1_3");
+			testTotem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+			testTotem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+			testTotem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+			testTotem.BuildRandom();
+			testTotem.Transform.PosX = 100;
 
             // Player initialisation	
             //
             player = new Player();
-			player.Initialise(totem);
+			player.Initialise(testTotem);
 
             // Pause screen & GUI initialisation
             //
@@ -170,6 +174,8 @@ namespace GbJamTotem
             swordSlashSound = SoundEffectLibrary.Get("sword_slash").CreateInstance();
             moveLeftToRightSound = SoundEffectLibrary.Get("move_left_to_right").CreateInstance();
             moveRightToLeftSound = SoundEffectLibrary.Get("move_right_to_left").CreateInstance();
+			spikeHitSound = SoundEffectLibrary.Get("spike_hit").CreateInstance();
+			groundImpact = SoundEffectLibrary.Get("ground_slam").CreateInstance();
 
             feedback_combo3 = SoundEffectLibrary.Get("feedback_combo3").CreateInstance();
             feedback_combo6 = SoundEffectLibrary.Get("feedback_combo6").CreateInstance();
@@ -209,6 +215,14 @@ namespace GbJamTotem
 		protected override void UnloadContent()
 		{
 			// TODO: Unload any non ContentManager content here
+		}
+
+		public static Totem GetNextTotem()
+		{
+			currentTotem++;
+			if (totems[currentTotem] != null)
+				return totems[currentTotem];
+			return null;
 		}
 
         public void Flash(float time)
@@ -302,16 +316,17 @@ namespace GbJamTotem
 
 			if (Game1.kbs.IsKeyDown(Keys.C) && !Game1.isInGameplay)
 			{
-				player.StartDebug(totem);
+				player.StartDebug(testTotem);
 			}
 
 			if (kbs.IsKeyDown(Keys.S) && old_kbs.IsKeyUp(Keys.S))
 			{
-				Cutscenes.GoToTotem(totem);
+				Cutscenes.GoToTotem(testTotem, 1.0f);
 			}
 			if (kbs.IsKeyDown(Keys.V) && old_kbs.IsKeyUp(Keys.V))
 			{
-				Cutscenes.ThrowPlayer(totem);
+				Cutscenes.ThrowPlayer(testTotem);
+				startingCountdown.resetCountdown();
 			}
 
             startingCountdown.Update();
@@ -319,21 +334,10 @@ namespace GbJamTotem
             pauseScreen.Update();
             if (pauseScreen.IsGamePaused) return;
            
-            // Playing music
-            //
-
-            // Starting playing music
-            //
-
-            if (startingCountdown.CountdownHasFinished && dynamicMusic.State != DynamicMusic.dynamicMusicState.PLAYING)
-            {
-                dynamicMusic.PlayDynamicMusic();
-            }
-
             // Update game if unpaused
             //
             player.Update();
-            totem.Update();
+            testTotem.Update();
             scoreBorder.Update();
             mapBorder.Update();
             comboCounter.Update();
@@ -407,7 +411,7 @@ namespace GbJamTotem
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             m_falaise.Draw();
 			Cutscenes.crowd.DrawBack();
-			totem.Draw();
+			testTotem.Draw();
 			Cutscenes.cutscenePlayer.Draw();
 			Cutscenes.crowd.DrawFront();
 

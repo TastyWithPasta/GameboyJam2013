@@ -148,6 +148,12 @@ namespace PastaGameLibrary
 			//throw new NotImplementedException();
 		}
 
+		protected override void OnStop()
+		{
+			base.OnStop();
+			m_loop = false;
+		}
+
 		protected override void OnStart()
 		{
 			base.OnStart();
