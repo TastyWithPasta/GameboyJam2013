@@ -192,7 +192,7 @@ namespace GbJamTotem
             musicT1P3L4 = SoundEffectLibrary.Get("music_T1P3L4").CreateInstance();
 
             //dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
-            dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
+            dynamicMusic = new DynamicMusic(musicT1P2L1, musicT1P2L2, musicT1P2L3, musicT1P2L4);
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
