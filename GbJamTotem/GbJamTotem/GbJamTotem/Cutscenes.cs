@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using PastaGameLibrary;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 
 namespace GbJamTotem
 {
@@ -24,7 +25,7 @@ namespace GbJamTotem
 		const float CloudOffsetToPlayerY = 12;
 
 		const float ShlingScale = 4.0f;
-		const float ShlingTime = 1.0f;
+		const float ShlingTime = 0.7f;
 		const float ShlingSpin = 4.0f;
 
 		MoveToTransform m_moveToCrowd;
@@ -42,6 +43,8 @@ namespace GbJamTotem
 		Sprite m_swordSprite;
 		Sprite m_cloudSprite; //Cloud Strife lol
 		Sprite m_shlingSprite;
+
+		SoundEffectInstance m_ascendSound;
 
 		Totem m_totemInstance;
 		bool isVisible = true;
@@ -63,6 +66,8 @@ namespace GbJamTotem
 		public CutscenePlayer()
 			: base()
 		{
+			m_ascendSound = SoundEffectLibrary.Get("ascend").CreateInstance();
+
 			m_swordSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("sword"), new Transform(m_transform, true));
 			m_swordSprite.Transform.Direction = Math.PI * 10;
 
@@ -122,18 +127,34 @@ namespace GbJamTotem
 			ScaleToAction shlingScale = new ScaleToAction(Program.TheGame, m_shlingSprite.Transform, new Vector2(ShlingScale, ShlingScale), 1);
 			shlingScale.Timer.Interval = ShlingTime;
 			shlingScale.StartScale = Vector2.Zero;
-			shlingScale.Interpolator = new PSquareInterpolation(3);
+			shlingScale.Interpolator = new PSquareInterpolation(2);
 
 			RotateToStaticAction shlingRotate = new RotateToStaticAction(Program.TheGame, m_shlingSprite.Transform, ShlingSpin, 1);
 			shlingRotate.Timer.Interval = ShlingTime;
 			m_shling = new Concurrent(new PastaGameLibrary.Action[] { shlingScale, shlingRotate });
 
+
+			Sequence readyAnim = new Sequence(1);
+			readyAnim.AddAction(new DelayAction(Program.TheGame, 1.0f));
+			readyAnim.AddAction(new MethodAction(delegate() {
+					Cutscenes.GetReady();
+				}));
+
+			Concurrent shlingReady = new Concurrent(new PastaGameLibrary.Action[] { 
+				m_shling,
+				readyAnim
+			});
+
 			m_ascend = new Sequence(1);
 			m_ascend.AddAction(new DelayAction(Program.TheGame, Crowd.LaunchTensionTime));
+			m_ascend.AddAction(new MethodAction(delegate() { m_ascendSound.Play(); }));
 			Concurrent ascendAndSword = new Concurrent(new PastaGameLibrary.Action[] { m_ascendMovement, swordAndCloudMovement });
 			m_ascend.AddAction(ascendAndSword);
 			m_ascend.AddAction(showPlayer);
-			m_ascend.AddAction(m_shling);
+			m_ascend.AddAction(shlingReady);
+			
+
+			
 			
 
 			m_actionManager = new SingleActionManager();
@@ -267,6 +288,11 @@ namespace GbJamTotem
 			cutscenePlayer.Launch(totem);
 			m_moveToPlayer.Timer.Interval = cutscenePlayer.AscendDuration + Crowd.LaunchTensionTime; //Total time of animation = crowd stretch + throwing time
 			actionManager.StartNew(m_moveToPlayer);
+		}
+
+		public static void GetReady()
+		{
+			Game1.player.GetReady();
 		}
 
 		public static void GoToTotem(Totem totem)

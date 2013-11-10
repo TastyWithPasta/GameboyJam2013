@@ -283,6 +283,18 @@ namespace GbJamTotem
 			isVisible = false;
 		}
 
+		public void GetReady()
+		{
+			//isFalling = true;
+			//Game1.startingCountdown.activateCountdown();
+			m_spriteAnimation.StartNew(m_ready);
+		}
+
+		public void StartCountDown()
+		{
+ 
+		}
+
 		//Pour debug
 		public void StartDebug(Totem totem)
 		{
