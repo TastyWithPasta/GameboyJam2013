@@ -57,7 +57,6 @@ namespace GbJamTotem
 	public class Totem : GameObject
 	{
 		List<TotemSection> m_sectionsToPlace = new List<TotemSection>();
-
 		List<TotemSection> m_allSections = new List<TotemSection>();
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
@@ -78,6 +77,16 @@ namespace GbJamTotem
 					return 0;
 				return m_attachedSections[m_attachedSections.Count - 1].Top; }
 		}
+		public float Base
+		{
+			get
+			{
+				if (m_attachedSections.Count == 0)
+					return 0;
+				return m_attachedSections[0].Top;
+			}
+		}
+
 		public List<TotemSection> AttachedSections
 		{
 			get { return m_attachedSections; }
@@ -105,27 +114,63 @@ namespace GbJamTotem
 			List<TotemSection> sectionsToAdd = new List<TotemSection>();
 			for(int i = lines.Length - 1; i > -1; --i)
 			{
-				if (lines[i].StartsWith("||"))
+				if (lines[i].StartsWith("| |"))
 					sectionsToAdd.Add(new NormalSection(SectionType.Bilateral));
-				if (lines[i].StartsWith("[|"))
+				if (lines[i].StartsWith("[ |"))
 					sectionsToAdd.Add(new MetalSection(SectionType.Left));
-				if (lines[i].StartsWith("|]"))
+				if (lines[i].StartsWith("| ]"))
 					sectionsToAdd.Add(new MetalSection(SectionType.Right));
-				if (lines[i].StartsWith("[]"))
+				if (lines[i].StartsWith("[ ]"))
 					sectionsToAdd.Add(new MetalSection(SectionType.Bilateral));
-				if (lines[i].StartsWith("{|"))
+				if (lines[i].StartsWith("{ |"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Left));
-				if (lines[i].StartsWith("|}"))
+				if (lines[i].StartsWith("| }"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Right));
-				if (lines[i].StartsWith("{}"))
+				if (lines[i].StartsWith("{ }"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Bilateral));
 			}
+			TotemBase totemBase  = new TotemBase();
+			m_allSections.Add(totemBase);
+			m_attachedSections.Add(totemBase);
 			m_allSections.AddRange(sectionsToAdd);
 			m_attachedSections.AddRange(sectionsToAdd);
+
+			//Place the totem sections in the world
+			TotemSection above = null, below = null;
+			for (int i = 0; i < m_allSections.Count; ++i)
+			{
+
+				if (i == 0)
+				{
+					below = null;
+					m_allSections[i].Transform.PosY = 0;
+				}
+				else
+				{
+					below = m_allSections[i - 1];
+					m_allSections[i].Transform.PosY = below.Top;
+				}
+
+				if (i == m_allSections.Count - 1)
+				{
+					above = null;
+				}
+				else
+				{
+					above = m_allSections[i + 1];
+				}
+
+				m_allSections[i].Transform.ParentTransform = m_transform;
+				m_allSections[i].PlaceOnTotem(this, above, below);
+			}
 		}
 
 		public void BuildRandom()
 		{
+			TotemBase totemBase = new TotemBase();
+			m_allSections.Add(totemBase);
+			m_attachedSections.Add(totemBase);
+
 			//Set the order of the totem sections
 			int amountOfSections = m_sectionsToPlace.Count;
 			for (int i = 0; i < amountOfSections; ++i)
@@ -135,7 +180,6 @@ namespace GbJamTotem
 				m_attachedSections.Add(m_sectionsToPlace[index]);
 				m_sectionsToPlace.RemoveAt(index);
 			}
-
 			//Place the totem sections in the world
 			TotemSection above = null, below = null;
 			for (int i = 0; i < m_allSections.Count; ++i)
@@ -296,6 +340,20 @@ namespace GbJamTotem
 		{
 			m_sprite.Draw();
             
+		}
+	}
+
+	public class TotemBase : TotemSection
+	{
+		public TotemBase()
+			: base(SectionType.Bilateral)
+		{
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_base"), m_transform);
+			m_sprite.Origin = TotemSection.spriteOrigin;
+		}
+		public override void OnHit(bool toTheLeft, Player player, float pushForce)
+		{
+			return;
 		}
 	}
 
