@@ -48,8 +48,8 @@ namespace GbJamTotem
 		const float SlashDuration = 0.4f;
 		const float CollisionDelayRatio = 0.5f;
 		const float CollisionDelayDuration = SlashDuration * CollisionDelayRatio;
-		const float SpeedMultiplierIncrement = 1.15f;
-		const float MaxSpeedMultiplier = 2.75f;
+		const float SpeedMultiplierIncrement = 1.05f;
+		const float MaxSpeedMultiplier = 2.5f;
 		const int DeltaAboveClimbingAltitude = -100;
 
 		Totem m_totemInstance;
@@ -353,6 +353,12 @@ namespace GbJamTotem
             comboCount = 0;
 
 		}
+
+		public void FinishTotem()
+		{
+			isFalling = false;
+			isVisible = false;
+		}
 		public override void Update()
         {
 			bool animationIsActive = m_slashLR.IsActive || m_slashRL.IsActive 
@@ -442,6 +448,11 @@ namespace GbJamTotem
                 // Update falling
                 //
                 this.Transform.PosY = this.Transform.PosY + (float)(BasePlayerSpeed * SpeedMultiplier * Program.TheGame.ElapsedTime);
+
+				if (Transform.PosY > m_totemInstance.Base)
+				{
+					Cutscenes.FinishTotem();
+				}
             }
 
             m_actionManager.Update();

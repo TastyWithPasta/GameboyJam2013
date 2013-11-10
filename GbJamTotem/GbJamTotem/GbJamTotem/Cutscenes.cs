@@ -292,6 +292,8 @@ namespace GbJamTotem
 			cameraZoom = new ScaleToAction(Program.TheGame, Game1.GameCamera.Transform, Vector2.Zero, 1);
 			cameraZoom.Interpolator = new PSmoothstepInterpolation();
 			cameraZoom.Timer.Interval = 0.3f;
+
+			
 		}
 
 		public static void ZoomToStage(int stageNumber)
@@ -317,6 +319,13 @@ namespace GbJamTotem
 			cutscenePlayer.Launch(totem);
 			moveToPlayer.Timer.Interval = cutscenePlayer.AscendDuration + Crowd.LaunchTensionTime; //Total time of animation = crowd stretch + throwing time
 			actionManager.StartNew(moveToPlayer);
+		}
+
+		public static void FinishTotem()
+		{
+			Game1.player.FinishTotem();
+			Game1.GameCamera.Transform.Position += Game1.GameCamera.Transform.ParentTransform.PositionGlobal;
+			Game1.GameCamera.Transform.ParentTransform = null;
 		}
 
 		public static void GetReady()

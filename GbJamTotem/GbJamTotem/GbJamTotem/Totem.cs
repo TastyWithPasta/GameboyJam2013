@@ -77,6 +77,16 @@ namespace GbJamTotem
 					return 0;
 				return m_attachedSections[m_attachedSections.Count - 1].Top; }
 		}
+		public float Base
+		{
+			get
+			{
+				if (m_attachedSections.Count == 0)
+					return 0;
+				return m_attachedSections[0].Top;
+			}
+		}
+
 		public List<TotemSection> AttachedSections
 		{
 			get { return m_attachedSections; }
@@ -104,19 +114,19 @@ namespace GbJamTotem
 			List<TotemSection> sectionsToAdd = new List<TotemSection>();
 			for(int i = lines.Length - 1; i > -1; --i)
 			{
-				if (lines[i].StartsWith("||"))
+				if (lines[i].StartsWith("| |"))
 					sectionsToAdd.Add(new NormalSection(SectionType.Bilateral));
-				if (lines[i].StartsWith("[|"))
+				if (lines[i].StartsWith("[ |"))
 					sectionsToAdd.Add(new MetalSection(SectionType.Left));
-				if (lines[i].StartsWith("|]"))
+				if (lines[i].StartsWith("| ]"))
 					sectionsToAdd.Add(new MetalSection(SectionType.Right));
-				if (lines[i].StartsWith("[]"))
+				if (lines[i].StartsWith("[ ]"))
 					sectionsToAdd.Add(new MetalSection(SectionType.Bilateral));
-				if (lines[i].StartsWith("{|"))
+				if (lines[i].StartsWith("{ |"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Left));
-				if (lines[i].StartsWith("|}"))
+				if (lines[i].StartsWith("| }"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Right));
-				if (lines[i].StartsWith("{}"))
+				if (lines[i].StartsWith("{ }"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Bilateral));
 			}
 			TotemBase totemBase  = new TotemBase();
@@ -124,6 +134,35 @@ namespace GbJamTotem
 			m_attachedSections.Add(totemBase);
 			m_allSections.AddRange(sectionsToAdd);
 			m_attachedSections.AddRange(sectionsToAdd);
+
+			//Place the totem sections in the world
+			TotemSection above = null, below = null;
+			for (int i = 0; i < m_allSections.Count; ++i)
+			{
+
+				if (i == 0)
+				{
+					below = null;
+					m_allSections[i].Transform.PosY = 0;
+				}
+				else
+				{
+					below = m_allSections[i - 1];
+					m_allSections[i].Transform.PosY = below.Top;
+				}
+
+				if (i == m_allSections.Count - 1)
+				{
+					above = null;
+				}
+				else
+				{
+					above = m_allSections[i + 1];
+				}
+
+				m_allSections[i].Transform.ParentTransform = m_transform;
+				m_allSections[i].PlaceOnTotem(this, above, below);
+			}
 		}
 
 		public void BuildRandom()
@@ -168,8 +207,6 @@ namespace GbJamTotem
 
 				m_allSections[i].Transform.ParentTransform = m_transform;
 				m_allSections[i].PlaceOnTotem(this, above, below);
-
-
 			}
 		}
 

@@ -76,6 +76,8 @@ namespace PastaGameLibrary
 		private Color m_renderColour = Color.White;
 		private Transform m_transform = null;
 
+		public bool PixelCorrection = false;
+
 		public Sprite(MyGame theGame, SpriteSheet spriteSheet, Transform transform)
 		{
 			m_theGame = theGame;
@@ -178,8 +180,13 @@ namespace PastaGameLibrary
 			Vector2 position, scale;
 			float rotation;
 			m_transform.GetGlobalComponents(out position, out rotation, out scale);
-			position.X = (int)position.X + 0.5f;
-			position.Y = (int)position.Y + 0.5f;
+
+			if (PixelCorrection)
+			{
+				position.X = (int)(position.X) + 0.5f;
+				position.Y = (int)(position.Y) + 0.5f;
+			}
+			
 			m_theGame.SpriteBatch.Draw(m_spriteSheet.Texture, position, SourceRectangle, m_renderColour, rotation, m_renderOrigin, scale, SpriteEffects.None, 0);
 
 			//m_theGame.SpriteBatch.Draw(m_spriteSheet.Texture, DestinationRectangle, SourceRectangle, Colour, Rotation, m_renderOrigin, SpriteEffects.None, 0);
