@@ -34,6 +34,7 @@ namespace GbJamTotem
         public static Player player;
 
         public static PauseScreen pauseScreen;
+        public static MenuScreen menuScreen;
         public static Countdown startingCountdown;
         public static ScoreBorder scoreBorder;
         public static MapBorder mapBorder;
@@ -42,6 +43,7 @@ namespace GbJamTotem
 
 		public static bool isInGameplay = false;
 
+        public static SpriteFont menuText;
         public static SpriteFont debugText;
         bool debugMode = true;
 
@@ -123,6 +125,7 @@ namespace GbJamTotem
             TextureLibrary.Initialise(GraphicsDevice);
 
             debugText = Content.Load<SpriteFont>("Text/Debug");
+            //menuText = Content.Load<SpriteFont>("Text/Menu");
 
             SoundEffectLibrary.LoadContent(Content, "SoundEffects");
 
@@ -133,11 +136,13 @@ namespace GbJamTotem
 			// Totem
 			//
 			totem = new Totem();
-			//totem.BuildFromFile("Level1_p1");
-			totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-			totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-			totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
-			totem.BuildRandom();
+
+            //totem.BuildFromFile("Level1_p1");
+            /*totem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
+            totem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
+            totem.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
+            totem.BuildRandom();*/
+
 			totem.Transform.PosX = 100;
 
             // Player initialisation	
@@ -147,6 +152,7 @@ namespace GbJamTotem
 
             // Pause screen & GUI initialisation
             //
+            menuScreen = new MenuScreen();
             pauseScreen = new PauseScreen();
             startingCountdown = new Countdown();
             scoreBorder = new ScoreBorder();
@@ -284,7 +290,7 @@ namespace GbJamTotem
 
             if (debugMode)
             {
-				if (kbs.IsKeyDown(Keys.Left))
+				/*if (kbs.IsKeyDown(Keys.Left))
 					GameCamera.Transform.PosX -= 1f;
 					//Cutscenes.crowd.Transform.PosX -= 1.0f;
                 if (kbs.IsKeyDown(Keys.Right))
@@ -293,7 +299,7 @@ namespace GbJamTotem
                 if (kbs.IsKeyDown(Keys.Up))
                     GameCamera.Transform.PosY -= 1f;
                 if (kbs.IsKeyDown(Keys.Down))
-                    GameCamera.Transform.PosY += 1;
+                    GameCamera.Transform.PosY += 1;*/
                 if (kbs.IsKeyDown(Keys.RightShift))
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 1.01f;
                 if (kbs.IsKeyDown(Keys.RightControl))
@@ -315,6 +321,9 @@ namespace GbJamTotem
 			}
 
             startingCountdown.Update();
+
+            if (menuScreen.IsActive)
+                menuScreen.Update();
 
             pauseScreen.Update();
             if (pauseScreen.IsGamePaused) return;
@@ -355,6 +364,7 @@ namespace GbJamTotem
 		/// <param name="gameTime">Provides a snapshot of timing values.</param>
 		protected override void Draw(GameTime gameTime)
 		{
+
 			m_drawer.SetRenderTarget();
 			GraphicsDevice.Clear(m_bgColor);
 
@@ -388,13 +398,21 @@ namespace GbJamTotem
             mapBorder.Draw();
             SpriteBatch.End();
 
+            // Drawing Menu
+            //
+            SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null);
+            menuScreen.Draw();
+            SpriteBatch.End();
+
             SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null);
             pauseScreen.Draw();
-            SpriteBatch.End(); 
+            SpriteBatch.End();
 
 			// End drawing
             //
-            m_drawer.Draw();                  
+            m_drawer.Draw();
+
+
             
 
             if (debugMode)
@@ -403,7 +421,8 @@ namespace GbJamTotem
                 // Debug text
                 //
                 SpriteBatch.DrawString(debugText, "Souls : " + scoreBorder.Score + "/" + scoreBorder.ScoreBarMaxValue, new Vector2(0, 300), Color.Red);
-                SpriteBatch.DrawString(debugText, "sw : " + ScreenWidth, new Vector2(0, 320), Color.Red);
+                SpriteBatch.DrawString(debugText, "Chall : " + menuScreen.challengeChoice, new Vector2(0, 320), Color.Red);
+                //SpriteBatch.DrawString(menuText, "Test", new Vector2(20, 350), Color.Black);
                 //SpriteBatch.DrawString(debugText, "FeedbackLock : " + feedbackLock , new Vector2(0, 300), Color.Red);
                 //SpriteBatch.DrawString(debugText, "isCBSP : " + isComboBreakerSoundPossible, new Vector2(0, 320), Color.Red);
                 SpriteBatch.End();
