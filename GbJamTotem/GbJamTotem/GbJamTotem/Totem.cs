@@ -6,6 +6,7 @@ using PastaGameLibrary;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Audio;
+using System.IO;
 
 namespace GbJamTotem
 {
@@ -61,7 +62,6 @@ namespace GbJamTotem
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
 
-
         #region ACCESSORS & MUTATORS
 
         public int TotalAmountOfSections
@@ -99,7 +99,32 @@ namespace GbJamTotem
 			m_sectionsToPlace.AddRange(sectionsToAdd.BuildSections());
 		}
 
-		public void Build()
+		public void BuildFromFile(string filename)
+		{
+			string[] lines = System.IO.File.ReadAllLines("Content/Levels/" + filename + ".txt");
+			List<TotemSection> sectionsToAdd = new List<TotemSection>();
+			for(int i = lines.Length - 1; i > -1; --i)
+			{
+				if (lines[i].StartsWith("||"))
+					sectionsToAdd.Add(new NormalSection(SectionType.Bilateral));
+				if (lines[i].StartsWith("[|"))
+					sectionsToAdd.Add(new MetalSection(SectionType.Left));
+				if (lines[i].StartsWith("|]"))
+					sectionsToAdd.Add(new MetalSection(SectionType.Right));
+				if (lines[i].StartsWith("[]"))
+					sectionsToAdd.Add(new MetalSection(SectionType.Bilateral));
+				if (lines[i].StartsWith("{|"))
+					sectionsToAdd.Add(new SpikeSection(SectionType.Left));
+				if (lines[i].StartsWith("|}"))
+					sectionsToAdd.Add(new SpikeSection(SectionType.Right));
+				if (lines[i].StartsWith("{}"))
+					sectionsToAdd.Add(new SpikeSection(SectionType.Bilateral));
+			}
+			m_allSections.AddRange(sectionsToAdd);
+			m_attachedSections.AddRange(sectionsToAdd);
+		}
+
+		public void BuildRandom()
 		{
 			//Set the order of the totem sections
 			int amountOfSections = m_sectionsToPlace.Count;

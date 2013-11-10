@@ -50,7 +50,7 @@ namespace GbJamTotem
 		const float CollisionDelayDuration = SlashDuration * CollisionDelayRatio;
 		const float SpeedMultiplierIncrement = 1.15f;
 		const float MaxSpeedMultiplier = 2.75f;
-		const int DeltaAboveClimbingAltitude = -200;
+		const int DeltaAboveClimbingAltitude = -100;
 
 		Totem m_totemInstance;
 
@@ -278,7 +278,7 @@ namespace GbJamTotem
 		public void Initialise(Totem totem)
 		{ 
 			m_totemInstance = totem;
-			m_transform.PosX = 0;
+			m_transform.PosX = totem.Transform.PosX;
 			m_transform.PosY = totem.Top + DeltaAboveClimbingAltitude;
 			isVisible = false;
 		}
@@ -400,7 +400,6 @@ namespace GbJamTotem
 
                     if (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space) && !animationIsActive)
                     {
-
                         Game1.swordSlashSound.Play();
 
                         if (isToLeft)
@@ -418,6 +417,12 @@ namespace GbJamTotem
                             isToLeft = true;
                         }
                     }
+
+					if (!animationIsActive)
+						if (isToLeft)
+							m_sprite.SetFrame(4);
+						else
+							m_sprite.SetFrame(12);
                 }
 
                 // Stop falling if on the floor 

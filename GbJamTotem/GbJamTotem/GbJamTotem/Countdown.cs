@@ -11,8 +11,10 @@ namespace GbJamTotem
 {
     public class Countdown : GameObject
     {
+		const float TimerMaxValue = 1.5f;
+
         float timer;
-        float timeCounter = 3;
+		float timeCounter = TimerMaxValue;
         bool activeTimer;
         bool countdownHasFinished;
 
@@ -41,7 +43,7 @@ namespace GbJamTotem
         public void resetCountdown()
         {
             timer = 0;
-            timeCounter = 3;
+			timeCounter = TimerMaxValue;
             activeTimer = false;
             countdownHasFinished = false;
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter3"), m_transform);
@@ -57,12 +59,12 @@ namespace GbJamTotem
                 //timer += (float)gameTime.ElapsedGameTime.TotalMilliseconds;
                 timeCounter -= timer;
 
-                if (timeCounter < 2)
+                if (timeCounter < 1.0f)
                 {
                     m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter2"), m_transform);
                 }
 
-                if (timeCounter < 1)
+                if (timeCounter < 0.5f)
                 {
                     m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("counter1"), m_transform);
                 }

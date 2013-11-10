@@ -225,16 +225,17 @@ namespace GbJamTotem
 		const float TimeToTotem = 1.0f;
 
 		//Main Menu
-		const float CameraMenuX = 200;
+		const float CameraMenuX = 360;
 		const float CameraMenuY = 30;
-		const float InitialCharacterPosition = 165;
-		const float InitialCrowdPosition = 110;
+		const float InitialCharacterPosition = 325;
+		const float InitialCrowdPosition = 270;
 
 		//Intro
 		const float CameraDelay = 1.5f;
 		const float TimeToFirstTotem = 2.0f;
 		static MoveToStaticAction moveTo;
 		static MoveToTransform moveToPlayer;
+		static MoveToStaticAction moveToTotem;
 		static Sequence cameraIntro;
 
 		//Ready
@@ -247,7 +248,7 @@ namespace GbJamTotem
 		static SingleActionManager actionManager = new SingleActionManager();
 
 		//Gameplay Zoom
-		const float[] TargetZooms = new float[] { 1.0f, 0.9f, 0.8f, 0.7f };
+		static float[] TargetZooms = new float[] { 1.0f, 0.9f, 0.8f, 0.7f };
 		static ScaleToAction cameraZoom;
 
 		public static bool IsReady
@@ -259,14 +260,15 @@ namespace GbJamTotem
 		{
 			cutscenePlayer = new CutscenePlayer();
 			cutscenePlayer.Transform.PosX = -100;
-			crowd = new Crowd(25, 25, new Vector2(2.5f, 0.5f));
+			crowd = new Crowd(40, 25, new Vector2(2.5f, 0.5f));
 
 			DelayAction cameraDelay = new DelayAction(Program.TheGame, CameraDelay);
-			MoveToStaticAction moveToTotem = new MoveToStaticAction(Program.TheGame, Game1.GameCamera.Transform, new Vector2(Totem1Position, CameraHeightOnGround), 1);
+			moveToTotem = new MoveToStaticAction(Program.TheGame, Game1.GameCamera.Transform, Vector2.Zero, 1);
 			moveToTotem.StartPosition = new Vector2(CameraMenuX, CameraMenuY);
 			moveToTotem.Interpolator = new PSmoothstepInterpolation();
 			moveToTotem.Timer.Interval = TimeToFirstTotem;
-			MethodAction moveCrowd = new MethodAction(delegate() { crowd.MoveTo(currentTotemPosition + TotemCrowdOffset, TimeToFirstTotem); });
+			MethodAction moveCrowd = new MethodAction(delegate() { 
+				crowd.MoveTo(currentTotemPosition + TotemCrowdOffset, TimeToFirstTotem); });
 			cameraIntro = new Sequence(1);
 			cameraIntro.AddAction(cameraDelay);
 			cameraIntro.AddAction(moveCrowd);
@@ -326,6 +328,7 @@ namespace GbJamTotem
 
 		public static void GoToTotem(Totem totem)
 		{
+			moveToTotem.Target = new Vector2(totem.Transform.PosX, CameraHeightOnGround);
 			currentTotemPosition = totem.Transform.PosX;
 			if (actionManager.IsActive)
 				return;
