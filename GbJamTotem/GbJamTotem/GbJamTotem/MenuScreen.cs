@@ -142,6 +142,7 @@ namespace GbJamTotem
                     //Game1.scoreBorder.ScoreBarMaxValue = Game1.scoreBorder.calculateScoreMax();
                     //Game1.mapBorder.setTopTotem();
                     canLauchChallenge = false;
+                    
                     Cutscenes.GoToTotem(Game1.totem);
                 }
             }

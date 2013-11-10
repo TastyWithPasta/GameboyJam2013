@@ -432,17 +432,34 @@ namespace GbJamTotem
 			}
 			else
 			{
-				player.Bounce(toTheLeft);
-                if (Game1.metalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                if (player.IsPoweredUp)
                 {
-                    Game1.metalTotemCollisionSound_Channel2.Play();
+                    Push(player, pushForce);
+                    if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                    {
+                        Game1.normalTotemCollisionSound_Channel2.Play();
+                    }
+                    else
+                    {
+                        Game1.normalTotemCollisionSound_Channel1.Play();
+                    }
+                    player.ComboCount++;
+                    player.IsPoweredUp = false;
                 }
                 else
                 {
-                    Game1.metalTotemCollisionSound_Channel1.Play();
+                    player.Bounce(toTheLeft);
+                    if (Game1.metalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                    {
+                        Game1.metalTotemCollisionSound_Channel2.Play();
+                    }
+                    else
+                    {
+                        Game1.metalTotemCollisionSound_Channel1.Play();
+                    }
+                    player.ComboCount = 0;
+                    //Push(player, pushForce);
                 }
-                player.ComboCount = 0;
-				//Push(player, pushForce);
 			}
 		}
 
@@ -511,8 +528,26 @@ namespace GbJamTotem
 			}
 			else
 			{
-				player.Bounce(toTheLeft);
-                player.ComboCount = 0; // TODO Utile ici?
+
+                if (player.IsPoweredUp)
+                {
+                    Push(player, pushForce);
+                    if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                    {
+                        Game1.normalTotemCollisionSound_Channel2.Play();
+                    }
+                    else
+                    {
+                        Game1.normalTotemCollisionSound_Channel1.Play();
+                    }
+                    player.ComboCount++;
+                    player.IsPoweredUp = false;
+                }
+                else
+                {
+                    player.Bounce(toTheLeft);
+                    player.ComboCount = 0; // TODO Utile ici?
+                }
 			}
         }
 

@@ -60,9 +60,11 @@ namespace GbJamTotem
 
 		public static DrawingList Foreground = new DrawingList();
 
+        PowerUp p;
+
         PTimer m_flashComboTimer;
 
-        #region SOUND ATTRIBUTES
+        #region SOUND & MUSIC ATTRIBUTES
 
         public static SoundEffectInstance normalTotemCollisionSound_Channel1;
         public static SoundEffectInstance normalTotemCollisionSound_Channel2;
@@ -96,6 +98,21 @@ namespace GbJamTotem
         public static SoundEffectInstance musicT1P3L3;
         public static SoundEffectInstance musicT1P3L4;
 
+        public static SoundEffectInstance musicT4P1L1;
+        public static SoundEffectInstance musicT4P1L2;
+        public static SoundEffectInstance musicT4P1L3;
+        public static SoundEffectInstance musicT4P1L4;
+
+        public static SoundEffectInstance musicT4P2L1;
+        public static SoundEffectInstance musicT4P2L2;
+        public static SoundEffectInstance musicT4P2L3;
+        public static SoundEffectInstance musicT4P2L4;
+
+        public static SoundEffectInstance musicT4P3L1;
+        public static SoundEffectInstance musicT4P3L2;
+        public static SoundEffectInstance musicT4P3L3;
+        public static SoundEffectInstance musicT4P3L4;
+
         public static DynamicMusic dynamicMusic;
 
         #endregion
@@ -125,7 +142,7 @@ namespace GbJamTotem
             TextureLibrary.Initialise(GraphicsDevice);
 
             debugText = Content.Load<SpriteFont>("Text/Debug");
-            //menuText = Content.Load<SpriteFont>("Text/Menu");
+            menuText = Content.Load<SpriteFont>("Text/Menu");
 
             SoundEffectLibrary.LoadContent(Content, "SoundEffects");
 
@@ -158,6 +175,9 @@ namespace GbJamTotem
             scoreBorder = new ScoreBorder();
             mapBorder = new MapBorder();
             comboCounter = new ComboCounter(player);
+
+            p = new PowerUp(true);
+            p.Transform.Position = new Vector2(40, -1800);
 
             // Background textures
             //
@@ -199,8 +219,27 @@ namespace GbJamTotem
             musicT1P3L3 = SoundEffectLibrary.Get("music_T1P3L3").CreateInstance();
             musicT1P3L4 = SoundEffectLibrary.Get("music_T1P3L4").CreateInstance();
 
+            musicT4P1L1 = SoundEffectLibrary.Get("music_T4P1L1").CreateInstance();
+            musicT4P1L2 = SoundEffectLibrary.Get("music_T4P1L2").CreateInstance();
+            musicT4P1L3 = SoundEffectLibrary.Get("music_T4P1L3").CreateInstance();
+            musicT4P1L4 = SoundEffectLibrary.Get("music_T4P1L4").CreateInstance();
+
+            musicT4P2L1 = SoundEffectLibrary.Get("music_T4P2L1").CreateInstance();
+            musicT4P2L2 = SoundEffectLibrary.Get("music_T4P2L2").CreateInstance();
+            musicT4P2L3 = SoundEffectLibrary.Get("music_T4P2L3").CreateInstance();
+            musicT4P2L4 = SoundEffectLibrary.Get("music_T4P2L4").CreateInstance();
+
+            musicT4P3L1 = SoundEffectLibrary.Get("music_T4P3L1").CreateInstance();
+            musicT4P3L2 = SoundEffectLibrary.Get("music_T4P3L2").CreateInstance();
+            musicT4P3L3 = SoundEffectLibrary.Get("music_T4P3L3").CreateInstance();
+            musicT4P3L4 = SoundEffectLibrary.Get("music_T4P3L4").CreateInstance();
+
+            //dynamicMusic = new DynamicMusic(musicT1P1L1, musicT1P1L2, musicT1P1L3, musicT1P1L4);
+            //dynamicMusic = new DynamicMusic(musicT1P2L1, musicT1P2L2, musicT1P2L3, musicT1P2L4);
             //dynamicMusic = new DynamicMusic(musicT1P3L1, musicT1P3L2, musicT1P3L3, musicT1P3L4);
-            dynamicMusic = new DynamicMusic(musicT1P2L1, musicT1P2L2, musicT1P2L3, musicT1P2L4);
+            //dynamicMusic = new DynamicMusic(musicT4P1L1, musicT4P1L2, musicT4P1L3, musicT4P1L4);
+            dynamicMusic = new DynamicMusic(musicT4P2L1, musicT4P2L2, musicT4P2L3, musicT4P2L4);
+            //dynamicMusic = new DynamicMusic(musicT4P3L1, musicT4P3L2, musicT4P3L3, musicT4P3L4);
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
@@ -347,6 +386,8 @@ namespace GbJamTotem
             mapBorder.Update();
             comboCounter.Update();
 
+            p.Update();
+
             GameCamera.Update();
 			//if (GameCamera.Transform.PosY > -CameraOffset)
 			//    GameCamera.Transform.PosY = -CameraOffset;
@@ -385,6 +426,8 @@ namespace GbJamTotem
 			Cutscenes.crowd.DrawFront();
 
             player.Draw();
+
+            p.Draw();
 			
 			Souls.Draw();
             Explosions.Draw();
@@ -412,18 +455,22 @@ namespace GbJamTotem
             //
             m_drawer.Draw();
 
-
-            
+            if (startingCountdown.CountdownHasFinished)
+            {
+                SpriteBatch.Begin();
+                SpriteBatch.DrawString(menuText, "Souls : " + scoreBorder.Score, new Vector2(70, 0), Color.Black);
+                SpriteBatch.End();
+            }
 
             if (debugMode)
             {
                 SpriteBatch.Begin();
                 // Debug text
                 //
-                SpriteBatch.DrawString(debugText, "Souls : " + scoreBorder.Score + "/" + scoreBorder.ScoreBarMaxValue, new Vector2(0, 300), Color.Red);
-                SpriteBatch.DrawString(debugText, "Chall : " + menuScreen.challengeChoice, new Vector2(0, 320), Color.Red);
+                //SpriteBatch.DrawString(debugText, "Souls : " + scoreBorder.Score + "/" + scoreBorder.ScoreBarMaxValue, new Vector2(0, 300), Color.Red);
+                //SpriteBatch.DrawString(debugText, "Chall : " + menuScreen.challengeChoice, new Vector2(0, 320), Color.Red);
                 //SpriteBatch.DrawString(menuText, "Test", new Vector2(20, 350), Color.Black);
-                //SpriteBatch.DrawString(debugText, "FeedbackLock : " + feedbackLock , new Vector2(0, 300), Color.Red);
+                SpriteBatch.DrawString(debugText, "player posY : " +player.Transform.PosY , new Vector2(0, 300), Color.Red);
                 //SpriteBatch.DrawString(debugText, "isCBSP : " + isComboBreakerSoundPossible, new Vector2(0, 320), Color.Red);
                 SpriteBatch.End();
             }

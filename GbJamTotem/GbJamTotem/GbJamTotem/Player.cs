@@ -51,6 +51,7 @@ namespace GbJamTotem
 		const float SpeedMultiplierIncrement = 1.05f;
 		const float MaxSpeedMultiplier = 2.5f;
 		const int DeltaAboveClimbingAltitude = -100;
+        bool isPoweredUp;
 
 		Totem m_totemInstance;
 
@@ -98,6 +99,11 @@ namespace GbJamTotem
 		float m_speedMultiplier = 1; //Permet d'accélérer le rythme d'action du joueur
 
         int comboCount;
+
+        public bool IsPoweredUp{
+            get { return isPoweredUp; }
+            set { isPoweredUp = value; }
+        }
 
 		public bool IsVisible
 		{
@@ -172,6 +178,8 @@ namespace GbJamTotem
             canClimb = true;
             isFalling = false;
             comboCount = 0;
+
+            isPoweredUp = false;
 			
             m_actionManager = new SingleActionManager();
 			m_spriteAnimation = new SingleActionManager();
