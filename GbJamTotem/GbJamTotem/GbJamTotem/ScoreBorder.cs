@@ -89,7 +89,7 @@ namespace GbJamTotem
 
             }
 
-            return nbSoulsCollectible + multiplierFactor - (nbSoulsCollectible + multiplierFactor)/3;
+            return nbSoulsCollectible + multiplierFactor; //- (nbSoulsCollectible + multiplierFactor)/3;
         }
 
         public void Slide(bool onScreen)
