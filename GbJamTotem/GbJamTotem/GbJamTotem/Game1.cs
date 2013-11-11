@@ -162,7 +162,7 @@ namespace GbJamTotem
 			// Totem
 			//
 
-			LoadLevel(1);
+			//LoadLevel(1);
 			//totems[0] = new Totem();
 			////testTotem.BuildFromFile("Level1_p1");
 			//totems[0].AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
@@ -260,10 +260,54 @@ namespace GbJamTotem
                 CurrentTotem.HidePowerUp();
 
 			currentIndex++;
-            CurrentTotem.ShowPowerUp();
-			player.Initialise(CurrentTotem);
+
+            if (CurrentTotem != null)
+            {
+                CurrentTotem.ShowPowerUp();
+                scoreBorder.Initialize();
+                mapBorder.Initialize();
+
+                player.Initialise(CurrentTotem);
+            }
+            player.IsPoweredUp = false;
 			startingCountdown.resetCountdown();
 		}
+
+        public void LoadRandomLevel()
+        {
+
+            totems[0] = new Totem();
+            totems[0].AddSections(new SectionData(typeof(NormalSection), 0, 0, 10));
+            totems[0].AddSections(new SectionData(typeof(MetalSection), 8, 8, 4));
+            totems[0].AddSections(new SectionData(typeof(SpikeSection), 4, 4, 2));
+            totems[0].BuildRandom();
+
+            totems[1] = new Totem();
+            totems[1].AddSections(new SectionData(typeof(NormalSection), 0, 0, 10));
+            totems[1].AddSections(new SectionData(typeof(MetalSection), 8, 8, 4));
+            totems[1].AddSections(new SectionData(typeof(SpikeSection), 4, 4, 2));
+            totems[1].BuildRandom();
+
+            totems[2] = new Totem();
+            totems[2].AddSections(new SectionData(typeof(NormalSection), 0, 0, 10));
+            totems[2].AddSections(new SectionData(typeof(MetalSection), 8, 8, 4));
+            totems[2].AddSections(new SectionData(typeof(SpikeSection), 4, 4, 2));
+            totems[2].BuildRandom();
+
+            for (int i = 0; i < 3; ++i)
+            {
+                SoundEffectInstance musicL1 = SoundEffectLibrary.Get("music_T1P" + (i + 1) + "L1").CreateInstance();
+                SoundEffectInstance musicL2 = SoundEffectLibrary.Get("music_T1P" + (i + 1) + "L2").CreateInstance();
+                SoundEffectInstance musicL3 = SoundEffectLibrary.Get("music_T1P" + (i + 1) + "L3").CreateInstance();
+                SoundEffectInstance musicL4 = SoundEffectLibrary.Get("music_T1P" + (i + 1) + "L4").CreateInstance();
+                musics[i] = new DynamicMusic(musicL1, musicL2, musicL3, musicL4);
+            }
+
+            PlaceTotems();
+
+        }
+
+
 		public void LoadLevel(int index)
 		{
 			string path = "Level_" + index;
@@ -275,7 +319,7 @@ namespace GbJamTotem
 			totems[2] = new Totem();
 			totems[2].BuildFromFile(path + "/Level" + index + "_3");
 
-            totems[0].ShowPowerUp();
+            totems[0].HidePowerUp();
             totems[1].HidePowerUp();
             totems[2].HidePowerUp();
 
@@ -397,9 +441,12 @@ namespace GbJamTotem
             // Update game if unpaused
             //
             player.Update();
-            CurrentTotem.Update();
-            scoreBorder.Update();
-            mapBorder.Update();
+            if (CurrentTotem != null)
+            {
+                CurrentTotem.Update();
+                scoreBorder.Update();
+                mapBorder.Update();
+            }
             comboCounter.Update();
 
             GameCamera.Update();
@@ -435,8 +482,11 @@ namespace GbJamTotem
 			SpriteBatch.Begin(SpriteSortMode.Immediate, null, SamplerState.PointClamp, null, null, null, GameCamera.CameraMatrix);
             m_falaise.Draw();
 			Cutscenes.crowd.DrawBack();
-			for (int i = 0; i < totems.Length; ++i)
-				totems[i].Draw();
+            if (CurrentTotem != null)
+            {
+                for (int i = 0; i < totems.Length; ++i)
+                    totems[i].Draw();
+            }
 			Cutscenes.cutscenePlayer.Draw();
 			Cutscenes.crowd.DrawFront();
 

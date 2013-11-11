@@ -46,8 +46,6 @@ namespace GbJamTotem
 
             score = 0;
 
-            scoreBarMaxValue = calculateScoreMax();
-
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("score_background"), m_transform);
             m_transform.Position = new Vector2(-8, 72);
 
@@ -65,6 +63,11 @@ namespace GbJamTotem
             m_slideOutOfScreen.Interpolator = new PSmoothstepInterpolation();
             m_slideOutOfScreen.Timer.Interval = durationSlide;
 
+        }
+
+        public void Initialize()
+        {
+            scoreBarMaxValue = calculateScoreMax();
         }
 
         public int calculateScoreMax()

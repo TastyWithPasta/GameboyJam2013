@@ -37,11 +37,6 @@ namespace GbJamTotem
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("score_background"), m_transform);
             m_transform.Position = new Vector2(168, 72);
 
-            // Get the highest point of totem at start
-            //
-			if (Game1.CurrentTotem.Top != 0)
-				topTotem = Game1.CurrentTotem.Top;
-
             pixelPlayer = new Sprite(Program.TheGame, TextureLibrary.PixelSpriteSheet, new Transform(m_transform, true));
             pixelPlayer.Colour = new Vector4((float)255/(float)255, (float)251/(float)255, (float)240/(float)255, 1);
             pixelPlayer.Transform.PosX = -4;
@@ -61,6 +56,14 @@ namespace GbJamTotem
             m_slideOutOfScreen.Interpolator = new PSmoothstepInterpolation();
             m_slideOutOfScreen.StartPosition = positionOnScreen;
             m_slideOutOfScreen.Timer.Interval = durationSlide;
+        }
+
+        public void Initialize()
+        {
+            // Get the highest point of totem at start
+            //
+            if (Game1.CurrentTotem.Top != 0)
+                topTotem = Game1.CurrentTotem.Top;
         }
 
         public void Slide(bool onScreen)
