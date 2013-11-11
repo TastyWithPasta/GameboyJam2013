@@ -355,6 +355,36 @@ namespace GbJamTotem
 			PlaceTotems();
 		}
 
+        public void LoadTutorialLevel(int index)
+        {
+            string path = "Tutorial";
+
+            totems[0] = new Totem();
+            totems[0].BuildFromFile(path + "/Tutorial_1");
+            totems[1] = new Totem();
+            totems[1].BuildFromFile(path + "/Tutorial_2");
+            totems[2] = new Totem();
+            totems[2].BuildFromFile(path + "/Tutorial_3");
+
+            totems[0].HidePowerUp();
+            totems[1].HidePowerUp();
+            totems[2].HidePowerUp();
+
+            int maxIndex = 3;
+            if (index == 0)
+                maxIndex = 2;
+            for (int i = 0; i < maxIndex; ++i)
+            {
+                SoundEffectInstance musicL1 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L1").CreateInstance();
+                SoundEffectInstance musicL2 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L2").CreateInstance();
+                SoundEffectInstance musicL3 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L3").CreateInstance();
+                SoundEffectInstance musicL4 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L4").CreateInstance();
+                musics[i] = new DynamicMusic(musicL1, musicL2, musicL3, musicL4);
+            }
+
+            PlaceTotems();
+        }
+
 		private void PlaceTotems()
 		{
 			for (int i = 0; i < totems.Length; ++i)

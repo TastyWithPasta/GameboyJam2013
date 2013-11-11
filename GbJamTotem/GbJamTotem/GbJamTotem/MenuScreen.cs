@@ -19,6 +19,7 @@ namespace GbJamTotem
         {
             START,
             CHALLENGES,
+            TUTORIAL,
             CHALLENGE_CHOICE
         }
 
@@ -39,7 +40,9 @@ namespace GbJamTotem
 
         bool isActive, isHidden;
         bool canLauchChallenge;
+        int deltaArrowBetweenModes = 11;
         int deltaArrowBetweenChallenges = 19;
+        bool tutoOn;
 
         public bool IsActive
         {
@@ -51,10 +54,12 @@ namespace GbJamTotem
             isActive = false;
 			isHidden = true;
             canLauchChallenge = false;
+            tutoOn = false;
 
-            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("menu_start_bg"), m_transform);
+            m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("menu_start_bg_off"), m_transform);
             m_sprite.Transform.Position = new Vector2(80, 120);
             arrow = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("arrow"), new Transform(m_transform, true));
+            arrow.Transform.PosY = -12;
 
 			moveTo = new MoveToStaticAction(Program.TheGame, m_transform, new Vector2(80, 120), 1);
 			moveTo.StartPosition = new Vector2(80, 200);
@@ -74,13 +79,29 @@ namespace GbJamTotem
         {
             if (isActive)
             {
+
+                // Change BG with tuto
+                //
+                if (choice != MenuState.CHALLENGE_CHOICE)
+                {
+                    if (tutoOn)
+                        m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_start_bg_on");
+                    else
+                        m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_start_bg_off");
+                }
+
                 // Positionning arrow
                 //
                 if (choice == MenuState.START)
-                    arrow.Transform.Position = new Vector2(-25, -7);
+                    arrow.Transform.Position = new Vector2(-25, -12);
 
                 if (choice == MenuState.CHALLENGES)
-                    arrow.Transform.Position = new Vector2(-45, 7);
+                    //arrow.Transform.PosX = -45;
+                    arrow.Transform.Position = new Vector2(-46, -1);
+
+                if (choice == MenuState.TUTORIAL)
+                    //arrow.Transform.PosX = -35;
+                    arrow.Transform.Position = new Vector2(-46, 10);
 
                 // Actions with enter or space
                 //
@@ -90,18 +111,28 @@ namespace GbJamTotem
                     ExecuteStartAction();
                 }
 
-                // Up and down input between start & challenges
+                // Up and down input between start, challenges & tutorial
                 //
                 if (choice != MenuState.CHALLENGE_CHOICE)
                 {
-                    if (Game1.kbs.IsKeyDown(Keys.Up) && Game1.old_kbs.IsKeyUp(Keys.Up))
-                    {
-                        choice = MenuState.START;
-                    }
 
                     if (Game1.kbs.IsKeyDown(Keys.Down) && Game1.old_kbs.IsKeyUp(Keys.Down))
                     {
-                        choice = MenuState.CHALLENGES;
+                        if (choice < MenuState.TUTORIAL)
+                        {
+                            choice++;
+                            //arrow.Transform.PosY += deltaArrowBetweenModes;
+                        }
+                    }
+
+                    if (Game1.kbs.IsKeyDown(Keys.Up) && Game1.old_kbs.IsKeyUp(Keys.Up))
+                    {
+                        if (choice > MenuState.START)
+                        {
+                            choice--;
+                            //arrow.Transform.PosY -= deltaArrowBetweenModes;
+                        }
+
                     }
                 }
 
@@ -114,7 +145,11 @@ namespace GbJamTotem
                     {
                         choice = MenuState.START;
                         challengeChoice = ChallengeState.CHALL_1;
-                        m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_start_bg");
+                        if (tutoOn)
+                            m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_start_bg_on");
+                        else
+                            m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_start_bg_off");
+                        //m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_start_bg");
                         canLauchChallenge = false;
                     }
 
@@ -149,6 +184,7 @@ namespace GbJamTotem
             if (choice == MenuState.CHALLENGE_CHOICE && canLauchChallenge)
             {
                     HideMenu();
+                    Cutscenes.title.Dissappear();
 					Program.TheGame.LoadLevel((int)challengeChoice);
                     //Game1.totem.BuildFromFile("Level1_p1");
                     //Game1.scoreBorder.ScoreBarMaxValue = Game1.scoreBorder.calculateScoreMax();
@@ -165,27 +201,37 @@ namespace GbJamTotem
             if (choice == MenuState.START)
             {
 				HideMenu();
+                Cutscenes.title.Dissappear();
                 Program.TheGame.LoadRandomLevel();
                 Game1.SetupNextLevel();	
-
                 canLauchChallenge = false;
-                //Game1.SetupNextLevel();
-                Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f);
-
-				//// Set informations for slides
-				////
-				//Game1.scoreBorder.ScoreBarMaxValue = Game1.scoreBorder.calculateScoreMax();
-				//Game1.mapBorder.setTopTotem();
-
-				//Cutscenes.GoToTotem(Game1.totem);
+                Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f, -40);
             }
 
+            // Select challenges
+            //
             if (choice == MenuState.CHALLENGES)
             {
                 choice = MenuState.CHALLENGE_CHOICE;
                 m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_chall_bg");
                 arrow.Transform.Position = new Vector2(-47, 7);
                 canLauchChallenge = true;
+            }
+
+            // Select tutorial
+            //
+            if (choice == MenuState.TUTORIAL)
+            {
+
+                //tutoOn = !tutoOn;
+                // Lauch tutorial level
+                //
+                /*HideMenu();
+                Cutscenes.title.Dissappear();
+                Program.TheGame.LoadTutorialLevel(1);
+                Game1.SetupNextLevel();
+                canLauchChallenge = false;
+                Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f, -40);*/
             }
 
            

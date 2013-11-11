@@ -96,6 +96,7 @@
     <Compile Include="ScoreBorder.cs" />
     <Compile Include="Title.cs" />
     <Compile Include="Totem.cs" />
+    <Compile Include="Tutorial.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Game.ico" />
