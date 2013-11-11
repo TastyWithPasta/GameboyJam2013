@@ -124,6 +124,7 @@ namespace GbJamTotem
         public static SoundEffectInstance musicT4P3L3;
         public static SoundEffectInstance musicT4P3L4;
 
+		public static SoundEffectInstance menuMusic;
 
         #endregion
 
@@ -152,7 +153,7 @@ namespace GbJamTotem
             TextureLibrary.Initialise(GraphicsDevice);
 
             debugText = Content.Load<SpriteFont>("Text/Debug");
-            menuText = Content.Load<SpriteFont>("Text/Menu");
+            //menuText = Content.Load<SpriteFont>("Text/Menu");
 
             SoundEffectLibrary.LoadContent(Content, "SoundEffects");
 
@@ -211,6 +212,7 @@ namespace GbJamTotem
 			groundImpact = SoundEffectLibrary.Get("ground_slam").CreateInstance();
 			footsteps = SoundEffectLibrary.Get("footsteps").CreateInstance();
 			footsteps.IsLooped = true;
+			menuMusic = SoundEffectLibrary.Get("music_menu").CreateInstance();
 
             feedback_combo3 = SoundEffectLibrary.Get("feedback_combo3").CreateInstance();
 			feedback_combo3.Volume = 0.2f;
@@ -338,7 +340,8 @@ namespace GbJamTotem
 
             totems[0].HidePowerUp();
             totems[1].HidePowerUp();
-            totems[2].HidePowerUp();
+			if(totems[2] != null)
+				totems[2].HidePowerUp();
 
 			int maxIndex = 3;
 			if (index == 0)
@@ -512,6 +515,7 @@ namespace GbJamTotem
                     totems[i].Draw();
             }
 			Cutscenes.cutscenePlayer.Draw();
+			Cutscenes.monster.Draw();
 			Cutscenes.crowd.DrawFront();
 
             player.Draw();
@@ -543,12 +547,12 @@ namespace GbJamTotem
             //
             m_drawer.Draw();
 
-            if (startingCountdown.CountdownHasFinished)
-            {
-                SpriteBatch.Begin();
-                SpriteBatch.DrawString(menuText, "Souls : " + scoreBorder.Score, new Vector2(70, 0), Color.Black);
-                SpriteBatch.End();
-            }
+			//if (startingCountdown.CountdownHasFinished)
+			//{
+			//    SpriteBatch.Begin();
+			//    SpriteBatch.DrawString(menuText, "Souls : " + scoreBorder.Score, new Vector2(70, 0), Color.Black);
+			//    SpriteBatch.End();
+			//}
 
             if (debugMode)
             {

@@ -10,7 +10,7 @@ namespace GbJamTotem
 	public class Title : GameObject
 	{
 		const float TitleX = Game1.GameboyWidth * 0.5f;
-		const float TitleY = 40;
+		const float TitleY = 30;
 
 		SpriteSheetAnimation m_animation;
 		MoveToStaticAction m_moveTo;
@@ -36,11 +36,13 @@ namespace GbJamTotem
 			m_transform.PosX = TitleX;
 			m_transform.PosY = -50;
 			m_physics.Throw(0, 0, 0);
+			Game1.menuMusic.Play();
 		}
 		public void Dissappear()
 		{
 			m_moveTo.StartPosition = m_transform.Position;
 			m_moveTo.Start();
+			Game1.menuMusic.Stop();
 		}
 
 		public override void Update()

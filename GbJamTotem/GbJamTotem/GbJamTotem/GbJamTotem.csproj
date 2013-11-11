@@ -84,6 +84,7 @@
     <Compile Include="GameObject.cs" />
     <Compile Include="MapBorder.cs" />
     <Compile Include="MenuScreen.cs" />
+    <Compile Include="Monster.cs" />
     <Compile Include="PauseScreen.cs" />
     <Compile Include="PhysicsComponent.cs" />
     <Compile Include="PixelParticle.cs" />

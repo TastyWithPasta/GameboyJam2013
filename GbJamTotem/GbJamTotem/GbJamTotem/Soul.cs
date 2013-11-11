@@ -33,9 +33,9 @@ namespace GbJamTotem
 			Vector2 explodePosition;
 
 			if (player.IsToLeft)
-				explodePosition.X = Program.Random.Next(-72, -20);
+				explodePosition.X = player.Transform.PosX + Program.Random.Next(-72, -20);
 			else
-				explodePosition.X = Program.Random.Next(20, 73);
+				explodePosition.X = player.Transform.PosX + Program.Random.Next(20, 73);
 			explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)(player.Transform.PosY + 50 + ExplosionBreadth * m_playerInstance.SpeedMultiplier));
 
 			MoveToStaticAction moveToExplosionPoint = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);

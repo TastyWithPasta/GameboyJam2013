@@ -33,7 +33,43 @@ namespace GbJamTotem
 				m_sprite.Draw();
 		}
 	}
-	
+
+	public class SoulParticle : GameObject, IParticle
+	{
+		const float MaxTTL = 0.8f;
+		float m_ttl = MaxTTL;
+		float m_velX, m_velY;
+
+		public SoulParticle()
+		{
+			m_sprite = new Sprite(Program.TheGame, Cutscenes.auraTexture, m_transform);
+
+			float speed = 20;
+			float direction = (float)(Program.Random.NextDouble() * Math.PI * 2);
+			m_velX = (float)(Math.Cos(direction) * speed);
+			m_velY = (float)(Math.Sin(direction) * speed);
+			m_transform.Position = Cutscenes.cutscenePlayer.Transform.Position;
+		}
+
+		public override void Update()
+		{
+			float dt =(float)Program.TheGame.ElapsedTime;
+			m_ttl -= dt;
+			m_transform.PosX += m_velX * dt;
+			m_transform.PosY += m_velY * dt;
+		}
+
+		public bool RemoveMe()
+		{
+			return m_ttl <= 0;
+		}
+
+		public override void Draw()
+		{
+			m_sprite.Draw();
+		}
+	}
+
 	public class CutscenePlayer : GameObject
 	{
 		const float CloudStartX = -200;
@@ -53,7 +89,6 @@ namespace GbJamTotem
 		const float ShlingScale = 4.0f;
 		const float ShlingTime = 0.7f;
 		const float ShlingSpin = 4.0f;
-
 
 
 		MoveToTransform m_moveToCrowd;
@@ -84,6 +119,12 @@ namespace GbJamTotem
 		Totem m_totemInstance;
 		bool isVisible = true;
 
+		Sequence m_levitate;
+		MoveToTransform m_levitateMovement;
+		ParticleGenerator<SoulParticle> m_particleGenerator;
+		ParticleSystem m_soulAuraParticles;
+
+
 		public bool IsVisible
 		{
 			get { return isVisible; }
@@ -107,9 +148,9 @@ namespace GbJamTotem
 
 			m_shlingSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("shling"), new Transform(m_transform, true));
 
-			m_sprite = new PastaGameLibrary.Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("player_cutscene", 1, 2), m_transform);
+			m_sprite = new PastaGameLibrary.Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("player_cutscene", 1, 3), m_transform);
 			m_sprite.Origin = new Vector2(0.5f, 0.5f);
-			m_sprite.PixelCorrection = true;
+			m_sprite.PixelCorrection = false;
 
 			m_moveToCrowd = new MoveToTransform(Program.TheGame, m_transform, null, null, 1);
 			m_moveToCrowd.Timer.Interval = 0.1f;
@@ -229,8 +270,15 @@ namespace GbJamTotem
 					Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f, 0); 
 				m_sprite.SetFrame(0);
 				m_physics.OnBounce = null;
-				m_physics.Throw(0, -2, 0);
+				m_physics.Throw(0, -3, 0);
+				m_transform.PosY = m_physics.GroundLevel;
 			}));
+
+			m_levitate = new Sequence(1);
+			m_levitateMovement = new MoveToTransform(Program.TheGame, m_transform, new Transform(), new Transform(), 1);
+			m_levitateMovement.Interpolator = new PSmoothstepInterpolation();
+			m_levitate.AddAction(m_levitateMovement);
+			m_soulAuraParticles = new ParticleSystem(Program.TheGame, 100);
 		}
 
 		public void Launch(Totem totem)
@@ -338,6 +386,21 @@ namespace GbJamTotem
 		{
 			m_physics.Throw(2.5f, -3, 0);
 		}
+		public void Levitate()
+		{
+			if (m_transform.ParentTransform != null)
+				m_transform.Position += m_transform.ParentTransform.PositionGlobal;
+			m_transform.ParentTransform = null;
+			m_levitateMovement.Start.Position = m_transform.Position;
+			m_levitateMovement.Start.Direction = m_transform.Direction;
+			m_levitateMovement.End.Position = new Vector2(Cutscenes.InitialCharacterPosition, -50);
+			m_levitateMovement.End.Direction = (float)(Math.PI * 2);
+			m_sprite.SetFrame(2);
+			m_actionManager.StartNew(m_levitateMovement);
+			m_particleGenerator = new ParticleGenerator<SoulParticle>(Program.TheGame, m_soulAuraParticles);
+			m_particleGenerator.Automatic = true;
+			m_particleGenerator.GenerationInterval = 0.01f;
+		}
 
 		public void DropFromCrowd(float fx, float fy)
 		{
@@ -346,6 +409,11 @@ namespace GbJamTotem
 
 		public override void Update()
 		{
+			if (m_particleGenerator != null)
+			{
+				m_particleGenerator.Update();
+				m_soulAuraParticles.Update();
+			}
 			m_physics.Update();
 			m_sword.Update();
 			m_cloud.Update();
@@ -357,6 +425,9 @@ namespace GbJamTotem
 		{
 			if (isVisible)
 			{
+				if (m_particleGenerator != null)
+					m_soulAuraParticles.Draw();
+
 				m_cloud.Draw();
 				m_sprite.Draw();
 				m_sword.Draw();
@@ -371,7 +442,11 @@ namespace GbJamTotem
 	{
 		public static Title title;
 		public static Crowd crowd;
+		public static Monster monster;
 		public static CutscenePlayer cutscenePlayer;
+
+
+		public static SpriteSheet auraTexture;
 
 		//General
 		public const float CameraHeightOnGround = -50;
@@ -384,7 +459,7 @@ namespace GbJamTotem
 		//Main Menu
 		const float CameraMenuX = 360;
 		const float CameraMenuY = 30;
-		const float InitialCharacterPosition = 325;
+		public const float InitialCharacterPosition = 325;
 		const float InitialCrowdPosition = 265;
 
 		//MoveToTotem
@@ -412,6 +487,7 @@ namespace GbJamTotem
 		static Sequence goToPlayerOnGround;
 
 		static Sequence intro;
+		static Sequence goToCliff;
 
 		public static bool IsReady
 		{
@@ -422,6 +498,8 @@ namespace GbJamTotem
 		{
 			cutscenePlayer = new CutscenePlayer();
 			cutscenePlayer.Transform.PosX = -100;
+			monster = new Monster();
+			monster.Idle();
 			crowd = new Crowd(40, 18, new Vector2(2.5f, 0.5f));
 
 			title = new Title();
@@ -471,8 +549,18 @@ namespace GbJamTotem
 
 			intro.AddAction(moveToMenu);
 			intro.AddAction(new MethodAction(delegate() { crowd.PushNewGuy(); }));
-			intro.AddAction(new DelayAction(Program.TheGame, 3.0f));
+			intro.AddAction(new DelayAction(Program.TheGame, 1.5f));
 			intro.AddAction(new MethodAction(delegate() { StartMainMenu(); }));
+
+			goToCliff = new Sequence(1);
+			goToCliff.AddAction(cameraDelay);
+			goToCliff.AddAction(moveCrowd);
+			goToCliff.AddAction(moveToTotem);
+			goToCliff.AddAction(new MethodAction(delegate() { cutscenePlayer.Levitate(); }));
+
+			auraTexture = TextureLibrary.GetSpriteSheet("soul_temp");
+
+			//moveToAscendingPlayer = new MoveToTransform(Program.TheGame, Game1.GameCamera.Transform, new Transform(), cutscenePlayer.Transform, 1);
 		}
 
 		public static void ZoomToStage(int stageNumber)
@@ -494,7 +582,7 @@ namespace GbJamTotem
 		public static void StartMainMenu()
 		{
 			crowd.Transform.Position = new Vector2(InitialCrowdPosition, 0);
-			cutscenePlayer.Transform.Position = new Vector2(InitialCharacterPosition, 0);
+			//cutscenePlayer.Transform.Position = new Vector2(InitialCharacterPosition, 0);
 			Game1.GameCamera.Transform.Position = new Vector2(CameraMenuX, CameraMenuY);
 			title.Appear();
 			Game1.menuScreen.ShowMenu();
@@ -533,7 +621,14 @@ namespace GbJamTotem
 			actionManager.StartNew(gotoFirstTotem);
 		}
 		public static void GoToCliff()
-		{ }
+		{
+			moveToTotem.StartPosition = Game1.GameCamera.Transform.Position;
+			moveToTotem.Target = new Vector2(InitialCrowdPosition, 0);
+			currentTotemPosition = InitialCrowdPosition;
+			crowd.PickupPlayer(1.0f, 0);
+			actionManager.StartNew(goToCliff);
+
+		}
 
 		public static void FinishTotem()
 		{
@@ -549,6 +644,7 @@ namespace GbJamTotem
 		{
 			actionManager.Update();
 			crowd.Update();
+			monster.Update();
 			cutscenePlayer.Update();
 			title.Update();
 		}

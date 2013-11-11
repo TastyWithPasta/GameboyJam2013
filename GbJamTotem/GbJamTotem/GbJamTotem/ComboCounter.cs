@@ -10,8 +10,8 @@ namespace GbJamTotem
     public class ComboCounter : GameObject
     {
         Player player;
-        Vector2 comboPositionLeft = new Vector2(37, 72);
-        Vector2 comboPositionRight = new Vector2(113, 72);
+        Vector2 comboPositionLeft = new Vector2(37, 78);
+        Vector2 comboPositionRight = new Vector2(113, 78);
         int comboScale = 2;
         int comboScrollSpeed = 5;
         int initialWidth;
@@ -25,7 +25,7 @@ namespace GbJamTotem
             m_sprite.Transform.Position = new Vector2(Game1.GameboyWidth / 2, Game1.GameboyHeight / 2 + 20);
             m_sprite.Transform.Scale = new Vector2(0);
 
-			m_bump = new ScaleToAction(Program.TheGame, m_transform, new Vector2(2.0f, 2.0f), 1);
+			m_bump = new ScaleToAction(Program.TheGame, m_transform, new Vector2(2.3f, 2.3f), 1);
 			m_bump.Interpolator = new PBounceInterpolation(0);
 			m_bump.Timer.Interval = 0.2f;
 
@@ -68,7 +68,7 @@ namespace GbJamTotem
 
 			if (triggerAnimation)
 			{
-				m_bump.StartScale = new Vector2(1.8f, 1.8f);
+				m_bump.StartScale = new Vector2(2.1f, 2.1f);
 				m_bump.Restart();
 			}
 		}
@@ -104,12 +104,12 @@ namespace GbJamTotem
                 if (player.IsToLeft)
                 {
                    //m_sprite.Transform.Position = comboPositionRight;
-                    m_sprite.Origin = new Vector2(0, 0.5f);
+                    m_sprite.Origin = new Vector2(0.2f, 0.5f);
                 }
                 else
                 {
                    //m_sprite.Transform.Position = comboPositionLeft;
-                    m_sprite.Origin = new Vector2(1, 0.5f);
+                    m_sprite.Origin = new Vector2(0.9f, 0.5f);
                 }
 
                 m_sprite.Draw();

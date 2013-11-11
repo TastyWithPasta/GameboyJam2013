@@ -6,6 +6,7 @@ using PastaGameLibrary;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 
 namespace GbJamTotem
 {
@@ -35,6 +36,7 @@ namespace GbJamTotem
         public ChallengeState challengeChoice;
 		MoveToStaticAction moveTo, moveOut;
 		SingleActionManager actionManager = new SingleActionManager();
+		SoundEffectInstance menuSound;
 
 
         bool isActive, isHidden;
@@ -51,6 +53,8 @@ namespace GbJamTotem
             isActive = false;
 			isHidden = true;
             canLauchChallenge = false;
+
+			menuSound = SoundEffectLibrary.Get("cursor").CreateInstance();
 
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("menu_start_bg"), m_transform);
             m_sprite.Transform.Position = new Vector2(80, 120);
@@ -88,6 +92,7 @@ namespace GbJamTotem
                     || (Game1.kbs.IsKeyDown(Keys.Space) && Game1.old_kbs.IsKeyUp(Keys.Space)) )
                 {
                     ExecuteStartAction();
+					menuSound.Play();
                 }
 
                 // Up and down input between start & challenges
@@ -97,11 +102,13 @@ namespace GbJamTotem
                     if (Game1.kbs.IsKeyDown(Keys.Up) && Game1.old_kbs.IsKeyUp(Keys.Up))
                     {
                         choice = MenuState.START;
+						menuSound.Play();
                     }
 
                     if (Game1.kbs.IsKeyDown(Keys.Down) && Game1.old_kbs.IsKeyUp(Keys.Down))
                     {
                         choice = MenuState.CHALLENGES;
+						menuSound.Play();
                     }
                 }
 
@@ -112,6 +119,7 @@ namespace GbJamTotem
 
                     if (Game1.kbs.IsKeyDown(Keys.LeftAlt) && Game1.old_kbs.IsKeyUp(Keys.LeftAlt))
                     {
+						menuSound.Play();
                         choice = MenuState.START;
                         challengeChoice = ChallengeState.CHALL_1;
                         m_sprite.SpriteSheet = TextureLibrary.GetSpriteSheet("menu_start_bg");
@@ -123,6 +131,7 @@ namespace GbJamTotem
                         if (challengeChoice < ChallengeState.CHALL_5)
                         {
                             challengeChoice++;
+							menuSound.Play();
                             arrow.Transform.PosX += deltaArrowBetweenChallenges;
                         }
                     }
@@ -132,6 +141,7 @@ namespace GbJamTotem
                         if (challengeChoice > ChallengeState.CHALL_1)
                         {
                             challengeChoice--;
+							menuSound.Play();
                             arrow.Transform.PosX -= deltaArrowBetweenChallenges;
                         }
                     }
@@ -170,7 +180,8 @@ namespace GbJamTotem
 
                 canLauchChallenge = false;
                 //Game1.SetupNextLevel();
-                Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f);
+                Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f, -40);
+				Cutscenes.title.Dissappear();
 
 				//// Set informations for slides
 				////

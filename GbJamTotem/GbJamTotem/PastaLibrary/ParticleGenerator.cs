@@ -133,7 +133,9 @@ namespace PastaGameLibrary
 		public float GenerationInterval
 		{
 			get { return m_generationInterval; }
-			set { m_generationInterval = value; }
+			set { m_generationInterval = value;
+			m_generationTimer = m_generationInterval;
+			}
 		}
 		public ParticleGenerator(MyGame theGame, ParticleSystem system)
 			: base()
@@ -195,7 +197,7 @@ namespace PastaGameLibrary
 			{
 				m_generationTimer -= elapsed;
 				while (m_generationTimer <= 0)
-				{
+				 {
 					m_generationTimer = m_generationInterval + m_generationTimer;
 					Generate();
 				}
