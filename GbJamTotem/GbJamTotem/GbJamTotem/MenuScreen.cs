@@ -164,11 +164,13 @@ namespace GbJamTotem
             //
             if (choice == MenuState.START)
             {
-				//HideMenu();
-				//Game1.CurrentTotem.AddSections(new SectionData(typeof(NormalSection), 0, 0, 30));
-				//Game1.CurrentTotem.AddSections(new SectionData(typeof(MetalSection), 10, 10, 7));
-				//Game1.CurrentTotemt.AddSections(new SectionData(typeof(SpikeSection), 4, 4, 7));
-				//Game1.CurrentTotem.BuildRandom();
+				HideMenu();
+                Program.TheGame.LoadRandomLevel();
+                Game1.SetupNextLevel();	
+
+                canLauchChallenge = false;
+                //Game1.SetupNextLevel();
+                Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f);
 
 				//// Set informations for slides
 				////

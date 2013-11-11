@@ -61,6 +61,10 @@ namespace GbJamTotem
 		List<TotemSection> m_attachedSections = new List<TotemSection>();
 		List<TotemSection> m_detachedSections = new List<TotemSection>();
 
+        List<PowerUp> m_powerUpList = new List<PowerUp>();
+        const float distanceFromTotemCenter = -50;
+        float deltaPosYCorrection = 20;
+
         #region ACCESSORS & MUTATORS
 
         public int TotalAmountOfSections
@@ -130,6 +134,9 @@ namespace GbJamTotem
 			List<TotemSection> sectionsToAdd = new List<TotemSection>();
 			for(int i = lines.Length - 1; i > -1; --i)
 			{
+
+                
+
 				if (lines[i].StartsWith("| |"))
 					sectionsToAdd.Add(new NormalSection(SectionType.Bilateral));
 				if (lines[i].StartsWith("[ |"))
@@ -144,8 +151,21 @@ namespace GbJamTotem
 					sectionsToAdd.Add(new SpikeSection(SectionType.Right));
 				if (lines[i].StartsWith("{ }"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Bilateral));
+
+                if (lines[i].Contains("pD"))
+                {
+                    m_powerUpList.Add(new PowerUp(sectionsToAdd.Count, true));
+                }
+
+                if (lines[i].Contains("pG"))
+                {
+                    m_powerUpList.Add(new PowerUp(sectionsToAdd.Count, false));
+                }
 			}
 			
+
+            Console.WriteLine(m_powerUpList.Count);
+
 			TotemBase totemBase  = new TotemBase();
 			m_allSections.Add(totemBase);
 			m_attachedSections.Add(totemBase);
@@ -184,9 +204,32 @@ namespace GbJamTotem
 				m_allSections[i].Transform.ParentTransform = m_transform;
 				m_allSections[i].PlaceOnTotem(this, above, below);
 			}
+
+            // Place powers up in the world
+            //
+            for (int i = 0; i < m_powerUpList.Count; i++)
+            {
+                // Place power up at posY of totem section
+                //
+                int index = m_powerUpList[i].IndexTotemToPlacePowerUp;
+                m_powerUpList[i].Transform.ParentTransform = m_transform;
+                m_powerUpList[i].Transform.PosY = m_allSections[index].Transform.PosY - deltaPosYCorrection;
+
+                // Place power up at left or right
+                //
+                if (m_powerUpList[i].IsToLeft)
+                {
+                    m_powerUpList[i].Transform.PosX = -distanceFromTotemCenter;
+                }
+                else
+                {
+                    m_powerUpList[i].Transform.PosX = distanceFromTotemCenter;
+                }
+            }
+
 		}
 
-		public void BuildRandom()
+        public void BuildRandom()
 		{
 			TotemBase totemBase = new TotemBase();
 			m_allSections.Add(totemBase);
@@ -237,15 +280,38 @@ namespace GbJamTotem
 			m_detachedSections.Add(section);
 		}
 
-		public override void Update()
+        public void ShowPowerUp()
+        {
+            for (int i = 0; i < m_powerUpList.Count; i++)
+            {
+                m_powerUpList[i].Show();
+            }
+        }
+
+        public void HidePowerUp()
+        {
+            for (int i = 0; i < m_powerUpList.Count; i++)
+            {
+                m_powerUpList[i].Hide();
+            }
+        }
+
+        public override void Update()
 		{
 			for (int i = 0; i < m_allSections.Count; ++i)
 				m_allSections[i].Update();
+
+            for (int i = 0; i < m_powerUpList.Count; ++i)
+                m_powerUpList[i].Update();
+
 		}
-		public override void Draw()
+        public override void Draw()
 		{
 			for (int i = 0; i < m_allSections.Count; ++i)
 				m_allSections[i].Draw();
+
+            for (int i = 0; i < m_powerUpList.Count; ++i)
+                m_powerUpList[i].Draw();
 		}
 	}
 	public abstract class TotemSection : GameObject
@@ -476,17 +542,34 @@ namespace GbJamTotem
 			}
 			else
 			{
-				player.Bounce(toTheLeft);
-                if (Game1.metalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                if (player.IsPoweredUp)
                 {
-                    Game1.metalTotemCollisionSound_Channel2.Play();
+                    Push(player, pushForce);
+                    if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                    {
+                        Game1.normalTotemCollisionSound_Channel2.Play();
+                    }
+                    else
+                    {
+                        Game1.normalTotemCollisionSound_Channel1.Play();
+                    }
+                    player.ComboCount++;
+                    player.IsPoweredUp = false;
                 }
                 else
                 {
-                    Game1.metalTotemCollisionSound_Channel1.Play();
+                    player.Bounce(toTheLeft);
+                    if (Game1.metalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                    {
+                        Game1.metalTotemCollisionSound_Channel2.Play();
+                    }
+                    else
+                    {
+                        Game1.metalTotemCollisionSound_Channel1.Play();
+                    }
+                    player.ComboCount = 0;
+                    //Push(player, pushForce);
                 }
-                player.ComboCount = 0;
-				//Push(player, pushForce);
 			}
 		}
 
@@ -555,8 +638,25 @@ namespace GbJamTotem
 			}
 			else
 			{
-				player.HitSpikes();
-                player.ComboCount = 0; // TODO Utile ici?
+
+                if (player.IsPoweredUp)
+                {
+                    Push(player, pushForce);
+                    if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+                    {
+                        Game1.normalTotemCollisionSound_Channel2.Play();
+                    }
+                    else
+                    {
+                        Game1.normalTotemCollisionSound_Channel1.Play();
+                    }
+                    player.ComboCount++;
+                    player.IsPoweredUp = false;
+                }
+                else
+                {
+                    player.HitSpikes();
+                }
 			}
         }
 
