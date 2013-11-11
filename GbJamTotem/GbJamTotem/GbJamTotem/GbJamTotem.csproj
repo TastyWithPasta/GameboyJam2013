@@ -93,6 +93,7 @@
     <Compile Include="Game1.cs" />
     <Compile Include="Soul.cs" />
     <Compile Include="ScoreBorder.cs" />
+    <Compile Include="Title.cs" />
     <Compile Include="Totem.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -21,6 +21,7 @@ namespace GbJamTotem
         Vector2 positionOnScreen = new Vector2(152, 72);
         Vector2 positionOutOfScreen = new Vector2(168, 72);
         const float durationSlide = 0.25f;
+		bool m_active = false;
 
         SingleActionManager m_actionManager;
 
@@ -71,6 +72,8 @@ namespace GbJamTotem
             if (!onScreen)
                 m_actionManager.StartNew(m_slideOutOfScreen);
 
+			m_active = onScreen;
+
         }
 
         public override void Update()
@@ -78,6 +81,10 @@ namespace GbJamTotem
             // TODO
             // Mettre à jour la tour de totem ainsi que sa hauteur
             //
+			m_actionManager.Update();
+
+			if (!m_active)
+				return;
 
             float ratioPlayerPosition = Game1.player.Transform.PosY / topTotem;
 			float ratioTotemState = Game1.CurrentTotem.Top / topTotem;
@@ -85,7 +92,7 @@ namespace GbJamTotem
             pixelPlayer.Transform.PosY = (ratioPlayerPosition * -m_mapCeiling) + m_mapFloor;
             pixelTotem.Transform.SclY = (ratioTotemState * m_mapCeiling);
 
-            m_actionManager.Update();
+
         }
 
         public override void Draw()

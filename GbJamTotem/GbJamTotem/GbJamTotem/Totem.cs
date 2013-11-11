@@ -118,7 +118,15 @@ namespace GbJamTotem
 		public void BuildFromFile(string filename)
 		{
 			string file = "Content/Levels/" + filename + ".txt";
-			string[] lines = System.IO.File.ReadAllLines(file);
+			string[] lines;
+			try
+			{
+				lines = System.IO.File.ReadAllLines(file);
+			}
+			catch
+			{
+				return;
+			}
 			List<TotemSection> sectionsToAdd = new List<TotemSection>();
 			for(int i = lines.Length - 1; i > -1; --i)
 			{
@@ -137,11 +145,16 @@ namespace GbJamTotem
 				if (lines[i].StartsWith("{ }"))
 					sectionsToAdd.Add(new SpikeSection(SectionType.Bilateral));
 			}
+			
 			TotemBase totemBase  = new TotemBase();
 			m_allSections.Add(totemBase);
 			m_attachedSections.Add(totemBase);
 			m_allSections.AddRange(sectionsToAdd);
 			m_attachedSections.AddRange(sectionsToAdd);
+			TotemTop totemTop = new TotemTop();
+			m_allSections.Add(totemTop);
+			m_attachedSections.Add(totemTop);
+
 
 			//Place the totem sections in the world
 			TotemSection above = null, below = null;
@@ -348,6 +361,29 @@ namespace GbJamTotem
 		{
 			m_sprite.Draw();
             
+		}
+	}
+
+	public class TotemTop : TotemSection
+	{
+		public TotemTop()
+			: base(SectionType.Bilateral)
+		{
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("totem_sprite_1"), m_transform);
+			m_sprite.Origin = TotemSection.spriteOrigin;
+		}
+		public override void OnHit(bool toTheLeft, Player player, float pushForce)
+		{
+			Push(player, pushForce);
+			if (Game1.normalTotemCollisionSound_Channel1.State == SoundState.Playing)
+			{
+				Game1.normalTotemCollisionSound_Channel2.Play();
+			}
+			else
+			{
+				Game1.normalTotemCollisionSound_Channel1.Play();
+			}
+			player.ComboCount++;
 		}
 	}
 

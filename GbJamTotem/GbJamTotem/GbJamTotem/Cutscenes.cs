@@ -54,6 +54,8 @@ namespace GbJamTotem
 		const float ShlingTime = 0.7f;
 		const float ShlingSpin = 4.0f;
 
+
+
 		MoveToTransform m_moveToCrowd;
 		MoveToTransform m_ascendMovement;
 		Sequence m_carryAnimation;
@@ -102,7 +104,6 @@ namespace GbJamTotem
 			m_ascendSound = SoundEffectLibrary.Get("ascend").CreateInstance();
 			m_cloud = new Prop("cloud");
 			m_sword = new Prop("sword");
-			
 
 			m_shlingSprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("shling"), new Transform(m_transform, true));
 
@@ -151,7 +152,7 @@ namespace GbJamTotem
 			MethodAction showPlayer = new MethodAction(delegate()
 			{
 				m_sprite.Transform.PosY -= 1;
-				Game1.player.IsVisible = true;
+				Game1.player.ShowPlayer();
 				isVisible = false;
 				m_cloud.IsVisible = false;
 				m_sword.IsVisible = false;
@@ -189,6 +190,7 @@ namespace GbJamTotem
 
 			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
 			m_physics.Mass = 3.0f;
+			m_physics.GroundLevel = -5;
 			m_jumpFromTotem = new Sequence(1);
 			m_decelerate = new MoveToStaticAction(Program.TheGame, m_transform, Vector2.Zero, 1);
 			m_decelerate.Interpolator = new PSquareInterpolation(0.5f);
@@ -205,7 +207,10 @@ namespace GbJamTotem
 			m_jumpFromTotem.AddAction(new MethodAction(delegate()
 			{
 				Game1.SetupNextRound();
-				Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f);
+				if (Game1.CurrentTotem == null)
+					Cutscenes.GoToCliff();
+				else
+					Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f, 0);
 			}));
 			m_actionManager = new SingleActionManager();
 
@@ -218,7 +223,10 @@ namespace GbJamTotem
 			m_hitSpikes.AddAction(m_moveToCrashingPlayer);
 			m_hitSpikes.AddAction(new DelayAction(Program.TheGame, 0.5f));
 			m_hitSpikes.AddAction(new MethodAction(delegate() { 
-				Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f); 
+				if(Game1.CurrentTotem == null)
+					Cutscenes.GoToCliff();
+				else
+					Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f, 0); 
 				m_sprite.SetFrame(0);
 				m_physics.OnBounce = null;
 				m_physics.Throw(0, -2, 0);
@@ -274,6 +282,8 @@ namespace GbJamTotem
 			m_decelerate.Timer.Interval = 0.5f / Game1.player.SpeedMultiplier;
 			m_actionManager.StartNew(m_jumpFromTotem);
 			isVisible = true;
+			Game1.scoreBorder.Slide(false);
+			Game1.mapBorder.Slide(false);
 		}
 		public void HitSpikes()
 		{
@@ -324,6 +334,10 @@ namespace GbJamTotem
 			Game1.mapBorder.Slide(false);
 			Game1.SetupNextRound();
 		}
+		public void EjectFromCrowd()
+		{
+			m_physics.Throw(2.5f, -3, 0);
+		}
 
 		public void DropFromCrowd(float fx, float fy)
 		{
@@ -355,6 +369,7 @@ namespace GbJamTotem
 
 	public static class Cutscenes
 	{
+		public static Title title;
 		public static Crowd crowd;
 		public static CutscenePlayer cutscenePlayer;
 
@@ -363,19 +378,22 @@ namespace GbJamTotem
 		const float TotemCrowdOffset = -20.0f;
 		const float TimeToTotem = 1.0f;
 
+		//Intro
+		const float MoveInTime = 5.0f;
+
 		//Main Menu
 		const float CameraMenuX = 360;
 		const float CameraMenuY = 30;
 		const float InitialCharacterPosition = 325;
-		const float InitialCrowdPosition = 270;
+		const float InitialCrowdPosition = 265;
 
-		//Intro
+		//MoveToTotem
 		const float CameraDelay = 1.5f;
 		const float TimeToFirstTotem = 2.0f;
 		static MoveToStaticAction moveTo;
 		static MoveToTransform moveToAscendingPlayer;
 		static MoveToStaticAction moveToTotem;
-		static Sequence intro;
+		static Sequence gotoFirstTotem;
 
 		//Ready
 		static MoveToTransform moveToFallingPlayer;
@@ -393,6 +411,8 @@ namespace GbJamTotem
 		static MoveToTransform goToPlayerOnGroundMovement;
 		static Sequence goToPlayerOnGround;
 
+		static Sequence intro;
+
 		public static bool IsReady
 		{
 			get { return actionManager.IsActive; }
@@ -402,7 +422,9 @@ namespace GbJamTotem
 		{
 			cutscenePlayer = new CutscenePlayer();
 			cutscenePlayer.Transform.PosX = -100;
-			crowd = new Crowd(40, 25, new Vector2(2.5f, 0.5f));
+			crowd = new Crowd(40, 18, new Vector2(2.5f, 0.5f));
+
+			title = new Title();
 
 			DelayAction cameraDelay = new DelayAction(Program.TheGame, CameraDelay);
 			moveToTotem = new MoveToStaticAction(Program.TheGame, Game1.GameCamera.Transform, Vector2.Zero, 1);
@@ -411,11 +433,11 @@ namespace GbJamTotem
 			moveToTotem.Timer.Interval = TimeToFirstTotem;
 			MethodAction moveCrowd = new MethodAction(delegate() { 
 				crowd.MoveTo(currentTotemPosition + TotemCrowdOffset, TimeToFirstTotem); });
-			intro = new Sequence(1);
-			intro.AddAction(cameraDelay);
-			intro.AddAction(moveCrowd);
-			intro.AddAction(moveToTotem);
-			intro.AddAction(new MethodAction(delegate() { Cutscenes.ThrowPlayer(Game1.CurrentTotem); }));
+			gotoFirstTotem = new Sequence(1);
+			gotoFirstTotem.AddAction(cameraDelay);
+			gotoFirstTotem.AddAction(moveCrowd);
+			gotoFirstTotem.AddAction(moveToTotem);
+			gotoFirstTotem.AddAction(new MethodAction(delegate() { Cutscenes.ThrowPlayer(Game1.CurrentTotem); }));
 
 			moveToAscendingPlayer = new MoveToTransform(Program.TheGame, Game1.GameCamera.Transform, new Transform(), cutscenePlayer.Transform, 1);
 			moveToAscendingPlayer.Interpolator = new PSquareInterpolation(0.1f);
@@ -442,6 +464,15 @@ namespace GbJamTotem
 			goToPlayerOnGroundMovement.Interpolator = new PSmoothstepInterpolation();
 			goToPlayerOnGround.AddAction(new DelayAction(Program.TheGame, 0.5f));
 			goToPlayerOnGround.AddAction(goToPlayerOnGroundMovement);
+
+			intro = new Sequence(1);
+			MoveToStaticAction moveToMenu = new MoveToStaticAction(Program.TheGame, Game1.GameCamera.Transform, new Vector2(CameraMenuX, CameraMenuY), 1);
+			moveToMenu.Timer.Interval = MoveInTime + 1.0f;
+
+			intro.AddAction(moveToMenu);
+			intro.AddAction(new MethodAction(delegate() { crowd.PushNewGuy(); }));
+			intro.AddAction(new DelayAction(Program.TheGame, 3.0f));
+			intro.AddAction(new MethodAction(delegate() { StartMainMenu(); }));
 		}
 
 		public static void ZoomToStage(int stageNumber)
@@ -452,11 +483,21 @@ namespace GbJamTotem
 			actionManager.StartNew(cameraZoom);
 		}
 
+		public static void Intro()
+		{
+			crowd.Transform.Position = new Vector2(-100, 0);
+			crowd.MoveTo(InitialCrowdPosition, MoveInTime);
+			Game1.GameCamera.Transform.Position = crowd.Transform.Position;
+			actionManager.StartNew(intro);
+		}
+
 		public static void StartMainMenu()
 		{
 			crowd.Transform.Position = new Vector2(InitialCrowdPosition, 0);
 			cutscenePlayer.Transform.Position = new Vector2(InitialCharacterPosition, 0);
 			Game1.GameCamera.Transform.Position = new Vector2(CameraMenuX, CameraMenuY);
+			title.Appear();
+			Game1.menuScreen.ShowMenu();
 		}
 
 		public static void ThrowPlayer(Totem totem)
@@ -483,14 +524,17 @@ namespace GbJamTotem
 			actionManager.StartNew(readySequence);
 		}
 
-		public static void GoToTotem(Totem totem, float time)
+		public static void GoToTotem(Totem totem, float time, int pickupOffset)
 		{
 			moveToTotem.StartPosition = Game1.GameCamera.Transform.Position;
 			moveToTotem.Target = new Vector2(totem.Transform.PosX, CameraHeightOnGround);
 			currentTotemPosition = totem.Transform.PosX;
-			crowd.PickupPlayer(time);
-			actionManager.StartNew(intro);
+			crowd.PickupPlayer(time, pickupOffset);
+			actionManager.StartNew(gotoFirstTotem);
 		}
+		public static void GoToCliff()
+		{ }
+
 		public static void FinishTotem()
 		{
 			Game1.player.FinishTotem();
@@ -506,6 +550,7 @@ namespace GbJamTotem
 			actionManager.Update();
 			crowd.Update();
 			cutscenePlayer.Update();
+			title.Update();
 		}
 	}
 }

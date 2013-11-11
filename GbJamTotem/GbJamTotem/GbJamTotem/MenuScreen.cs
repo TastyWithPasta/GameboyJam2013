@@ -33,8 +33,11 @@ namespace GbJamTotem
 
         MenuState choice;
         public ChallengeState challengeChoice;
+		MoveToStaticAction moveTo, moveOut;
+		SingleActionManager actionManager = new SingleActionManager();
 
-        bool isActive;
+
+        bool isActive, isHidden;
         bool canLauchChallenge;
         int deltaArrowBetweenChallenges = 19;
 
@@ -45,12 +48,23 @@ namespace GbJamTotem
 
         public MenuScreen()
         {
-            isActive = true;
+            isActive = false;
+			isHidden = true;
             canLauchChallenge = false;
 
             m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("menu_start_bg"), m_transform);
             m_sprite.Transform.Position = new Vector2(80, 120);
             arrow = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("arrow"), new Transform(m_transform, true));
+
+			moveTo = new MoveToStaticAction(Program.TheGame, m_transform, new Vector2(80, 120), 1);
+			moveTo.StartPosition = new Vector2(80, 200);
+			moveTo.Interpolator = new PSmoothstepInterpolation();
+			moveTo.Timer.Interval = 0.5f;
+
+			moveOut = new MoveToStaticAction(Program.TheGame, m_transform, new Vector2(80, 200), 1);
+			moveOut.StartPosition = new Vector2(80, 120);
+			moveOut.Interpolator = new PSmoothstepInterpolation();
+			moveOut.Timer.Interval = 0.5f;
 
             choice = MenuState.START;
             challengeChoice = ChallengeState.CHALL_1;
@@ -58,7 +72,6 @@ namespace GbJamTotem
 
         public override void Update()
         {
-
             if (isActive)
             {
                 // Positionning arrow
@@ -125,6 +138,7 @@ namespace GbJamTotem
                 }
 
             }
+			actionManager.Update();
 
         }
 
@@ -141,7 +155,8 @@ namespace GbJamTotem
                     //Game1.mapBorder.setTopTotem();
                     canLauchChallenge = false;
 					Game1.SetupNextLevel();
-					Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f);
+					Cutscenes.GoToTotem(Game1.CurrentTotem, 1.0f, -40);
+					Cutscenes.title.Dissappear();
 					//Cutscenes.GoToTotem(Game1.CurrentTotem, 3.0f);
             }
 
@@ -178,32 +193,33 @@ namespace GbJamTotem
         public void ShowMenu()
         {
             choice = MenuState.START;
-            m_sprite.Transform.Scale = new Vector2(1);
+			actionManager.StartNew(moveTo);
             isActive = true;
+			isHidden = false;
         }
 
         public void HideMenu()
         {
             m_sprite.Transform.Scale = new Vector2(0);
+			actionManager.StartNew(moveOut);
             isActive = false;
+			isHidden = true;
         }
 
         public override void Draw()
         {
+			if (isHidden)
+			return;
 
-            m_sprite.Draw();
-            arrow.Draw();
+			m_sprite.Draw();
+			arrow.Draw();
+			
 
             //Program.TheGame.SpriteBatch.Begin();
 
             //Program.TheGame.SpriteBatch.DrawString(menuText, "Test", new Vector2((int)50, (int)50), Color.Black);
 
-            //Program.TheGame.SpriteBatch.End();
-
-
-            
-
-           
+            //Program.TheGame.SpriteBatch.End()
 
         }
 

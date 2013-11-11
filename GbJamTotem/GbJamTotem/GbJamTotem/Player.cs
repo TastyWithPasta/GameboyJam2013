@@ -103,7 +103,6 @@ namespace GbJamTotem
 		public bool IsVisible
 		{
 			get { return isVisible; }
-			set { isVisible = value; }
 		}
         public bool IsFalling
         {
@@ -295,6 +294,12 @@ namespace GbJamTotem
 			isFalling = false;
 			SpeedMultiplier = 1.0f;
 			ComboCount = 1;
+		}
+
+		public void ShowPlayer()
+		{
+			isVisible = true;
+			m_sprite.SetFrame(0);
 		}
 
 		public void GetReady()

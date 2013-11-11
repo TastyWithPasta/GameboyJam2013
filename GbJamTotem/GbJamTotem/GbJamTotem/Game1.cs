@@ -100,6 +100,7 @@ namespace GbJamTotem
         public static SoundEffectInstance moveRightToLeftSound;
 		public static SoundEffectInstance spikeHitSound;
 		public static SoundEffectInstance groundImpact;
+		public static SoundEffectInstance footsteps;
 
         public static SoundEffectInstance feedback_combo3;
         public static SoundEffectInstance feedback_combo6;
@@ -174,32 +175,41 @@ namespace GbJamTotem
             //
 			m_falaise = new Sprite(this, TextureLibrary.GetSpriteSheet("decors_sol_falaise"), new Transform());
 			m_falaise.Origin = new Vector2(0, 0.32f);
-            m_falaise.Transform.PosX = -60;
-			m_falaise.Transform.PosY = 10;
+            m_falaise.Transform.PosX = -235;
+			m_falaise.Transform.PosY = 8;
 
             // Sound & musics
             //
             normalTotemCollisionSound_Channel1 = SoundEffectLibrary.Get("normal_collision_sound").CreateInstance();
+			normalTotemCollisionSound_Channel1.Volume = 0.6f;
             normalTotemCollisionSound_Channel2 = SoundEffectLibrary.Get("normal_collision_sound").CreateInstance();
+			normalTotemCollisionSound_Channel2.Volume = 0.6f;
             metalTotemCollisionSound_Channel1 = SoundEffectLibrary.Get("metal_collision_sound").CreateInstance();
             metalTotemCollisionSound_Channel2 = SoundEffectLibrary.Get("metal_collision_sound").CreateInstance();
 
             swordSlashSound = SoundEffectLibrary.Get("sword_slash").CreateInstance();
             moveLeftToRightSound = SoundEffectLibrary.Get("move_left_to_right").CreateInstance();
+			moveLeftToRightSound.Volume = 0.6f;
             moveRightToLeftSound = SoundEffectLibrary.Get("move_right_to_left").CreateInstance();
+			moveRightToLeftSound.Volume = 0.6f;
 			spikeHitSound = SoundEffectLibrary.Get("spike_hit").CreateInstance();
 			groundImpact = SoundEffectLibrary.Get("ground_slam").CreateInstance();
+			footsteps = SoundEffectLibrary.Get("footsteps").CreateInstance();
+			footsteps.IsLooped = true;
 
             feedback_combo3 = SoundEffectLibrary.Get("feedback_combo3").CreateInstance();
+			feedback_combo3.Volume = 0.2f;
             feedback_combo6 = SoundEffectLibrary.Get("feedback_combo6").CreateInstance();
+			feedback_combo6.Volume = 0.3f;
             feedback_combo9 = SoundEffectLibrary.Get("feedback_combo9").CreateInstance();
+			feedback_combo9.Volume = 0.4f;
             feedback_comboBreaker = SoundEffectLibrary.Get("feedback_comboBreaker").CreateInstance();
             feedbackLock = true;
             isComboBreakerSoundPossible = false;
 
 			//Foule et joueur porté
 			Cutscenes.Initalise();
-			Cutscenes.StartMainMenu();
+			Cutscenes.Intro();
 			SetupNextLevel();
         }
 
@@ -223,6 +233,8 @@ namespace GbJamTotem
 				CurrentMusic.StopDynamicMusic();
 
 			currentIndex++;
+			if (currentIndex > 2 || CurrentTotem == null)
+				return;
 			player.Initialise(CurrentTotem);
 			startingCountdown.resetCountdown();
 		}
@@ -234,10 +246,18 @@ namespace GbJamTotem
 			totems[0].BuildFromFile(path + "/Level" + index + "_1");
 			totems[1] = new Totem();
 			totems[1].BuildFromFile(path + "/Level" + index + "_2");
-			totems[2] = new Totem();
-			totems[2].BuildFromFile(path + "/Level" + index + "_3");
+			if (index == 0)
+				totems[2] = null;
+			else
+			{
+				totems[2] = new Totem();
+				totems[2].BuildFromFile(path + "/Level" + index + "_3");
+			}
 
-			for (int i = 0; i < 3; ++i)
+			int maxIndex = 3;
+			if (index == 0)
+				maxIndex = 2;
+			for (int i = 0; i < maxIndex; ++i)
 			{
 				SoundEffectInstance musicL1 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L1").CreateInstance();
 				SoundEffectInstance musicL2 = SoundEffectLibrary.Get("music_T" + index + "P" + (i + 1) + "L2").CreateInstance();
@@ -252,7 +272,8 @@ namespace GbJamTotem
 		private void PlaceTotems()
 		{
 			for (int i = 0; i < totems.Length; ++i)
-				totems[i].Transform.PosX = InitialTotemPosition + i * TotemSpacing;
+				if(totems[i] != null)
+					totems[i].Transform.PosX = InitialTotemPosition + i * TotemSpacing;
 		}
 
 		public void Flash(float time)
@@ -344,10 +365,12 @@ namespace GbJamTotem
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
             }
 
+			if (kbs.IsKeyDown(Keys.C) && old_kbs.IsKeyDown(Keys.C))
+				Cutscenes.crowd.PushNewGuy();
+
             startingCountdown.Update();
 
-            if (menuScreen.IsActive)
-                menuScreen.Update();
+             menuScreen.Update();
 
             pauseScreen.Update();
             if (pauseScreen.IsGamePaused) return;
@@ -355,7 +378,8 @@ namespace GbJamTotem
             // Update game if unpaused
             //
             player.Update();
-            CurrentTotem.Update();
+			if(CurrentTotem != null)
+				CurrentTotem.Update();
             scoreBorder.Update();
             mapBorder.Update();
             comboCounter.Update();
@@ -394,7 +418,8 @@ namespace GbJamTotem
             m_falaise.Draw();
 			Cutscenes.crowd.DrawBack();
 			for (int i = 0; i < totems.Length; ++i)
-				totems[i].Draw();
+				if (totems[i] != null)
+					totems[i].Draw();
 			Cutscenes.cutscenePlayer.Draw();
 			Cutscenes.crowd.DrawFront();
 
@@ -410,6 +435,7 @@ namespace GbJamTotem
             startingCountdown.Draw();
             scoreBorder.Draw();
             mapBorder.Draw();
+			Cutscenes.title.Draw();
             SpriteBatch.End();
 
             // Drawing Menu
