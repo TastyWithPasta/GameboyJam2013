@@ -274,6 +274,8 @@ namespace GbJamTotem
 			m_decelerate.Timer.Interval = 0.5f / Game1.player.SpeedMultiplier;
 			m_actionManager.StartNew(m_jumpFromTotem);
 			isVisible = true;
+            Game1.scoreBorder.Slide(false);
+            Game1.mapBorder.Slide(false);
 		}
 		public void HitSpikes()
 		{
