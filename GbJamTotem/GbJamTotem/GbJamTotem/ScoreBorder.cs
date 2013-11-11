@@ -22,6 +22,8 @@ namespace GbJamTotem
         const float durationSlide = 0.25f;
 
         SingleActionManager m_actionManager;
+		bool m_active = false;
+
 
         public int Score
         {
@@ -102,10 +104,15 @@ namespace GbJamTotem
 
             if (!onScreen)
                 m_actionManager.StartNew(m_slideOutOfScreen);
+
+			m_active = onScreen;
         }
 
         public override void Update()
         {
+			if (!m_active)
+				return;
+
             //m_graphicScore.Transform.SclY = ((float)score / ((float)Game1.m_totem.TotalAmountOfSections * (float)Game1.normalTotemValue));
             m_graphicScore.Transform.SclY = (float)score/(float)scoreBarMaxValue;
             m_actionManager.Update();

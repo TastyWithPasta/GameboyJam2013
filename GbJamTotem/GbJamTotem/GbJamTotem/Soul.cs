@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace GbJamTotem
 {
+
 	public class Soul : GameObject, IParticle
 	{
 		const float BaseExplosionDuration = 0.5f;

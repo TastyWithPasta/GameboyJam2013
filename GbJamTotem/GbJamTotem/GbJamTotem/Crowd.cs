@@ -160,6 +160,9 @@ namespace GbJamTotem
 		Sequence m_pickupPlayer;
 		SingleActionManager m_animationManager;
 
+		MoveToStaticAction m_pushNewGuy;
+		bool m_isWalking = false;
+
 		public Transform PlayerCharacterTransform
 		{
 			get { return m_playerCharacterTransform; }
@@ -211,14 +214,21 @@ namespace GbJamTotem
 			//m_pickupPlayer.AddAction(new DelayAction(Program.TheGame, 0.1f));
 			m_pickupPlayer.AddAction(new MethodAction(delegate() { Cutscenes.cutscenePlayer.JumpOnCrowd();}));
 			m_animationManager = new SingleActionManager();
+
+			///
+			/// Pickup player animation
+			///
+			m_pushNewGuy = new MoveToStaticAction(Program.TheGame, m_transform, Vector2.Zero, 1);
+			m_pushNewGuy.Interpolator = new PBounceInterpolation(0.5f);
+			m_pushNewGuy.Timer.Interval = 0.2f;
 		}
 
-		public void PickupPlayer(float time)
+		public void PickupPlayer(float time, int offsetX)
 		{
 			for (int i = 0; i < m_people.Count; ++i)
 				m_people[i].StartWalk();
 			m_moveToMovement.StartPosition = m_transform.Position;
-			m_moveToMovement.Target = Cutscenes.cutscenePlayer.Transform.Position;
+			m_moveToMovement.Target = Cutscenes.cutscenePlayer.Transform.Position + new Vector2(offsetX, 0) ;
 			m_moveToMovement.Timer.Interval = time;
 			m_animationManager.StartNew(m_pickupPlayer);
 		}
@@ -232,8 +242,19 @@ namespace GbJamTotem
 			for (int i = 0; i < m_people.Count; ++i)
 				m_people[i].LaunchPlayer(LaunchTensionTime);
 		}
+		public void PushNewGuy()
+		{
+			m_pushNewGuy.StartPosition = m_transform.Position;
+			m_pushNewGuy.Target = m_transform.Position + new Vector2(20, 0);
+			m_animationManager.StartNew(m_pushNewGuy);
+			Cutscenes.cutscenePlayer.Transform.Position = m_transform.Position + new Vector2(0, -5) ;
+			Cutscenes.cutscenePlayer.EjectFromCrowd();
+			Game1.groundImpact.Play();
+		}
+
 		public void MoveTo(float position, float time)
 		{
+			m_isWalking = true;
 			for (int i = 0; i < m_people.Count; ++i)
 				m_people[i].StartWalk();
 			m_moveToMovement.StartPosition = m_transform.Position;
@@ -281,7 +302,12 @@ namespace GbJamTotem
 			}
 			m_previousPosition = m_transform.Position;
 
-			
+			m_isWalking = m_moveToMovement.IsActive;
+
+			if (m_isWalking)
+				Game1.footsteps.Play();
+			else
+				Game1.footsteps.Stop();
 		}
 
 		public void DrawFront()
