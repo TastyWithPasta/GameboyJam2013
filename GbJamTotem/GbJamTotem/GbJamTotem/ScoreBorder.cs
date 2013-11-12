@@ -70,6 +70,7 @@ namespace GbJamTotem
         public void Initialize()
         {
             scoreBarMaxValue = calculateScoreMax();
+			score = 0;
         }
 
         public int calculateScoreMax()

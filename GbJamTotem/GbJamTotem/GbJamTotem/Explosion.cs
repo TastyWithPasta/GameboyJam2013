@@ -17,6 +17,7 @@ namespace GbJamTotem
 		Player m_playerInstance;
 		//MoveToStaticAction m_moveToPlayer;
 		Sequence m_animation;
+		PhysicsComponent m_physics;
 
         // TODO NOTE
         // Si besoin de créer des particules, il faut un générateur de particules ( ParticleGenerator<ClasseDeParticle> )
@@ -24,41 +25,36 @@ namespace GbJamTotem
          * "J'ai un système de particules statique deans Game1, Il te faut un générateur de particules pour créer des particules"
          */
 
+		static SpriteSheet[] particleTextures = new SpriteSheet[4];
+		public static void InitialiseIndexes()
+		{
+			particleTextures[0] = TextureLibrary.GetSpriteSheet("totem_particle_1");
+			particleTextures[1] = TextureLibrary.GetSpriteSheet("totem_particle_2");
+			particleTextures[2] = TextureLibrary.GetSpriteSheet("totem_particle_3");
+			particleTextures[3] = TextureLibrary.GetSpriteSheet("totem_particle_4");
+		}
+
         public Explosion(Vector2 initialPosition, Player player)
 		{
 			//m_transform.ParentTransform = player.Transform;
 			m_playerInstance = player;
-			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("soul"), m_transform);
-			Vector2 explodePosition;
+			m_transform.Position = player.Transform.PositionGlobal;
+			m_sprite = new Sprite(Program.TheGame, particleTextures[Program.Random.Next(0, 4)], m_transform);
+			m_physics = new PhysicsComponent(Program.TheGame, m_transform);
+			m_physics.Mass = 2 + (float)Program.Random.NextDouble();
+			m_physics.GroundLevel = Program.Random.Next(0, 10);
 
-			/*if (player.IsToLeft)
-				explodePosition.X = Program.Random.Next(-72, -20) + 0.5f;
+			float fx = 1 + (float)Program.Random.NextDouble() * 2;
+			float fy = -1 - (float)Program.Random.NextDouble() * 2;
+			if (player.SpriteTransform.PosX < 0)
+				m_physics.Throw(fx, fy, 1.0f);
 			else
-				explodePosition.X = Program.Random.Next(20, 73) + 0.5f;*/
-
-            explodePosition.X = Program.Random.Next((int)(player.Transform.PosX - ExplosionBreadth), (int)(player.Transform.PosX + ExplosionBreadth));
-            explodePosition.Y = Program.Random.Next((int)(player.Transform.PosY - ExplosionBreadth), (int)(player.Transform.PosY + ExplosionBreadth));
-
-
-            //explodePosition.X = Program.Random.Next((int)player.Transform.PosX + 50, (int)(player.Transform.PosX + 50 + ExplosionBreadth * m_playerInstance.SpeedMultiplier)) + 0.5f;
-			//explodePosition.Y = Program.Random.Next((int)player.Transform.PosY + 50, (int)(player.Transform.PosY + 50 + ExplosionBreadth * m_playerInstance.SpeedMultiplier)) + 0.5f;
-
-			MoveToStaticAction moveToExplosionPoint = new MoveToStaticAction(Program.TheGame, m_transform, explodePosition, 1);
-			moveToExplosionPoint.StartPosition = initialPosition;
-            moveToExplosionPoint.Timer.Interval = BaseExplosionDuration;/// player.SpeedMultiplier;
-			moveToExplosionPoint.Interpolator = new PSmoothstepInterpolation();
-
-            
-			m_animation = new Sequence(1);
-			m_animation.AddAction(moveToExplosionPoint);
-			m_animation.AddAction(new DelayAction(Program.TheGame, (float)(Program.Random.NextDouble() * 0.5f + 0.1f) / m_playerInstance.SpeedMultiplier));
-			//m_animation.AddAction(m_moveToPlayer);
-			m_animation.Start();
+				m_physics.Throw(-fx, fy, 1.0f);
 		}
 
 		public override void Update()
 		{
-			m_animation.Update();
+			m_physics.Update();
 		}
 
 		public override void Draw()
@@ -69,7 +65,7 @@ namespace GbJamTotem
 
 		public bool RemoveMe()
 		{
-			return !m_animation.IsActive;
+			return !m_physics.IsProjected;
 			//return !m_moveToAnimation.IsActive;
 		}
 	}

@@ -74,6 +74,12 @@ namespace PastaGameLibrary
 			get { return m_amountOfParticles; }
 		}
 
+		public void Clear()
+		{
+			for (int i = 0; i < m_particles.Length; ++i)
+				m_particles[i] = null;
+		}
+
 		public ParticleSystem(MyGame theGame, int maxParticles)
 		{
 			m_theGame = theGame;

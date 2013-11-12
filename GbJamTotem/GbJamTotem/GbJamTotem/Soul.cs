@@ -29,7 +29,7 @@ namespace GbJamTotem
 		{
 			//m_transform.ParentTransform = player.Transform;
 			m_playerInstance = player;
-			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("soul_temp"), m_transform);
+			m_sprite = new Sprite(Program.TheGame, TextureLibrary.GetSpriteSheet("soul"), m_transform);
 			Vector2 explodePosition;
 
 			if (player.IsToLeft)

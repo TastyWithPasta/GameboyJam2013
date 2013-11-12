@@ -109,7 +109,7 @@ namespace GbJamTotem
                 else
                 {
                    //m_sprite.Transform.Position = comboPositionLeft;
-                    m_sprite.Origin = new Vector2(0.9f, 0.5f);
+                    m_sprite.Origin = new Vector2(0.95f, 0.5f);
                 }
 
                 m_sprite.Draw();

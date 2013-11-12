@@ -48,6 +48,7 @@ namespace GbJamTotem
                 {
                     this.Hide();
                     Game1.player.IsPoweredUp = true;
+					Game1.feedback_powerUp.Play();
                     isPickedUp = true;
                 }
             }

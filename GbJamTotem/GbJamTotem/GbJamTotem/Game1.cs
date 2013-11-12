@@ -31,6 +31,8 @@ namespace GbJamTotem
         public static ParticleSystem Souls;
         public static ParticleSystem Explosions;
 
+		public static int TotalScore = 0;
+
 		public static Camera2D GameCamera;
 		public static KeyboardState kbs = new KeyboardState();
         public static KeyboardState old_kbs = new KeyboardState();
@@ -42,6 +44,7 @@ namespace GbJamTotem
         public static ScoreBorder scoreBorder;
         public static MapBorder mapBorder;
         public static ComboCounter comboCounter;
+		public static ScoreDisplay scoreDisplay;
         public static int normalTotemValue = 100;
 
 		public static bool isInGameplay = false;
@@ -101,7 +104,9 @@ namespace GbJamTotem
 		public static SoundEffectInstance spikeHitSound;
 		public static SoundEffectInstance groundImpact;
 		public static SoundEffectInstance footsteps;
+		public static SoundEffectInstance successJingle;
 
+		public static SoundEffectInstance feedback_powerUp;
         public static SoundEffectInstance feedback_combo3;
         public static SoundEffectInstance feedback_combo6;
         public static SoundEffectInstance feedback_combo9;
@@ -151,9 +156,10 @@ namespace GbJamTotem
         {
             TextureLibrary.LoadContent(Content, "Textures");
             TextureLibrary.Initialise(GraphicsDevice);
+			Explosion.InitialiseIndexes();
 
             debugText = Content.Load<SpriteFont>("Text/Debug");
-            //menuText = Content.Load<SpriteFont>("Text/Menu");
+            menuText = Content.Load<SpriteFont>("Text/Menu");
 
             SoundEffectLibrary.LoadContent(Content, "SoundEffects");
 
@@ -186,6 +192,7 @@ namespace GbJamTotem
             scoreBorder = new ScoreBorder();
             mapBorder = new MapBorder();
             comboCounter = new ComboCounter(player);
+			scoreDisplay = new ScoreDisplay();
 
             // Background textures
             //
@@ -213,8 +220,10 @@ namespace GbJamTotem
 			footsteps = SoundEffectLibrary.Get("footsteps").CreateInstance();
 			footsteps.IsLooped = true;
 			menuMusic = SoundEffectLibrary.Get("music_menu").CreateInstance();
+			successJingle = SoundEffectLibrary.Get("success_jingle").CreateInstance();
 
-            feedback_combo3 = SoundEffectLibrary.Get("feedback_combo3").CreateInstance();
+			feedback_powerUp = SoundEffectLibrary.Get("feedback_powerup").CreateInstance();
+			feedback_combo3 = SoundEffectLibrary.Get("feedback_combo3").CreateInstance();
 			feedback_combo3.Volume = 0.2f;
             feedback_combo6 = SoundEffectLibrary.Get("feedback_combo6").CreateInstance();
 			feedback_combo6.Volume = 0.3f;
@@ -261,6 +270,8 @@ namespace GbJamTotem
 		public static void SetupNextLevel()
 		{
 			currentIndex = -1;
+			TotalScore = 0;
+			scoreDisplay.Initialise();
 			SetupNextRound();
 		}
 		public static void SetupNextRound()
@@ -278,7 +289,9 @@ namespace GbJamTotem
             if (CurrentTotem != null)
             {
                 CurrentTotem.ShowPowerUp();
-                scoreBorder.Initialize();
+
+				TotalScore += scoreBorder.Score;
+				scoreBorder.Initialize();
                 mapBorder.Initialize();
 
                 player.Initialise(CurrentTotem);
@@ -484,9 +497,6 @@ namespace GbJamTotem
                     GameCamera.Transform.ScaleUniform = GameCamera.Transform.SclX * 0.99f;
             }
 
-			if (kbs.IsKeyDown(Keys.C) && old_kbs.IsKeyDown(Keys.C))
-				Cutscenes.crowd.PushNewGuy();
-
             startingCountdown.Update();
 
              menuScreen.Update();
@@ -560,6 +570,7 @@ namespace GbJamTotem
             startingCountdown.Draw();
             scoreBorder.Draw();
             mapBorder.Draw();
+			scoreDisplay.Draw();
 			Cutscenes.title.Draw();
             SpriteBatch.End();
 
